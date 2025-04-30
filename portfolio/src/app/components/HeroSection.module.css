@@ -1,3 +1,6 @@
+body{
+  background: black;
+}
 .hero {
   min-height: 100vh;
   justify-content: center;
