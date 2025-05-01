@@ -1,20 +1,19 @@
-body{
-  background: black;
-}
 .hero {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  z-index: 2;
   position: relative;
   overflow: hidden;
   perspective: 1000px;
-  background: transparent;
-  display: flex;
-  flex-direction: column;
+  background: #091119;
+  z-index: 2;
 }
 
+
+/* Concentric circles container */
 .circleContainer {
   position: absolute;
   top: 50%;
@@ -26,6 +25,7 @@ body{
   z-index: 1;
 }
 
+/* Concentric circles */
 .circle {
   position: absolute;
   top: 50%;
@@ -82,10 +82,12 @@ body{
 }
 
 .circle:hover {
-  box-shadow: 0 0 80px rgba(41, 141, 238, 1);
+  box-shadow: 0 0 80px rgba(41, 141, 238, 1) !important;
   transition: box-shadow 0.2s ease;
+  cursor: pointer;
 }
 
+/* Hero image */
 .heroImg {
   position: relative;
   top: 20px;
@@ -110,6 +112,7 @@ body{
   100% { filter: drop-shadow(0 0 10px rgba(41, 141, 238, 0.6)); }
 }
 
+/* Hero text */
 .heroText {
   opacity: 0;
   transform: translateY(30px);

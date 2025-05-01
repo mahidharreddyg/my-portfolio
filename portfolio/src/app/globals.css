@@ -120,3 +120,8 @@
     @apply bg-background text-foreground;
   }
 }
+@layer components {
+  .section-transition {
+    transition: background-color 0.5s ease, color 0.5s ease;
+  }
+}

@@ -6,6 +6,7 @@ const HeroSection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
 
+  
   // After-glow effect for circles
   useEffect(() => {
     const circles = containerRef.current?.querySelectorAll(`.${styles.circle}`);
