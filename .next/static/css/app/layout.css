@@ -1341,6 +1341,9 @@ video {
 .border-transparent {
   border-color: transparent;
 }
+.border-red-700\/50 {
+  border-color: rgb(185 28 28 / 0.5);
+}
 .border-l-transparent {
   border-left-color: transparent;
 }
