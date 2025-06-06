@@ -5,13 +5,14 @@ import type React from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 import Image from "next/image"
 import { ChevronDown } from "lucide-react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 
 export default function HeroSection() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [isGlowing, setIsGlowing] = useState(false)
   const { scrollY } = useScroll()
   const heroHeight = 600
+  const imageRef = useRef<HTMLImageElement>(null)
 
   // Transform values for moving elements to navbar
   const profileY = useTransform(scrollY, [0, heroHeight * 0.7], [0, -300])
@@ -29,26 +30,49 @@ export default function HeroSection() {
   const descriptionOpacity = useTransform(scrollY, [0, heroHeight * 0.3], [1, 0])
   const arrowOpacity = useTransform(scrollY, [0, heroHeight * 0.2], [1, 0])
 
-  // Handle mouse movement for 3D tilt effect
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect()
-    const x = (e.clientX - rect.left) / rect.width - 0.5
-    const y = (e.clientY - rect.top) / rect.height - 0.5
-    setMousePosition({ x: x * 30, y: y * 30 })
-  }
+  const roles = [
+    "Full Stack Developer",
+    "UI/UX Designer",
+    "AI/ML Enthusiast",
+  ];
+  const [currentRole, setCurrentRole] = useState(0);
 
-  const handleMouseLeave = () => {
-    setMousePosition({ x: 0, y: 0 })
-  }
+  // Glow state for timed glow
+  const [timedGlow, setTimedGlow] = useState(false);
+  // Glow state for hover
+  const [hovered, setHovered] = useState<number | null>(null);
 
-  // Trigger glow effect after initial animation (exactly like HTML)
   useEffect(() => {
     const timer = setTimeout(() => {
-      setIsGlowing(true)
-      setTimeout(() => setIsGlowing(false), 1000)
-    }, 5000)
-    return () => clearTimeout(timer)
-  }, [])
+      setTimedGlow(true);
+      setTimeout(() => setTimedGlow(false), 1000);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // 3D tilt effect for image
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setMousePosition({ x: x * 30, y: y * 30 });
+    if (imageRef.current) {
+      imageRef.current.style.transform = `translate(-50%, -50%) rotateX(${y * 30}deg) rotateY(${-x * 30}deg)`;
+    }
+  };
+  const handleMouseLeave = () => {
+    setMousePosition({ x: 0, y: 0 });
+    if (imageRef.current) {
+      imageRef.current.style.transform = 'translate(-50%, -50%)';
+    }
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentRole((prev) => (prev + 1) % roles.length);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <section className="h-screen flex flex-col items-center justify-center relative px-4 overflow-hidden">
@@ -81,206 +105,6 @@ export default function HeroSection() {
         />
       ))}
 
-      {/* Circle Container - Exact HTML Implementation */}
-      <div
-        className="circle-container absolute top-1/2 left-1/2 w-[130vmin] h-[130vmin] -translate-x-1/2 -translate-y-1/2 z-10"
-        style={{
-          perspective: "1000px",
-          transformStyle: "preserve-3d",
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          width: "130vmin",
-          height: "130vmin",
-          transform: "translate(-50%, -50%)",
-        }}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-      >
-        {/* Circle 1 - Largest (100%) */}
-        <motion.div
-          className="circle"
-          style={{
-            width: "100%",
-            height: "100%",
-            borderRadius: "50%",
-            background: "radial-gradient(circle, #091119 55%, rgba(255, 255, 255, 0.25) 100%)",
-            border: "0.1px solid rgba(255, 255, 255, 0.12)",
-            boxShadow: isGlowing ? "0 0 60px rgba(41, 141, 238, 0.8)" : "0 0 30px rgba(41, 141, 238, 0.35)",
-            opacity: 0.8,
-            willChange: "box-shadow, opacity",
-            x: "-50%",
-            y: "-50%",
-            scale: 1,
-            rotate: 0,
-          }}
-          initial={{
-            x: "-150%",
-            y: "-100%",
-            scale: 0.8,
-            rotate: 360,
-            opacity: 0,
-          }}
-          animate={{
-            x: "-50%",
-            y: "-50%",
-            scale: 1,
-            rotate: 0,
-            opacity: 1,
-          }}
-          transition={{
-            duration: 5,
-            ease: "easeOut",
-            times: [0, 0.5, 1],
-            scale: [0.8, 1.4, 1],
-            opacity: [0, 0.5, 1],
-          }}
-          whileHover={{
-            boxShadow: "0 0 80px rgba(41, 141, 238, 1)",
-            transition: { duration: 0.2 },
-          }}
-        />
-        {/* Circle 2 - Medium (80%) */}
-        <motion.div
-          className="circle"
-          style={{
-            width: "80%",
-            height: "80%",
-            borderRadius: "50%",
-            background: "radial-gradient(circle, #091119 55%, rgba(255, 255, 255, 0.25) 100%)",
-            border: "0.1px solid rgba(255, 255, 255, 0.12)",
-            boxShadow: isGlowing ? "0 0 60px rgba(41, 141, 238, 0.8)" : "0 0 30px rgba(41, 141, 238, 0.35)",
-            opacity: 0.8,
-            willChange: "box-shadow, opacity",
-            x: "-50%",
-            y: "-50%",
-            scale: 1,
-            rotate: 0,
-          }}
-          initial={{
-            x: "120%",
-            y: "-50%",
-            scale: 0.8,
-            rotate: 360,
-            opacity: 0,
-          }}
-          animate={{
-            x: "-50%",
-            y: "-50%",
-            scale: 1,
-            rotate: 0,
-            opacity: 1,
-          }}
-          transition={{
-            duration: 5,
-            ease: "easeOut",
-            times: [0, 0.5, 1],
-            scale: [0.8, 1.4, 1],
-            opacity: [0, 0.5, 1],
-          }}
-          whileHover={{
-            boxShadow: "0 0 80px rgba(41, 141, 238, 1)",
-            transition: { duration: 0.2 },
-          }}
-        />
-        {/* Circle 3 - Smallest (60%) with Profile Image */}
-        <motion.div
-          className="circle"
-          style={{
-            width: "60%",
-            height: "60%",
-            borderRadius: "50%",
-            background: "radial-gradient(circle, #091119 55%, rgba(255, 255, 255, 0.25) 100%)",
-            border: "0.1px solid rgba(255, 255, 255, 0.12)",
-            boxShadow: isGlowing ? "0 0 60px rgba(41, 141, 238, 0.8)" : "0 0 30px rgba(41, 141, 238, 0.35)",
-            opacity: 0.8,
-            willChange: "box-shadow, opacity",
-            x: "-50%",
-            y: "-50%",
-            scale: 1,
-            rotate: 0,
-          }}
-          initial={{
-            x: "50%",
-            y: "150%",
-            scale: 0.8,
-            rotate: 360,
-            opacity: 0,
-          }}
-          animate={{
-            x: "-50%",
-            y: "-50%",
-            scale: 1,
-            rotate: 0,
-            opacity: 1,
-          }}
-          transition={{
-            duration: 5,
-            ease: "easeOut",
-            times: [0, 0.5, 1],
-            scale: [0.8, 1.4, 1],
-            opacity: [0, 0.5, 1],
-          }}
-          whileHover={{
-            boxShadow: "0 0 80px rgba(41, 141, 238, 1)",
-            transition: { duration: 0.2 },
-          }}
-        >
-          {/* Profile Image with 3D tilt */}
-          <motion.div
-            layoutId="profile-image"
-            className="absolute z-30"
-            style={{
-              top: "50%",
-              left: "50%",
-              width: "32%",
-              height: "32%",
-              y: profileY,
-              scale: profileScale,
-              opacity: profileOpacity,
-              rotateX: mousePosition.y,
-              rotateY: -mousePosition.x,
-              transform: `translate(-50%, -50%) translateY(-15px) rotateX(${mousePosition.y}deg) rotateY(${-mousePosition.x}deg)`,
-              transition: "transform 0.3s ease, filter 0.3s ease",
-              pointerEvents: "none",
-            }}
-            animate={{
-              y: [-15, 15, -15],
-              rotate: [-3, 3, -3],
-            }}
-            transition={{
-              duration: 5,
-              repeat: Number.POSITIVE_INFINITY,
-              ease: "easeInOut",
-            }}
-          >
-            <motion.div
-              className="w-full h-full rounded-full overflow-hidden scale-75"
-              animate={{
-                filter: [
-                  "drop-shadow(0 0 10px rgba(41, 141, 238, 0.6))",
-                  "drop-shadow(0 0 20px rgba(41, 141, 238, 1))",
-                  "drop-shadow(0 0 10px rgba(41, 141, 238, 0.6))",
-                ],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "easeInOut",
-              }}
-            >
-              <Image
-                src="/placeholder.svg?height=128&width=128"
-                alt="Profile"
-                width={128}
-                height={128}
-                className="object-cover w-full h-full"
-              />
-            </motion.div>
-          </motion.div>
-        </motion.div>
-      </div>
-
       {/* Hero Text - Exact timing from HTML */}
       <motion.div
         layoutId="name-title"
@@ -304,38 +128,18 @@ export default function HeroSection() {
         >
           Mahidhar Reddy G
         </motion.h1>
-
-        {/* Animated subtitle with staggered fade-in */}
+        {/* Animated single role with fade/slide effect */}
         <motion.div
-          className="flex flex-col items-center justify-center gap-2 mt-2"
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: {},
-            visible: {
-              transition: {
-                staggerChildren: 0.3,
-              },
-            },
-          }}
+          key={roles[currentRole]}
+          className="mt-2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.6, ease: "easeInOut" }}
         >
-          {[
-            "Full Stack Developer",
-            "UI/UX Designer",
-            "AI/ML Enthusiast",
-          ].map((role, idx) => (
-            <motion.span
-              key={role}
-              className="text-xl md:text-2xl text-gray-300 font-medium bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent"
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0 },
-              }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
-            >
-              {role}
-            </motion.span>
-          ))}
+          <span className="text-xl md:text-2xl font-medium bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+            {roles[currentRole]}
+          </span>
         </motion.div>
       </motion.div>
 
