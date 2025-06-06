@@ -83,7 +83,7 @@ export default function HeroSection() {
 
       {/* Circle Container - Exact HTML Implementation */}
       <div
-        className="absolute top-1/2 left-1/2 w-[130vmin] h-[130vmin] -translate-x-1/2 -translate-y-1/2 z-10"
+        className="circle-container absolute top-1/2 left-1/2 w-[130vmin] h-[130vmin] -translate-x-1/2 -translate-y-1/2 z-10"
         style={{
           perspective: "1000px",
           transformStyle: "preserve-3d",
@@ -99,14 +99,20 @@ export default function HeroSection() {
       >
         {/* Circle 1 - Largest (100%) */}
         <motion.div
-          className="absolute top-1/2 left-1/2 rounded-full border-[0.1px] border-white/12 opacity-80"
+          className="circle"
           style={{
             width: "100%",
             height: "100%",
+            borderRadius: "50%",
             background: "radial-gradient(circle, #091119 55%, rgba(255, 255, 255, 0.25) 100%)",
+            border: "0.1px solid rgba(255, 255, 255, 0.12)",
             boxShadow: isGlowing ? "0 0 60px rgba(41, 141, 238, 0.8)" : "0 0 30px rgba(41, 141, 238, 0.35)",
-            transition: "box-shadow 1.2s cubic-bezier(0.77, 0, 0.175, 1), opacity 1.2s cubic-bezier(0.77, 0, 0.175, 1)",
+            opacity: 0.8,
             willChange: "box-shadow, opacity",
+            x: "-50%",
+            y: "-50%",
+            scale: 1,
+            rotate: 0,
           }}
           initial={{
             x: "-150%",
@@ -134,17 +140,22 @@ export default function HeroSection() {
             transition: { duration: 0.2 },
           }}
         />
-
         {/* Circle 2 - Medium (80%) */}
         <motion.div
-          className="absolute top-1/2 left-1/2 rounded-full border-[0.1px] border-white/12 opacity-80"
+          className="circle"
           style={{
             width: "80%",
             height: "80%",
+            borderRadius: "50%",
             background: "radial-gradient(circle, #091119 55%, rgba(255, 255, 255, 0.25) 100%)",
+            border: "0.1px solid rgba(255, 255, 255, 0.12)",
             boxShadow: isGlowing ? "0 0 60px rgba(41, 141, 238, 0.8)" : "0 0 30px rgba(41, 141, 238, 0.35)",
-            transition: "box-shadow 1.2s cubic-bezier(0.77, 0, 0.175, 1), opacity 1.2s cubic-bezier(0.77, 0, 0.175, 1)",
+            opacity: 0.8,
             willChange: "box-shadow, opacity",
+            x: "-50%",
+            y: "-50%",
+            scale: 1,
+            rotate: 0,
           }}
           initial={{
             x: "120%",
@@ -172,17 +183,22 @@ export default function HeroSection() {
             transition: { duration: 0.2 },
           }}
         />
-
         {/* Circle 3 - Smallest (60%) with Profile Image */}
         <motion.div
-          className="absolute top-1/2 left-1/2 rounded-full border-[0.1px] border-white/12 opacity-80"
+          className="circle"
           style={{
             width: "60%",
             height: "60%",
+            borderRadius: "50%",
             background: "radial-gradient(circle, #091119 55%, rgba(255, 255, 255, 0.25) 100%)",
+            border: "0.1px solid rgba(255, 255, 255, 0.12)",
             boxShadow: isGlowing ? "0 0 60px rgba(41, 141, 238, 0.8)" : "0 0 30px rgba(41, 141, 238, 0.35)",
-            transition: "box-shadow 1.2s cubic-bezier(0.77, 0, 0.175, 1), opacity 1.2s cubic-bezier(0.77, 0, 0.175, 1)",
+            opacity: 0.8,
             willChange: "box-shadow, opacity",
+            x: "-50%",
+            y: "-50%",
+            scale: 1,
+            rotate: 0,
           }}
           initial={{
             x: "50%",
@@ -210,7 +226,7 @@ export default function HeroSection() {
             transition: { duration: 0.2 },
           }}
         >
-          {/* Profile Image with exact HTML animations */}
+          {/* Profile Image with 3D tilt */}
           <motion.div
             layoutId="profile-image"
             className="absolute z-30"
@@ -286,37 +302,40 @@ export default function HeroSection() {
           }}
           transition={{ duration: 0.3 }}
         >
-          Mahidhar
+          Mahidhar Reddy G
         </motion.h1>
 
+        {/* Animated subtitle with staggered fade-in */}
         <motion.div
-          className="flex items-center justify-center gap-4"
-          style={{
-            y: titleY,
-            scale: titleScale,
-            opacity: titleOpacity,
+          className="flex flex-col items-center justify-center gap-2 mt-2"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: {},
+            visible: {
+              transition: {
+                staggerChildren: 0.3,
+              },
+            },
           }}
         >
-          <motion.div
-            className="h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent flex-1 max-w-20"
-            animate={{ scaleX: [0, 1, 0] }}
-            transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-          />
-          <motion.p
-            className="text-xl md:text-2xl text-gray-300 font-medium"
-            whileHover={{
-              color: "#60a5fa",
-              scale: 1.05,
-            }}
-            transition={{ duration: 0.3 }}
-          >
-            Software Developer
-          </motion.p>
-          <motion.div
-            className="h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent flex-1 max-w-20"
-            animate={{ scaleX: [0, 1, 0] }}
-            transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut", delay: 1 }}
-          />
+          {[
+            "Full Stack Developer",
+            "UI/UX Designer",
+            "AI/ML Enthusiast",
+          ].map((role, idx) => (
+            <motion.span
+              key={role}
+              className="text-xl md:text-2xl text-gray-300 font-medium bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent"
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0 },
+              }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+            >
+              {role}
+            </motion.span>
+          ))}
         </motion.div>
       </motion.div>
 
