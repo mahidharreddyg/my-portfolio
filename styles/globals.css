@@ -48,6 +48,7 @@ body {
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -82,9 +83,7 @@ body {
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
@@ -93,18 +92,10 @@ body {
   }
 }
 
+/* Keyframes */
 @keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-.animate-shimmer {
-  background-size: 200% 100%;
-  animation: shimmer 1.5s linear infinite;
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 @keyframes text-glitch {
   0% { text-shadow: 2px 2px #4facfe, -2px -2px #00f2fe; }
@@ -132,55 +123,8 @@ body {
   100% { filter: drop-shadow(0 0 2px #4facfe); }
 }
 @keyframes rotate {
-  from { transform: rotate(0deg);}
-  to { transform: rotate(360deg);}
-}
-
-/* --- Custom Hero Circles CSS (must be last, outside any @layer) --- */
-.circle-container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 130vmin;
-  height: 130vmin;
-  transform: translate(-50%, -50%);
-  transform-style: preserve-3d;
-  z-index: 1;
-}
-.circle {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: radial-gradient(circle, #091119 55%, rgba(255, 255, 255, 0.25) 100%);
-  border: 0.1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 0 30px rgba(41, 141, 238, 0.35);
-  animation: pullIn 5s ease-out forwards;
-  transition: box-shadow 1.2s cubic-bezier(0.77, 0, 0.175, 1), opacity 1.2s cubic-bezier(0.77, 0, 0.175, 1);
-  opacity: 0.8;
-  will-change: box-shadow, opacity;
-}
-.circle.glow {
-  box-shadow: 0 0 60px rgba(41, 141, 238, 0.8);
-}
-.circle:nth-child(1) {
-  width: 100%;
-  height: 100%;
-  --start-x: -150%;
-  --start-y: -100%;
-}
-.circle:nth-child(2) {
-  width: 80%;
-  height: 80%;
-  --start-x: 120%;
-  --start-y: -50%;
-}
-.circle:nth-child(3) {
-  width: 60%;
-  height: 60%;
-  --start-x: 50%;
-  --start-y: 150%;
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 @keyframes pullIn {
   0% {
@@ -206,5 +150,80 @@ body {
   50% { filter: drop-shadow(0 0 20px rgba(41, 141, 238, 1)); }
   100% { filter: drop-shadow(0 0 10px rgba(41, 141, 238, 0.6)); }
 }
-/* --- End Custom Hero Circles CSS --- */
 
+/* Hero Circles */
+.circle-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 130vmin;
+  height: 130vmin;
+  transform: translate(-50%, -50%);
+  transform-style: preserve-3d;
+  z-index: 1;
+}
+.circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, #091119 55%, rgba(255, 255, 255, 0.25) 100%);
+  border: 0.1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 30px rgba(41, 141, 238, 0.35);
+  animation: pullIn 5s ease-out forwards;
+  transition: box-shadow 1.2s cubic-bezier(0.77, 0, 0.175, 1), opacity 1.2s cubic-bezier(0.77, 0, 0.175, 1);
+  opacity: 0.8;
+  will-change: box-shadow, opacity;
+}
+.circle.glow {
+  animation: glow 2.5s ease-in-out infinite;
+}
+.circle:nth-child(1) {
+  width: 100%;
+  height: 100%;
+  --start-x: -150%;
+  --start-y: -100%;
+}
+.circle:nth-child(2) {
+  width: 80%;
+  height: 80%;
+  --start-x: 120%;
+  --start-y: -50%;
+}
+.circle:nth-child(3) {
+  width: 60%;
+  height: 60%;
+  --start-x: 50%;
+  --start-y: 150%;
+}
+
+@layer utilities {
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-float {
+    animation: float 5s ease-in-out infinite;
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 1.5s ease-out forwards;
+  }
+
+  .animate-glow {
+    animation: glow 2.5s ease-in-out infinite;
+  }
+
+  .animate-shimmer {
+    background-size: 200% 100%;
+    animation: shimmer 1.5s linear infinite;
+  }
+}

@@ -58,7 +58,19 @@ export default function Navbar() {
                   <h2 className="text-white font-semibold text-lg bg-gradient-to-r from-white to-gray-300 bg-clip-text">
                     Mahidhar Reddy
                   </h2>
-                  <div className="w-1 h-1 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full" />
+                  {/* <div className="w-1 h-1 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full" /> */}
+                  <motion.div
+                className="w-1 h-1 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full"
+                animate={{
+                  scale: [1, 1.25, 1],
+                  opacity: [0.7, 1, 0.7],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Number.POSITIVE_INFINITY,
+                  ease: "easeInOut",
+                }}
+              />
                   <span className="text-gray-400 text-sm font-medium">
                     Software Developer
                   </span>
