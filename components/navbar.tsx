@@ -41,7 +41,7 @@ export default function Navbar() {
         >
           <div className="max-w-7xl mx-auto">
             <motion.div
-              className="relative bg-black/80 backdrop-blur-xl rounded-full px-6 py-4 flex items-center justify-between border border-gray-800/50 shadow-2xl group transition-all duration-300"
+              className="relative bg-black/80 backdrop-blur-xl rounded-full px-6 py-4 flex items-center justify-between border border-cyan-800/50 shadow-2xl group transition-all duration-300"
             >
               {/* Profile Info */}
               <div className="flex items-center gap-4 relative z-10">
