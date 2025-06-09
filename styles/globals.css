@@ -227,3 +227,18 @@ body {
     animation: shimmer 1.5s linear infinite;
   }
 }
+
+.metallic-cyan-3d {
+  background: linear-gradient(90deg, #00eaff 0%, #3be7ff 50%, #00b3d6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+  /* 3D text-shadow effect */
+  text-shadow:
+    0 2px 4px #0ff,
+    0 4px 8px #0ff,
+    0 8px 16px #0e5c6d,
+    0 16px 32px #0e5c6d;
+  font-weight: bold;
+}

@@ -1,20 +1,15 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react"
-import { motion, useAnimation, AnimationControls, AnimatePresence } from "framer-motion"
+import { motion, useAnimation, AnimatePresence } from "framer-motion"
 import SplitText from "../src/components/TextAnimations/SplitText/SplitText"
 import DecryptedText from "../src/components/TextAnimations/DecryptedText/DecryptedText"
-
-interface CircleConfig {
-  size: string;
-  startX: string;
-  startY: string;
-  delay: number;
-  glowControls: AnimationControls;
-}
-
+import LetsConnectModal from "./letsconnectmodal"
+import Particles from './Particles';
+import Image from "next/image"
+// --- Interactive Background Gradient Animation ---
 function BackgroundGradientAnimation() {
-  const interactiveRef = useRef<HTMLDivElement>(null);
+  const interactiveRef = useRef(null);
   const [curX, setCurX] = useState(0);
   const [curY, setCurY] = useState(0);
   const [tgX, setTgX] = useState(0);
@@ -30,7 +25,7 @@ function BackgroundGradientAnimation() {
     move();
   }, [tgX, tgY, curX, curY]);
 
-  const handleMouseMove = useCallback((event: React.MouseEvent) => {
+  const handleMouseMove = useCallback((event) => {
     if (interactiveRef.current) {
       const rect = interactiveRef.current.getBoundingClientRect();
       setTgX(event.clientX - rect.left);
@@ -85,10 +80,56 @@ function BackgroundGradientAnimation() {
   );
 }
 
+// --- "Let's Connect" Button (now takes onClick prop) ---
+function LetsConnectButton({ onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className="
+        flex items-center gap-2 px-8 py-3 rounded-full
+        bg-white/10 border border-white/20
+        text-white font-semibold text-lg
+        shadow-lg hover:scale-105 hover:shadow-xl
+        transition-all duration-200
+        focus:outline-none
+        backdrop-blur-md
+      "
+      style={{
+        boxShadow: "0 2px 12px 0 rgba(80,80,255,0.12)"
+      }}
+    >
+      Let's Connect
+      <span className="ml-2">
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 22 22"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="inline-block"
+        >
+          <circle cx="11" cy="11" r="10" stroke="white" strokeWidth="2" />
+          <path
+            d="M9 7l4 4-4 4"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
+        </svg>
+      </span>
+    </button>
+  );
+}
+
+// --- Main HeroSection Component ---
 export default function HeroSection() {
   const [allArrivedGlow, setAllArrivedGlow] = useState(false)
   const [showName, setShowName] = useState(false)
-  const circleContainerRef = useRef<HTMLDivElement>(null)
+  const circleContainerRef = useRef(null)
+  const [showConnectModal, setShowConnectModal] = useState(false)
+  const containerRef = useRef(null); // <-- Added for the particles wrapper
 
   const skills = useMemo(() => [
     "Full Stack Developer",
@@ -107,18 +148,18 @@ export default function HeroSection() {
   }, [skills.length, showName])
 
   const textVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: (i: number) => ({
+    hidden: { opacity: 0, y: 30, scale: 0.95 },
+    visible: (i) => ({
       opacity: 1,
       y: 0,
+      scale: 1,
       transition: {
-        delay: i * 0.04,
-        duration: 0.2,
-        ease: "easeOut"
+        delay: i * 0.045,
+        duration: 0.34,
+        ease: [0.16, 1, 0.3, 1]
       }
     })
   }
-
   const cursorVariants = {
     blinking: {
       opacity: [0, 0, 1, 1],
@@ -134,7 +175,7 @@ export default function HeroSection() {
   const glowControls2 = useAnimation()
   const glowControls3 = useAnimation()
 
-  const circleConfigs: CircleConfig[] = [
+  const circleConfigs = [
     {
       size: '130vmin',
       startX: '-150%',
@@ -158,9 +199,9 @@ export default function HeroSection() {
     }
   ]
 
-  const animationDuration = 5 // seconds
+  const animationDuration = 5
 
-  const handleHover = useCallback((controls: AnimationControls) => {
+  const handleHover = useCallback((controls) => {
     if (!allArrivedGlow) {
       controls.start({
         boxShadow: '0 0 80px rgba(41,141,238,1)',
@@ -169,7 +210,7 @@ export default function HeroSection() {
     }
   }, [allArrivedGlow])
 
-  const handleHoverEnd = useCallback((controls: AnimationControls) => {
+  const handleHoverEnd = useCallback((controls) => {
     if (!allArrivedGlow) {
       controls.start({
         boxShadow: '0 0 30px rgba(41,141,238,0.35)',
@@ -203,25 +244,35 @@ export default function HeroSection() {
     return () => clearTimeout(glowTimer)
   }, [glowControls1, glowControls2, glowControls3])
 
-  // Memoize the intro block so it only mounts once
+  // --- Enhanced Animated Name ---
+  const name = "Mahidhar Reddy G".split("");
   const introBlock = useMemo(() => (
     <>
       <div>
         <SplitText
           text="Hello! I'm"
-          className="text-3xl md:text-4xl font-semibold text-cyan-300 mb-2"
+          className="text-3xl md:text-4xl font-semibold mb-2 metallic-cyan-3d"
           splitType="words"
           delay={120}
-          duration={0.6}
+          duration={1}
           ease="power3.out"
         />
       </div>
       <div>
-        <DecryptedText
-          text="Mahidhar Reddy G"
-          interval={40}
-          className="text-5xl md:text-7xl font-extrabold text-white mb-4"
-        />
+        <motion.h1 className="text-5xl md:text-7xl font-extrabold text-white mb-4 flex flex-wrap justify-center gap-1">
+          {name.map((char, i) => (
+            <motion.span
+              key={i}
+              custom={i}
+              initial="hidden"
+              animate="visible"
+              variants={textVariants}
+              style={{ display: "inline-block" }}
+            >
+              {char === " " ? "\u00A0" : char}
+            </motion.span>
+          ))}
+        </motion.h1>
       </div>
     </>
   ), []);
@@ -229,6 +280,45 @@ export default function HeroSection() {
   return (
     <section className="h-screen flex flex-col items-center justify-center relative px-4 overflow-hidden">
       <BackgroundGradientAnimation />
+      <div className="absolute top-5 left-20 z-50">
+    <img src="/MR_logo.png" alt="Logo" width={30} height={80} />
+  </div>
+
+
+      
+
+      {/* --- Particles background, fills the hero section --- */}
+      <div
+        ref={containerRef}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          minHeight: '100%',
+          pointerEvents: 'auto',
+          zIndex: 1,
+          display: 'block',
+        }}
+      >
+        <Particles
+            particleColors={[
+              '#00FFFF', // Bright cyan
+              '#80FFFF', // Light cyan
+              '#1DE9B6', // Turquoise
+              '#7FDBFF', // Sky blue
+              '#3EF8F8', // Mint
+            ]}
+          particleCount={500}
+          particleSpread={15}
+          speed={0.2}
+          particleBaseSize={100}
+          moveParticlesOnHover={true}
+          alphaParticles={false}
+          disableRotation={false}
+        />
+      </div>
 
       {/* Circles Container */}
       <div 
@@ -301,7 +391,7 @@ export default function HeroSection() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.4 }}
-                  className="text-xl md:text-3xl font-mono text-cyan-300"
+                  className="text-xl md:text-3xl font-mono metallic-cyan-3d"
                 >
                   {currentSkill.split("").map((char, index) => (
                     <motion.span
@@ -327,9 +417,16 @@ export default function HeroSection() {
             <motion.p className="text-xl md:text-2xl text-gray-300 mt-6">
               Creating digital experiences that matter
             </motion.p>
+            {/* "Let's Connect" Button */}
+            <div className="mt-8 flex justify-center">
+              <LetsConnectButton onClick={() => setShowConnectModal(true)} />
+            </div>
           </>
         )}
       </motion.div>
+
+      {/* Lets Connect Modal */}
+      <LetsConnectModal open={showConnectModal} onClose={() => setShowConnectModal(false)} />
     </section>
   )
 }

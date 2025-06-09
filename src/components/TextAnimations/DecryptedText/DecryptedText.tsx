@@ -3,7 +3,7 @@ import { motion, HTMLMotionProps } from "framer-motion";
 
 interface DecryptedTextProps extends HTMLMotionProps<"span"> {
   text: string;
-  speed?: number;
+  interval?: number; // <-- Use interval as the prop
   maxIterations?: number;
   sequential?: boolean;
   revealDirection?: "start" | "end" | "center";
@@ -17,7 +17,7 @@ interface DecryptedTextProps extends HTMLMotionProps<"span"> {
 
 export default function DecryptedText({
   text,
-  speed = 50,
+  interval = 50,
   maxIterations = 10,
   sequential = false,
   revealDirection = "start",
@@ -32,14 +32,12 @@ export default function DecryptedText({
   const [displayText, setDisplayText] = useState<string>(text);
   const [isHovering, setIsHovering] = useState<boolean>(false);
   const [isScrambling, setIsScrambling] = useState<boolean>(false);
-  const [revealedIndices, setRevealedIndices] = useState<Set<number>>(
-    new Set(),
-  );
+  const [revealedIndices, setRevealedIndices] = useState<Set<number>>(new Set());
   const [hasAnimated, setHasAnimated] = useState<boolean>(false);
   const containerRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let timer: NodeJS.Timeout;
     let currentIteration = 0;
 
     const getNextIndex = (revealedSet: Set<number>): number => {
@@ -124,7 +122,7 @@ export default function DecryptedText({
 
     if (isHovering) {
       setIsScrambling(true);
-      interval = setInterval(() => {
+      timer = setInterval(() => {
         setRevealedIndices((prevRevealed) => {
           if (sequential) {
             if (prevRevealed.size < text.length) {
@@ -134,7 +132,7 @@ export default function DecryptedText({
               setDisplayText(shuffleText(text, newRevealed));
               return newRevealed;
             } else {
-              clearInterval(interval);
+              clearInterval(timer);
               setIsScrambling(false);
               return prevRevealed;
             }
@@ -142,14 +140,14 @@ export default function DecryptedText({
             setDisplayText(shuffleText(text, prevRevealed));
             currentIteration++;
             if (currentIteration >= maxIterations) {
-              clearInterval(interval);
+              clearInterval(timer);
               setIsScrambling(false);
               setDisplayText(text);
             }
             return prevRevealed;
           }
         });
-      }, speed);
+      }, interval);
     } else {
       setDisplayText(text);
       setRevealedIndices(new Set());
@@ -157,12 +155,12 @@ export default function DecryptedText({
     }
 
     return () => {
-      if (interval) clearInterval(interval);
+      if (timer) clearInterval(timer);
     };
   }, [
     isHovering,
     text,
-    speed,
+    interval,
     maxIterations,
     sequential,
     revealDirection,
@@ -218,12 +216,10 @@ export default function DecryptedText({
       {...props}
     >
       <span className="sr-only">{displayText}</span>
-
       <span aria-hidden="true">
         {displayText.split("").map((char, index) => {
           const isRevealedOrDone =
             revealedIndices.has(index) || !isScrambling || !isHovering;
-
           return (
             <span
               key={index}
