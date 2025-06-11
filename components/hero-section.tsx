@@ -6,7 +6,7 @@ import SplitText from "../src/components/TextAnimations/SplitText/SplitText"
 import DecryptedText from "../src/components/TextAnimations/DecryptedText/DecryptedText"
 import LetsConnectModal from "./letsconnectmodal"
 import Particles from './Particles';
-import Image from "next/image"
+
 // --- Interactive Background Gradient Animation ---
 function BackgroundGradientAnimation() {
   const interactiveRef = useRef(null);
@@ -80,46 +80,157 @@ function BackgroundGradientAnimation() {
   );
 }
 
-// --- "Let's Connect" Button (now takes onClick prop) ---
+// --- Enhanced "Let's Connect" Button with Interactive Effects ---
 function LetsConnectButton({ onClick }) {
+  const [isHovered, setIsHovered] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const buttonRef = useRef(null);
+
+  const handleMouseMove = useCallback((e) => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      setMousePosition({ x, y });
+    }
+  }, []);
+
   return (
-    <button
+    <motion.button
+      ref={buttonRef}
       onClick={onClick}
-      className="
-        flex items-center gap-2 px-8 py-3 rounded-full
-        bg-white/10 border border-white/20
-        text-white font-semibold text-lg
-        shadow-lg hover:scale-105 hover:shadow-xl
-        transition-all duration-200
-        focus:outline-none
-        backdrop-blur-md
-      "
-      style={{
-        boxShadow: "0 2px 12px 0 rgba(80,80,255,0.12)"
-      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onMouseMove={handleMouseMove}
+      className="relative overflow-hidden group"
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 400, damping: 17 }}
     >
-      Let's Connect
-      <span className="ml-2">
-        <svg
-          width="22"
-          height="22"
-          viewBox="0 0 22 22"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="inline-block"
+      {/* Animated Background Gradient */}
+      <motion.div
+        className="absolute inset-0 rounded-full"
+        style={{
+          background: `
+            radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, 
+              rgba(0, 255, 255, 0.15), 
+              rgba(29, 233, 182, 0.1), 
+              transparent 40%
+            )
+          `,
+        }}
+        animate={{
+          opacity: isHovered ? 1 : 0,
+        }}
+        transition={{ duration: 0.3 }}
+      />
+
+      {/* Glass Morphism Base */}
+      <div className="
+        relative flex items-center gap-3 px-8 py-4 rounded-full
+        bg-white/5 border border-white/10
+        text-white font-semibold text-lg
+        backdrop-blur-xl
+        shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]
+        transition-all duration-300
+        group-hover:bg-white/10 group-hover:border-cyan-400/30
+        group-hover:shadow-[0_8px_32px_0_rgba(0,255,255,0.2)]
+      ">
+        {/* Animated Text */}
+        <motion.span
+          className="relative z-10"
+          animate={{
+            color: isHovered ? "#00FFFF" : "#FFFFFF",
+          }}
+          transition={{ duration: 0.3 }}
         >
-          <circle cx="11" cy="11" r="10" stroke="white" strokeWidth="2" />
-          <path
-            d="M9 7l4 4-4 4"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+          Let's Connect
+        </motion.span>
+
+        {/* Enhanced Arrow Icon with Rotation */}
+        <motion.div
+          className="relative z-10"
+          animate={{
+            rotate: isHovered ? 45 : 0,
+            scale: isHovered ? 1.1 : 1,
+          }}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
             fill="none"
-          />
-        </svg>
-      </span>
-    </button>
+            xmlns="http://www.w3.org/2000/svg"
+            className="transition-colors duration-300"
+          >
+            <motion.circle
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="2"
+              fill="none"
+              animate={{
+                stroke: isHovered ? "#00FFFF" : "#FFFFFF",
+              }}
+              transition={{ duration: 0.3 }}
+            />
+            <motion.path
+              d="M8 12l4 4 4-4"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fill="none"
+              animate={{
+                stroke: isHovered ? "#00FFFF" : "#FFFFFF",
+                d: isHovered ? "M8 12l4-4 4 4" : "M8 12l4 4 4-4",
+              }}
+              transition={{ duration: 0.3 }}
+            />
+          </svg>
+        </motion.div>
+
+        {/* Shimmer Effect */}
+        <motion.div
+          className="absolute inset-0 rounded-full"
+          style={{
+            background: `
+              linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(0, 255, 255, 0.1) 50%,
+                transparent 70%
+              )
+            `,
+            transform: "translateX(-100%)",
+          }}
+          animate={{
+            transform: isHovered ? "translateX(100%)" : "translateX(-100%)",
+          }}
+          transition={{
+            duration: 0.6,
+            ease: "easeInOut",
+            repeat: isHovered ? Infinity : 0,
+            repeatDelay: 1,
+          }}
+        />
+      </div>
+
+      {/* Outer Glow Ring */}
+      <motion.div
+        className="absolute inset-0 rounded-full border border-cyan-400/20"
+        animate={{
+          scale: isHovered ? 1.1 : 1,
+          opacity: isHovered ? 1 : 0,
+        }}
+        transition={{ duration: 0.3 }}
+        style={{
+          boxShadow: "0 0 20px rgba(0, 255, 255, 0.3)",
+        }}
+      />
+    </motion.button>
   );
 }
 
@@ -129,7 +240,7 @@ export default function HeroSection() {
   const [showName, setShowName] = useState(false)
   const circleContainerRef = useRef(null)
   const [showConnectModal, setShowConnectModal] = useState(false)
-  const containerRef = useRef(null); // <-- Added for the particles wrapper
+  const containerRef = useRef(null);
 
   const skills = useMemo(() => [
     "Full Stack Developer",
@@ -277,32 +388,36 @@ export default function HeroSection() {
     </>
   ), []);
 
+  // Handle modal close when clicking on backdrop
+  const handleModalClose = useCallback(() => {
+    setShowConnectModal(false);
+  }, []);
+
+  // Handle modal open
+  const handleModalOpen = useCallback(() => {
+    setShowConnectModal(true);
+  }, []);
+
   return (
-    <section className="h-screen flex flex-col items-center justify-center relative px-4 overflow-hidden">
-      <BackgroundGradientAnimation />
-      <div className="absolute top-5 left-20 z-50">
-    <img src="/MR_logo.png" alt="Logo" width={30} height={80} />
-  </div>
+    <>
+      <section className="h-screen flex flex-col items-center justify-center relative px-4 overflow-hidden">
+        <BackgroundGradientAnimation />
 
-
-      
-
-      {/* --- Particles background, fills the hero section --- */}
-      <div
-        ref={containerRef}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          minHeight: '100%',
-          pointerEvents: 'auto',
-          zIndex: 1,
-          display: 'block',
-        }}
-      >
-        <Particles
+        {/* --- Particles background with cyan colors and hover interaction --- */}
+        <div
+          ref={containerRef}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            minHeight: '100%',
+            zIndex: 1,
+            display: 'block',
+          }}
+        >
+          <Particles
             particleColors={[
               '#00FFFF', // Bright cyan
               '#80FFFF', // Light cyan
@@ -310,123 +425,194 @@ export default function HeroSection() {
               '#7FDBFF', // Sky blue
               '#3EF8F8', // Mint
             ]}
-          particleCount={500}
-          particleSpread={15}
-          speed={0.2}
-          particleBaseSize={100}
-          moveParticlesOnHover={true}
-          alphaParticles={false}
-          disableRotation={false}
-        />
-      </div>
+            particleCount={200}
+            particleSpread={10}
+            speed={0.1}
+            particleBaseSize={100}
+            moveParticlesOnHover={true}
+            alphaParticles={false}
+            disableRotation={false}
+          />
+        </div>
 
-      {/* Circles Container */}
-      <div 
-        className="absolute top-1/2 left-1/2 w-[130vmin] h-[130vmin] -translate-x-1/2 -translate-y-1/2 z-10"
-        ref={circleContainerRef}
-        style={{ perspective: '1000px', transformStyle: 'preserve-3d' }}
-      >
-        {circleConfigs.map((config, index) => (
-          <motion.div
-            key={index}
-            className="absolute top-1/2 left-1/2 rounded-full"
-            style={{
-              width: config.size,
-              height: config.size,
-              background: 'radial-gradient(circle, #091119 55%, rgba(255, 255, 255, 0.25) 100%)',
-              border: '0.1px solid rgba(255, 255, 255, 0.12)',
-              boxShadow: '0 0 30px rgba(41, 141, 238, 0.35)'
-            }}
-            initial={{
-              x: config.startX,
-              y: config.startY,
-              scale: 0.8,
-              rotate: 360,
-              opacity: 0
-            }}
-            animate={{
-              x: [config.startX, "0%", "-50%"],
-              y: [config.startY, "0%", "-50%"],
-              scale: [0.8, 1.4, 1],
-              rotate: [360, 180, 0],
-              opacity: [0, 0.5, 0.8],
-              transition: {
-                duration: animationDuration,
-                delay: config.delay,
-                times: [0, 0.5, 1],
-                ease: "easeOut"
-              }
-            }}
-            onHoverStart={() => handleHover(config.glowControls)}
-            onHoverEnd={() => handleHoverEnd(config.glowControls)}
-          >
+        {/* Circles Container */}
+        <div 
+          className="absolute top-1/2 left-1/2 w-[130vmin] h-[130vmin] -translate-x-1/2 -translate-y-1/2 z-10"
+          ref={circleContainerRef}
+          style={{ perspective: '1000px', transformStyle: 'preserve-3d' }}
+        >
+          {circleConfigs.map((config, index) => (
             <motion.div
-              className="absolute inset-0 rounded-full pointer-events-none"
-              animate={config.glowControls}
+              key={index}
+              className="absolute top-1/2 left-1/2 rounded-full"
               style={{
-                boxShadow: '0 0 30px rgba(41,141,238,0.35)'
+                width: config.size,
+                height: config.size,
+                background: 'radial-gradient(circle, #091119 55%, rgba(255, 255, 255, 0.25) 100%)',
+                border: '0.1px solid rgba(255, 255, 255, 0.12)',
+                boxShadow: '0 0 30px rgba(41, 141, 238, 0.35)'
               }}
-            />
-          </motion.div>
-        ))}
-      </div>
+              initial={{
+                x: config.startX,
+                y: config.startY,
+                scale: 0.8,
+                rotate: 360,
+                opacity: 0
+              }}
+              animate={{
+                x: [config.startX, "0%", "-50%"],
+                y: [config.startY, "0%", "-50%"],
+                scale: [0.8, 1.4, 1],
+                rotate: [360, 180, 0],
+                opacity: [0, 0.5, 0.8],
+                transition: {
+                  duration: animationDuration,
+                  delay: config.delay,
+                  times: [0, 0.5, 1],
+                  ease: "easeOut"
+                }
+              }}
+              onHoverStart={() => handleHover(config.glowControls)}
+              onHoverEnd={() => handleHoverEnd(config.glowControls)}
+            >
+              <motion.div
+                className="absolute inset-0 rounded-full pointer-events-none"
+                animate={config.glowControls}
+                style={{
+                  boxShadow: '0 0 30px rgba(41,141,238,0.35)'
+                }}
+              />
+            </motion.div>
+          ))}
+        </div>
 
-      {/* Hero text content with animated intro and name */}
-      <motion.div
-        className="text-center space-y-4 relative z-20"
-        initial={{ opacity: 0, y: 0 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.5, delay: 2 }}
-      >
-        {showName && introBlock}
+        {/* Hero text content with animated intro and name */}
+        <motion.div
+          className="text-center space-y-4 relative z-20"
+          initial={{ opacity: 0, y: 0 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.5, delay: 2 }}
+        >
+          {showName && introBlock}
 
-        {/* Skills and tagline only after showName */}
-        {showName && (
-          <>
-            <div className="min-h-[60px] md:min-h-[80px]">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentSkillIndex}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.4 }}
-                  className="text-xl md:text-3xl font-mono metallic-cyan-3d"
-                >
-                  {currentSkill.split("").map((char, index) => (
-                    <motion.span
-                      key={index}
-                      custom={index}
-                      initial="hidden"
-                      animate="visible"
-                      variants={textVariants}
-                    >
-                      {char}
-                    </motion.span>
-                  ))}
-                  <motion.span
-                    variants={cursorVariants}
-                    animate="blinking"
-                    className="ml-1"
+          {/* Skills and tagline only after showName */}
+          {showName && (
+            <>
+              <div className="min-h-[60px] md:min-h-[80px]">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentSkillIndex}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.4 }}
+                    className="text-xl md:text-3xl font-mono metallic-cyan-3d"
                   >
-                    |
-                  </motion.span>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-            <motion.p className="text-xl md:text-2xl text-gray-300 mt-6">
-              Creating digital experiences that matter
-            </motion.p>
-            {/* "Let's Connect" Button */}
-            <div className="mt-8 flex justify-center">
-              <LetsConnectButton onClick={() => setShowConnectModal(true)} />
-            </div>
-          </>
-        )}
-      </motion.div>
+                    {currentSkill.split("").map((char, index) => (
+                      <motion.span
+                        key={index}
+                        custom={index}
+                        initial="hidden"
+                        animate="visible"
+                        variants={textVariants}
+                      >
+                        {char}
+                      </motion.span>
+                    ))}
+                    <motion.span
+                      variants={cursorVariants}
+                      animate="blinking"
+                      className="ml-1"
+                    >
+                      |
+                    </motion.span>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+              <motion.p className="text-xl md:text-2xl text-gray-300 mt-6">
+                Creating digital experiences that matter
+              </motion.p>
+              {/* Enhanced "Let's Connect" Button */}
+              <div className="mt-8 flex justify-center">
+                <LetsConnectButton onClick={handleModalOpen} />
+              </div>
+            </>
+          )}
+        </motion.div>
+      </section>
 
-      {/* Lets Connect Modal */}
-      <LetsConnectModal open={showConnectModal} onClose={() => setShowConnectModal(false)} />
-    </section>
+      {/* Enhanced Modal Opening with Smooth Blur Effect */}
+      <AnimatePresence mode="wait">
+        {showConnectModal && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ 
+              duration: 0.5,
+              ease: [0.4, 0.0, 0.2, 1]
+            }}
+          >
+            {/* Enhanced Blurred Background Overlay */}
+            <motion.div
+              className="absolute inset-0 bg-black/50"
+              initial={{ 
+                backdropFilter: "blur(0px)",
+                backgroundColor: "rgba(0, 0, 0, 0)"
+              }}
+              animate={{ 
+                backdropFilter: "blur(16px)",
+                backgroundColor: "rgba(0, 0, 0, 0.5)"
+              }}
+              exit={{ 
+                backdropFilter: "blur(0px)",
+                backgroundColor: "rgba(0, 0, 0, 0)"
+              }}
+              transition={{ 
+                duration: 0.6,
+                ease: [0.25, 0.46, 0.45, 0.94]
+              }}
+              onClick={handleModalClose}
+              style={{ cursor: 'pointer' }}
+            />
+            
+            {/* Modal Wrapper with Smooth Scale Animation */}
+            <motion.div
+              className="relative z-10"
+              initial={{ 
+                scale: 0.7, 
+                opacity: 0,
+                y: 60
+              }}
+              animate={{ 
+                scale: 1, 
+                opacity: 1,
+                y: 0
+              }}
+              exit={{ 
+                scale: 0.85, 
+                opacity: 0,
+                y: 20
+              }}
+              transition={{ 
+                type: "spring",
+                stiffness: 300,
+                damping: 30,
+                mass: 0.8,
+                delay: 0.1
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Keep the LetsConnectModal unchanged */}
+              <LetsConnectModal 
+                open={showConnectModal} 
+                onClose={handleModalClose} 
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   )
 }
