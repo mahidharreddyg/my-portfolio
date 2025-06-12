@@ -41,7 +41,7 @@ export default function Navbar() {
         >
           <div className="max-w-7xl mx-auto">
             <motion.div
-              className="relative bg-black/80 backdrop-blur-xl rounded-full px-6 py-4 flex items-center justify-between border border-gray-800/50 shadow-2xl group transition-all duration-300"
+              className="relative bg-black/80 backdrop-blur-xl rounded-full px-6 py-4 flex items-center justify-between border border-cyan-800/50 shadow-2xl group transition-all duration-300"
             >
               {/* Profile Info */}
               <div className="flex items-center gap-4 relative z-10">
@@ -58,7 +58,30 @@ export default function Navbar() {
                   <h2 className="text-white font-semibold text-lg bg-gradient-to-r from-white to-gray-300 bg-clip-text">
                     Mahidhar Reddy
                   </h2>
-                  <div className="w-1 h-1 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full" />
+                  {/* Perplexity-style dot */}
+                  <motion.div
+                    className="relative flex items-center justify-center"
+                    animate={{
+                      scale: [1, 1.15, 1],
+                      opacity: [0.85, 1, 0.85],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    {/* Glowing outer ring */}
+                    <span
+                      className="absolute w-3.5 h-3.5 rounded-full"
+                      style={{
+                        background: "radial-gradient(circle, rgba(0,212,255,0.35) 60%, transparent 100%)",
+                        filter: "blur(2px)",
+                      }}
+                    />
+                    {/* Solid center dot */}
+                    <span className="relative w-2 h-2 bg-cyan-400 rounded-full border-2 border-cyan-300" />
+                  </motion.div>
                   <span className="text-gray-400 text-sm font-medium">
                     Software Developer
                   </span>
