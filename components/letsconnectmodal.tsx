@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState as useStateTransition, useTransition } from "react";
+import { QRCodeSVG } from 'qrcode.react';
 
 const socials = [
   {
@@ -55,7 +56,32 @@ const socials = [
   }
 ];
 
-// Animation variants for different slide directions
+// Copy to clipboard utility
+const useCopyToClipboard = () => {
+  const [copiedText, setCopiedText] = useState(null);
+  
+  const copy = async (text) => {
+    if (!navigator?.clipboard) {
+      console.warn('Clipboard not supported');
+      return false;
+    }
+    
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedText(text);
+      setTimeout(() => setCopiedText(null), 2000);
+      return true;
+    } catch (error) {
+      console.warn('Copy failed', error);
+      setCopiedText(null);
+      return false;
+    }
+  };
+  
+  return [copiedText, copy];
+};
+
+// Animation variants
 const modalVariants = {
   slideUp: {
     initial: { y: "100%" },
@@ -73,9 +99,15 @@ interface LetsConnectModalProps {
   isOpen: boolean;
   onClose: () => void;
   slideDirection?: "up" | "down";
+  websiteUrl?: string;
 }
 
-export default function LetsConnectModal({ isOpen, onClose, slideDirection = "up" }: LetsConnectModalProps) {
+export default function LetsConnectModal({ 
+  isOpen, 
+  onClose, 
+  slideDirection = "up",
+  websiteUrl = "https://yourwebsite.com"
+}: LetsConnectModalProps) {
   const [tab, setTab] = useState<string>("quick");
   const [form, setForm] = useState<{ name: string; email: string; message: string }>({ 
     name: "", 
@@ -83,11 +115,38 @@ export default function LetsConnectModal({ isOpen, onClose, slideDirection = "up
     message: "" 
   });
   const [isPending, startTransition] = useTransition();
-
+  const [copiedText, copyToClipboard] = useCopyToClipboard();
+  
+  // State to control share view within the same panel
+  const [showShareView, setShowShareView] = useState(false);
+  
   const MODAL_CONTENT_HEIGHT = 560;
-
-  // Choose animation variant based on slideDirection prop
   const currentVariant = slideDirection === "down" ? modalVariants.slideDown : modalVariants.slideUp;
+
+  // Ref for QR container for 3D rotation effect
+  const qrContainerRef = useRef<HTMLDivElement>(null);
+
+  // 3D Rotation effect handlers
+  const handleQRMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!qrContainerRef.current) return;
+    
+    const rect = qrContainerRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const rotateX = ((y - centerY) / centerY) * 15;
+    const rotateY = ((x - centerX) / centerX) * 15;
+
+    qrContainerRef.current.style.transform = `rotateX(${-rotateX}deg) rotateY(${rotateY}deg)`;
+  };
+
+  const handleQRMouseLeave = () => {
+    if (!qrContainerRef.current) return;
+    qrContainerRef.current.style.transform = 'rotateX(0deg) rotateY(0deg)';
+  };
 
   // Handle blur effect when modal opens/closes
   useEffect(() => {
@@ -117,7 +176,8 @@ export default function LetsConnectModal({ isOpen, onClose, slideDirection = "up
 
   const handleTabChange = (newTab: string) => {
     if (newTab === tab) return;
-
+    // Reset share view when switching tabs
+    setShowShareView(false);
     startTransition(() => {
       setTab(newTab);
     });
@@ -127,6 +187,33 @@ export default function LetsConnectModal({ isOpen, onClose, slideDirection = "up
     if (e.target === e.currentTarget) {
       onClose();
     }
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Check out my website!',
+          text: 'Visit my website to learn more about me and my work.',
+          url: websiteUrl,
+        });
+      } catch (error) {
+        console.log('Error sharing:', error);
+        copyToClipboard(websiteUrl);
+      }
+    } else {
+      copyToClipboard(websiteUrl);
+    }
+  };
+
+  // Handle Share Card Click - Toggle share view in same panel
+  const handleShareCardClick = () => {
+    setShowShareView(true);
+  };
+
+  // Handle Back Button Click
+  const handleBackClick = () => {
+    setShowShareView(false);
   };
 
   if (!isOpen) return null;
@@ -149,7 +236,7 @@ export default function LetsConnectModal({ isOpen, onClose, slideDirection = "up
             onClick={handleBackdropClick}
           />
 
-          {/* Modal with configurable slide animation */}
+          {/* Modal */}
           <motion.div
             className={`fixed z-[10000] flex flex-col mx-auto w-full max-w-xl px-6 pb-6 sm:px-8 border border-white/10 shadow-2xl bg-black/60 backdrop-blur-xl ring-1 ring-white/10 ${
               slideDirection === "down" 
@@ -178,6 +265,7 @@ export default function LetsConnectModal({ isOpen, onClose, slideDirection = "up
           >
             <div className="mx-auto mt-6 mb-6 h-3 w-32 rounded-full bg-gray-300 shadow-lg border border-gray-200" />
 
+            {/* Social Icons */}
             <div className="flex mt-2 mb-6 justify-center gap-6">
               {socials.map((social, index: number) => (
                 <a
@@ -197,19 +285,16 @@ export default function LetsConnectModal({ isOpen, onClose, slideDirection = "up
                         background: `radial-gradient(circle, ${social.color}20 0%, transparent 70%)`
                       }}
                     />
-
                     <div className="social-icon-main">
                       <span className="sr-only">{social.name}</span>
                       {social.icon}
                     </div>
-
                     <div
                       className="social-icon-ripple"
                       style={{
                         borderColor: social.color
                       }}
                     />
-
                     <div className="social-icon-tooltip">
                       {social.name}
                     </div>
@@ -219,6 +304,7 @@ export default function LetsConnectModal({ isOpen, onClose, slideDirection = "up
             </div>
 
             <div className="flex flex-col gap-2 w-full">
+              {/* Tab Switcher */}
               <div className="h-12 items-center justify-center rounded-xl p-[3px] grid w-full grid-cols-2 bg-white/10 backdrop-blur-sm mb-6 relative overflow-hidden">
                 <div
                   className="absolute inset-y-[3px] rounded-lg bg-black/40 shadow will-change-transform"
@@ -244,22 +330,8 @@ export default function LetsConnectModal({ isOpen, onClose, slideDirection = "up
                       ? "text-white"
                       : "text-neutral-300"
                     }`}
-                  style={{
-                    transform: isPending
-                      ? (tab === "quick" ? 'scale(1.03) translateY(-0.5px)' : 'scale(0.97) translateY(0.5px)')
-                      : 'scale(1) translateY(0px)',
-                    filter: isPending ? 'brightness(0.9)' : 'brightness(1)'
-                  }}
                 >
-                  <span
-                    style={{
-                      transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                      transform: isPending ? 'translateY(-0.5px) scale(0.98)' : 'translateY(0px) scale(1)',
-                      opacity: isPending ? 0.8 : 1
-                    }}
-                  >
-                    Quick connect
-                  </span>
+                  <span>Quick connect</span>
                 </button>
                 <button
                   type="button"
@@ -268,25 +340,12 @@ export default function LetsConnectModal({ isOpen, onClose, slideDirection = "up
                       ? "text-white"
                       : "text-neutral-300"
                     }`}
-                  style={{
-                    transform: isPending
-                      ? (tab === "form" ? 'scale(1.03) translateY(-0.5px)' : 'scale(0.97) translateY(0.5px)')
-                      : 'scale(1) translateY(0px)',
-                    filter: isPending ? 'brightness(0.9)' : 'brightness(1)'
-                  }}
                 >
-                  <span
-                    style={{
-                      transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                      transform: isPending ? 'translateY(-0.5px) scale(0.98)' : 'translateY(0px) scale(1)',
-                      opacity: isPending ? 0.8 : 1
-                    }}
-                  >
-                    Fill a form
-                  </span>
+                  <span>Fill a form</span>
                 </button>
               </div>
 
+              {/* Tab Content */}
               <div className="flex-1 outline-none flex flex-col justify-between relative overflow-hidden" style={{ minHeight: MODAL_CONTENT_HEIGHT - 160 }}>
                 <div
                   className="will-change-transform"
@@ -297,12 +356,9 @@ export default function LetsConnectModal({ isOpen, onClose, slideDirection = "up
                     filter: isPending ? 'blur(0.5px)' : 'blur(0px)'
                   }}
                 >
+                  {/* Form Tab Content */}
                   {tab === "form" && (
-                    <div
-                      style={{
-                        animation: !isPending ? 'fadeInUp 0.5s ease-out' : 'none'
-                      }}
-                    >
+                    <div style={{ animation: !isPending ? 'fadeInUp 0.5s ease-out' : 'none' }}>
                       <form className="flex flex-col flex-1 h-full">
                         <div className="flex gap-6 mb-5">
                           <div className="flex-1" style={{ animation: !isPending ? 'fadeInUp 0.5s ease-out 0.1s both' : 'none' }}>
@@ -377,6 +433,7 @@ export default function LetsConnectModal({ isOpen, onClose, slideDirection = "up
                     </div>
                   )}
 
+                  {/* Quick Connect Tab Content */}
                   {tab === "quick" && (
                     <div
                       className="flex flex-col h-full"
@@ -384,156 +441,311 @@ export default function LetsConnectModal({ isOpen, onClose, slideDirection = "up
                         animation: !isPending ? 'fadeInUp 0.5s ease-out' : 'none'
                       }}
                     >
-                      <div className="mb-4 sm:mb-6"></div>
-                      
-                      <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2 mb-3 sm:mb-4">
-                        <a
-                          className="group contact-card block overflow-hidden rounded-lg border border-white/10 bg-black/30 shadow-sm transition-all duration-500 hover:border-blue-500/40 hover:shadow-lg hover:shadow-blue-900/20 relative"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label="Email"
-                          href="mailto:mahidhar.reddy2003@gmail.com"
-                          style={{ 
-                            animation: !isPending ? 'fadeInUp 0.5s ease-out 0.1s both' : 'none',
-                            minHeight: '100px'
-                          }}
-                        >
-                          <div className="contact-glow absolute inset-0 opacity-0 transition-all duration-500 group-hover:opacity-100" />
-                          <div className="contact-shimmer absolute inset-0 opacity-0 group-hover:opacity-100" />
+                      {/* Conditional rendering: Show either cards or share view */}
+                      {!showShareView ? (
+                        <>
+                          <div className="mb-4 sm:mb-6"></div>
+                          
+                          <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2 mb-3 sm:mb-4">
+                            {/* Email Card */}
+                            <a
+                              className="group contact-card block overflow-hidden rounded-lg border border-white/10 bg-black/30 shadow-sm transition-all duration-500 hover:border-blue-500/40 hover:shadow-lg hover:shadow-blue-900/20 relative"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              aria-label="Email"
+                              href="mailto:mahidhar.reddy2003@gmail.com"
+                              style={{ 
+                                animation: !isPending ? 'fadeInUp 0.5s ease-out 0.1s both' : 'none',
+                                minHeight: '100px'
+                              }}
+                            >
+                              <div className="contact-glow absolute inset-0 opacity-0 transition-all duration-500 group-hover:opacity-100" />
+                              <div className="contact-shimmer absolute inset-0 opacity-0 group-hover:opacity-100" />
 
-                          <div className="flex gap-x-3 border-b border-white/10 bg-gradient-to-r from-blue-900/40 to-black/50 p-3 sm:p-4 relative z-10 group-hover:from-blue-800/60 group-hover:to-blue-900/30 transition-all duration-500">
-                            <div className="flex items-center gap-2">
-                              <div className="contact-icon-container">
-                                <svg
-                                  width="16"
-                                  height="16"
-                                  className="sm:w-[18px] sm:h-[18px] contact-icon text-blue-400 group-hover:text-blue-300 transition-all duration-500"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                >
-                                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                                  <polyline points="22,6 12,13 2,6" />
-                                </svg>
+                              <div className="flex gap-x-3 border-b border-white/10 bg-gradient-to-r from-blue-900/40 to-black/50 p-3 sm:p-4 relative z-10 group-hover:from-blue-800/60 group-hover:to-blue-900/30 transition-all duration-500">
+                                <div className="flex items-center gap-2">
+                                  <div className="contact-icon-container">
+                                    <svg
+                                      width="16"
+                                      height="16"
+                                      className="sm:w-[18px] sm:h-[18px] contact-icon text-blue-400 group-hover:text-blue-300 transition-all duration-500"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeWidth="2"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    >
+                                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                      <polyline points="22,6 12,13 2,6" />
+                                    </svg>
+                                  </div>
+                                  <h3 className="text-sm sm:text-base font-medium text-white group-hover:text-blue-100 transition-all duration-500">Email</h3>
+                                </div>
                               </div>
-                              <h3 className="text-sm sm:text-base font-medium text-white group-hover:text-blue-100 transition-all duration-500">Email</h3>
-                            </div>
-                          </div>
-                          <div className="p-3 sm:p-4 relative z-10">
-                            <div className="flex items-center text-xs sm:text-sm font-medium text-neutral-200 transition-all duration-500 group-hover:text-white group-hover:translate-x-1">
-                              <span className="truncate">mahidhar.reddy2003@gmail.com</span>
-                              <svg
-                                width="12"
-                                height="12"
-                                className="sm:w-[14px] sm:h-[14px] ml-2 opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:translate-x-1 flex-shrink-0"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <path d="M7 17L17 7" />
-                                <path d="M7 7h10v10" />
-                              </svg>
-                            </div>
-                            <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-neutral-400 group-hover:text-neutral-300 transition-all duration-500">Send me an email directly</p>
-                          </div>
-                        </a>
-
-                        <a
-                          className="group contact-card block overflow-hidden rounded-lg border border-white/10 bg-black/30 shadow-sm transition-all duration-500 hover:border-purple-500/40 hover:shadow-lg hover:shadow-purple-900/20 relative"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label="Calendar"
-                          href="https://cal.com/mahidharreddyg"
-                          style={{ 
-                            animation: !isPending ? 'fadeInUp 0.5s ease-out 0.2s both' : 'none',
-                            minHeight: '100px'
-                          }}
-                        >
-                          <div className="contact-glow-purple absolute inset-0 opacity-0 transition-all duration-500 group-hover:opacity-100" />
-                          <div className="contact-shimmer absolute inset-0 opacity-0 group-hover:opacity-100" />
-
-                          <div className="flex gap-x-3 border-b border-white/10 bg-gradient-to-r from-purple-900/40 to-black/50 p-3 sm:p-4 relative z-10 group-hover:from-purple-800/60 group-hover:to-purple-900/30 transition-all duration-500">
-                            <div className="flex items-center gap-2">
-                              <div className="contact-icon-container">
-                                <svg
-                                  width="16"
-                                  height="16"
-                                  className="sm:w-[18px] sm:h-[18px] contact-icon text-purple-400 group-hover:text-purple-300 transition-all duration-500"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                >
-                                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                                  <line x1="16" y1="2" x2="16" y2="6" />
-                                  <line x1="8" y1="2" x2="8" y2="6" />
-                                  <line x1="3" y1="10" x2="21" y2="10" />
-                                </svg>
+                              <div className="p-3 sm:p-4 relative z-10">
+                                <div className="flex items-center text-xs sm:text-sm font-medium text-neutral-200 transition-all duration-500 group-hover:text-white group-hover:translate-x-1">
+                                  <span className="truncate">mahidhar.reddy2003@gmail.com</span>
+                                  <svg
+                                    width="12"
+                                    height="12"
+                                    className="sm:w-[14px] sm:h-[14px] ml-2 opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:translate-x-1 flex-shrink-0"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  >
+                                    <path d="M7 17L17 7" />
+                                    <path d="M7 7h10v10" />
+                                  </svg>
+                                </div>
+                                <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-neutral-400 group-hover:text-neutral-300 transition-all duration-500">Send me an email directly</p>
                               </div>
-                              <h3 className="text-sm sm:text-base font-medium text-white group-hover:text-purple-100 transition-all duration-500">Schedule</h3>
+                            </a>
+
+                            {/* Share Card */}
+                            <div
+                              className="group contact-card block overflow-hidden rounded-lg border border-white/10 bg-black/30 shadow-sm transition-all duration-500 hover:border-purple-500/40 hover:shadow-lg hover:shadow-purple-900/20 relative cursor-pointer"
+                              onClick={handleShareCardClick}
+                              style={{ 
+                                animation: !isPending ? 'fadeInUp 0.5s ease-out 0.2s both' : 'none',
+                                minHeight: '100px'
+                              }}
+                            >
+                              <div className="contact-glow-purple absolute inset-0 opacity-0 transition-all duration-500 group-hover:opacity-100" />
+                              <div className="contact-shimmer absolute inset-0 opacity-0 group-hover:opacity-100" />
+
+                              <div className="flex gap-x-3 border-b border-white/10 bg-gradient-to-r from-purple-900/40 to-black/50 p-3 sm:p-4 relative z-10 group-hover:from-purple-800/60 group-hover:to-purple-900/30 transition-all duration-500">
+                                <div className="flex items-center gap-2">
+                                  <div className="contact-icon-container">
+                                    <svg
+                                      width="16"
+                                      height="16"
+                                      className="sm:w-[18px] sm:h-[18px] contact-icon text-purple-400 group-hover:text-purple-300 transition-all duration-500"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeWidth="2"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    >
+                                      <circle cx="18" cy="5" r="3"/>
+                                      <circle cx="6" cy="12" r="3"/>
+                                      <circle cx="18" cy="19" r="3"/>
+                                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                                      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                                    </svg>
+                                  </div>
+                                  <h3 className="text-sm sm:text-base font-medium text-white group-hover:text-purple-100 transition-all duration-500">Share</h3>
+                                </div>
+                              </div>
+                              <div className="p-3 sm:p-4 relative z-10">
+                                <div className="flex items-center text-xs sm:text-sm font-medium text-neutral-200 transition-all duration-500 group-hover:text-white group-hover:translate-x-1">
+                                  <span className="truncate">Share my website</span>
+                                  <svg
+                                    width="12"
+                                    height="12"
+                                    className="sm:w-[14px] sm:h-[14px] ml-2 opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:translate-x-1 flex-shrink-0"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  >
+                                    <path d="M7 17L17 7" />
+                                    <path d="M7 7h10v10" />
+                                  </svg>
+                                </div>
+                                <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-neutral-400 group-hover:text-neutral-300 transition-all duration-500">Click to open share options</p>
+                              </div>
                             </div>
                           </div>
-                          <div className="p-3 sm:p-4 relative z-10">
-                            <div className="flex items-center text-xs sm:text-sm font-medium text-neutral-200 transition-all duration-500 group-hover:text-white group-hover:translate-x-1">
-                              Book a meeting
-                              <svg
-                                width="12"
-                                height="12"
-                                className="sm:w-[14px] sm:h-[14px] ml-2 opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:translate-x-1 flex-shrink-0"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <path d="M7 17L17 7" />
-                                <path d="M7 7h10v10" />
-                              </svg>
-                            </div>
-                            <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-neutral-400 group-hover:text-neutral-300 transition-all duration-500">Schedule a call with me</p>
-                          </div>
-                        </a>
-                      </div>
 
-                      <div
-                        className="availability-status relative group flex items-center justify-center gap-2 sm:gap-3 w-full py-2.5 sm:py-3 mt-3 sm:mt-4 rounded-2xl border border-green-400/40 px-4 sm:px-6 overflow-hidden"
-                        style={{
-                          color: "#D6FFE2",
-                          background: "linear-gradient(90deg, #010202 0%, #062806 50%, #010202 100%)",
-                          animation: !isPending ? 'fadeInUp 0.5s ease-out 0.3s both' : 'none',
-                          minHeight: 44,
-                          letterSpacing: "0.01em"
-                        }}
-                      >
-                        <div className="availability-shimmer absolute inset-0 opacity-0 group-hover:opacity-100" />
-                        <div className="availability-glow absolute inset-0 opacity-60 group-hover:opacity-100 transition-all duration-500" />
-
-                        <div className="status-indicator relative z-10">
-                          <svg
-                            width="12"
-                            height="12"
-                            className="sm:w-[14px] sm:h-[14px] flex-shrink-0"
-                            viewBox="0 0 14 14"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
+                          {/* Availability Status */}
+                          <div
+                            className="availability-status relative group flex items-center justify-center gap-2 sm:gap-3 w-full py-2.5 sm:py-3 mt-3 sm:mt-4 rounded-2xl border border-green-400/40 px-4 sm:px-6 overflow-hidden"
+                            style={{
+                              color: "#D6FFE2",
+                              background: "linear-gradient(90deg, #010202 0%, #062806 50%, #010202 100%)",
+                              animation: !isPending ? 'fadeInUp 0.5s ease-out 0.3s both' : 'none',
+                              minHeight: 44,
+                              letterSpacing: "0.01em"
+                            }}
                           >
-                            <circle cx="7" cy="7" r="7" fill="#4ADE80" className="animate-pulse" />
-                            <circle cx="7" cy="7" r="3" fill="#22C55E" />
-                          </svg>
-                        </div>
-                        <span className="text-sm sm:text-base font-semibold relative z-10 group-hover:text-green-100 transition-all duration-500 text-center leading-tight">
-                          Currently available for new opportunities
-                        </span>
-                      </div>
+                            <div className="availability-shimmer absolute inset-0 opacity-0 group-hover:opacity-100" />
+                            <div className="availability-glow absolute inset-0 opacity-60 group-hover:opacity-100 transition-all duration-500" />
+
+                            <div className="status-indicator relative z-10">
+                              <svg
+                                width="12"
+                                height="12"
+                                className="sm:w-[14px] sm:h-[14px] flex-shrink-0"
+                                viewBox="0 0 14 14"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <circle cx="7" cy="7" r="7" fill="#4ADE80" className="animate-pulse" />
+                                <circle cx="7" cy="7" r="3" fill="#22C55E" />
+                              </svg>
+                            </div>
+                            <span className="text-sm sm:text-base font-semibold relative z-10 group-hover:text-green-100 transition-all duration-500 text-center leading-tight">
+                              Currently available for new opportunities
+                            </span>
+                          </div>
+                        </>
+                      ) : (
+                        /* SHARE VIEW WITH 3D ROTATION QR CODE */
+                        <motion.div
+                          className="flex flex-col h-full"
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -20 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          {/* Simplified Back Button */}
+                          <div className="w-full flex justify-start mb-2">
+                            <button
+                              onClick={handleBackClick}
+                              className="group flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/10 transition-all duration-300"
+                            >
+                              <svg width="16" height="16" className="text-neutral-400 group-hover:text-white group-hover:-translate-x-0.5 transition-all duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M19 12H5"/>
+                                <path d="M12 19l-7-7 7-7"/>
+                              </svg>
+                            </button>
+                          </div>
+
+                          {/* 3D Rotation QR Code Container */}
+                          <div className="flex-1 flex flex-col items-center justify-start !-mt-6 qr-3d-perspective">
+                            <div 
+                              ref={qrContainerRef}
+                              className="qr-compact-hologram-container qr-3d-container relative !mb-6"
+                              onMouseMove={handleQRMouseMove}
+                              onMouseLeave={handleQRMouseLeave}
+                            >
+                              <div className="qr-compact-hologram-glow" />
+                              <div className="qr-compact-hologram-ring" />
+                              <div className="qr-compact-code-wrapper">
+                                <QRCodeSVG
+                                  value={websiteUrl}
+                                  size={110}
+                                  bgColor="transparent"
+                                  fgColor="#ffffff"
+                                  level="M"
+                                  includeMargin={false}
+                                  className="qr-compact-code-svg"
+                                />
+                                <div className="qr-compact-hologram-overlay" />
+                                <div className="qr-compact-scan-line" />
+                              </div>
+                            </div>
+
+                            {/* Compact Share Options */}
+                            <div className="grid grid-cols-1 gap-2 w-full max-w-xs mb-3">
+                              {/* Copy Link Button */}
+                              <button
+                                onClick={() => copyToClipboard(websiteUrl)}
+                                className="group share-compact-option relative overflow-hidden rounded-lg border border-white/10 bg-black/30 p-2.5 transition-all duration-500 hover:border-cyan-500/40 hover:shadow-lg hover:shadow-cyan-900/20"
+                              >
+                                <div className="share-compact-glow-cyan absolute inset-0 opacity-0 transition-all duration-500 group-hover:opacity-100" />
+                                <div className="share-compact-shimmer absolute inset-0 opacity-0 group-hover:opacity-100" />
+                                
+                                <div className="flex items-center gap-2 relative z-10">
+                                  <div className="share-compact-icon-container">
+                                    <svg
+                                      width="14"
+                                      height="14"
+                                      className="text-cyan-400 group-hover:text-cyan-300 transition-all duration-500"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeWidth="2"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    >
+                                      <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+                                      <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+                                    </svg>
+                                  </div>
+                                  <div className="flex-1">
+                                    <h3 className="text-xs font-medium text-white group-hover:text-cyan-100 transition-all duration-500">
+                                      {copiedText === websiteUrl ? "Copied!" : "Copy Link"}
+                                    </h3>
+                                    <p className="text-xs text-neutral-400 group-hover:text-neutral-300 transition-all duration-500">
+                                      Share via clipboard
+                                    </p>
+                                  </div>
+                                  <div className="flex items-center justify-center w-4 h-4">
+                                    {copiedText === websiteUrl ? (
+                                      <svg width="10" height="10" className="text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <polyline points="20,6 9,17 4,12"/>
+                                      </svg>
+                                    ) : (
+                                      <svg width="8" height="8" className="opacity-0 group-hover:opacity-100 transition-all duration-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <path d="M7 17L17 7"/>
+                                        <path d="M7 7h10v10"/>
+                                      </svg>
+                                    )}
+                                  </div>
+                                </div>
+                              </button>
+
+                              {/* Native Share Button */}
+                              <button
+                                onClick={handleShare}
+                                className="group share-compact-option relative overflow-hidden rounded-lg border border-white/10 bg-black/30 p-2.5 transition-all duration-500 hover:border-purple-500/40 hover:shadow-lg hover:shadow-purple-900/20"
+                              >
+                                <div className="share-compact-glow-purple absolute inset-0 opacity-0 transition-all duration-500 group-hover:opacity-100" />
+                                <div className="share-compact-shimmer absolute inset-0 opacity-0 group-hover:opacity-100" />
+                                
+                                <div className="flex items-center gap-2 relative z-10">
+                                  <div className="share-compact-icon-container">
+                                    <svg
+                                      width="14"
+                                      height="14"
+                                      className="text-purple-400 group-hover:text-purple-300 transition-all duration-500"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeWidth="2"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    >
+                                      <circle cx="18" cy="5" r="3"/>
+                                      <circle cx="6" cy="12" r="3"/>
+                                      <circle cx="18" cy="19" r="3"/>
+                                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                                      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                                    </svg>
+                                  </div>
+                                  <div className="flex-1">
+                                    <h3 className="text-xs font-medium text-white group-hover:text-purple-100 transition-all duration-500">
+                                      Share
+                                    </h3>
+                                    <p className="text-xs text-neutral-400 group-hover:text-neutral-300 transition-all duration-500">
+                                      Use device share menu
+                                    </p>
+                                  </div>
+                                  <svg width="8" height="8" className="opacity-0 group-hover:opacity-100 transition-all duration-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M7 17L17 7"/>
+                                    <path d="M7 7h10v10"/>
+                                  </svg>
+                                </div>
+                              </button>
+                            </div>
+
+                            {/* Compact Description */}
+                            <div className="text-center px-4">
+                              <p className="text-xs text-neutral-400 leading-relaxed">
+                                Scan the QR code or use the options above
+                              </p>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -543,7 +755,196 @@ export default function LetsConnectModal({ isOpen, onClose, slideDirection = "up
         </>
       )}
 
+      {/* Enhanced Styles with 3D Rotation Effects */}
       <style jsx>{`
+        /* 3D Perspective and Container */
+        .qr-3d-perspective {
+          perspective: 1000px;
+        }
+
+        .qr-3d-container {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 150px;
+          height: 150px;
+          margin: 0 auto;
+          cursor: pointer;
+          transition: transform 0.1s ease;
+          transform-style: preserve-3d;
+        }
+
+        .qr-3d-container:hover {
+          transform: scale(1.02);
+        }
+
+        /* Improved Compact QR Code Hologram Styles */
+        .qr-compact-hologram-container {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 150px;
+          height: 150px;
+          margin: 0 auto;
+        }
+
+        .qr-compact-hologram-glow {
+          position: absolute;
+          inset: -12px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(0, 255, 255, 0.3) 0%, rgba(128, 0, 255, 0.2) 50%, transparent 70%);
+          opacity: 0.8;
+          animation: compactHoloGlow 3s ease-in-out infinite alternate;
+          filter: blur(10px);
+        }
+
+        .qr-compact-hologram-ring {
+          position: absolute;
+          inset: -6px;
+          border-radius: 14px;
+          border: 2px solid transparent;
+          background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ffff) border-box;
+          mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+          mask-composite: subtract;
+          opacity: 0.7;
+          animation: compactHoloRing 4s linear infinite;
+        }
+
+        .qr-compact-code-wrapper {
+          position: relative;
+          background: rgba(0, 0, 0, 0.8);
+          border-radius: 10px;
+          padding: 12px;
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          overflow: hidden;
+          box-shadow: 
+            0 4px 8px rgba(0, 0, 0, 0.3),
+            0 0 20px rgba(0, 255, 255, 0.1);
+        }
+
+        .qr-compact-code-svg {
+          position: relative;
+          z-index: 2;
+          filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.3));
+        }
+
+        .qr-compact-hologram-overlay {
+          position: absolute;
+          inset: 0;
+          border-radius: 10px;
+          background: linear-gradient(
+            45deg,
+            transparent 30%,
+            rgba(0, 255, 255, 0.1) 50%,
+            transparent 70%
+          );
+          opacity: 0.6;
+          animation: compactHoloShimmer 2s linear infinite;
+          pointer-events: none;
+        }
+
+        .qr-compact-scan-line {
+          position: absolute;
+          top: 12px;
+          left: 12px;
+          right: 12px;
+          height: 2px;
+          background: linear-gradient(90deg, transparent, #00ffff, transparent);
+          opacity: 0.8;
+          animation: compactScanLine 3s ease-in-out infinite;
+        }
+
+        /* Improved Compact Share Option Styles */
+        .share-compact-option {
+          transform-style: preserve-3d;
+        }
+
+        .share-compact-option:hover {
+          transform: translateY(-1px) scale(1.01);
+        }
+
+        .share-compact-glow-cyan {
+          background: radial-gradient(circle at center, rgba(0, 255, 255, 0.15) 0%, transparent 70%);
+          filter: blur(12px);
+        }
+
+        .share-compact-glow-purple {
+          background: radial-gradient(circle at center, rgba(147, 51, 234, 0.15) 0%, transparent 70%);
+          filter: blur(12px);
+        }
+
+        .share-compact-shimmer {
+          background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.1) 50%,
+            transparent 100%
+          );
+          transform: translateX(-100%);
+          transition: transform 0.6s ease-out;
+        }
+
+        .share-compact-option:hover .share-compact-shimmer {
+          transform: translateX(100%);
+        }
+
+        .share-compact-icon-container {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 24px;
+          height: 24px;
+          border-radius: 6px;
+          background: rgba(255, 255, 255, 0.05);
+          transition: all 0.3s ease;
+        }
+
+        .share-compact-option:hover .share-compact-icon-container {
+          transform: scale(1.05);
+          background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Animations */
+        @keyframes compactHoloGlow {
+          0% { 
+            transform: scale(1) rotate(0deg);
+            opacity: 0.6;
+          }
+          100% { 
+            transform: scale(1.06) rotate(180deg);
+            opacity: 0.9;
+          }
+        }
+
+        @keyframes compactHoloRing {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        @keyframes compactHoloShimmer {
+          0% { transform: translateX(-100%) rotate(45deg); }
+          100% { transform: translateX(170%) rotate(45deg); }
+        }
+
+        @keyframes compactScanLine {
+          0%, 20% { 
+            transform: translateY(0);
+            opacity: 0;
+          }
+          50% { 
+            opacity: 1;
+          }
+          80%, 100% { 
+            transform: translateY(86px);
+            opacity: 0;
+          }
+        }
+
+        /* All existing styles remain the same... */
         .social-icon-link {
           animation: socialIconFloat 0.6s ease-out both;
         }

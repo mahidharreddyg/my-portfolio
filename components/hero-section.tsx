@@ -343,7 +343,8 @@ export default function HeroSection() {
     },
   ]
 
-  const animationDuration = 5
+  // UPDATED: Circle animation duration reduced by 1 second (5s -> 4s)
+  const animationDuration = 4
 
   const handleHover = useCallback(
     (controls: AnimationControls) => {
@@ -369,11 +370,12 @@ export default function HeroSection() {
     [allArrivedGlow],
   )
 
+  // UPDATED: Synchronized timing - circle glow and name reveal both trigger at 4s
   useEffect(() => {
-    const totalDelay = animationDuration * 1000
+    const totalDelay = animationDuration * 1000 // 4 seconds
     const glowTimer = setTimeout(() => {
       setAllArrivedGlow(true)
-      setShowName(true)
+      setShowName(true) // This now triggers exactly when circles glow
       const glowAnimation = {
         boxShadow: [
           "0 0 30px rgba(41,141,238,0.35)",
@@ -392,7 +394,7 @@ export default function HeroSection() {
     }, totalDelay)
 
     return () => clearTimeout(glowTimer)
-  }, [glowControls1, glowControls2, glowControls3])
+  }, [glowControls1, glowControls2, glowControls3, animationDuration])
 
   const openModal = () => setShowConnectModal(true)
   const closeModal = () => setShowConnectModal(false)
@@ -468,7 +470,7 @@ export default function HeroSection() {
                 rotate: [360, 180, 0],
                 opacity: [0, 0.5, 0.8],
                 transition: {
-                  duration: animationDuration,
+                  duration: animationDuration, // Now 4 seconds instead of 5
                   delay: config.delay,
                   times: [0, 0.5, 1],
                   ease: "easeOut",
@@ -488,6 +490,7 @@ export default function HeroSection() {
           ))}
         </div>
 
+        {/* UPDATED: Main content container with adjusted timing */}
         <motion.div
           className="text-center space-y-4 relative z-20"
           initial={{ opacity: 0, y: 0 }}
@@ -500,19 +503,27 @@ export default function HeroSection() {
         >
           {showName && (
             <>
+              {/* UPDATED: "Hello! I'm" appears after the synchronized glow moment */}
               <div>
-                <SplitText
-                  text="Hello! I'm"
-                  className="text-3xl md:text-4xl font-semibold mb-6 text-cyan-400 drop-shadow-lg"
-                  splitType="words"
-                  delay={120}
-                  duration={1}
-                  ease="power3.out"
-                />
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 1, delay: 0.5 }} // Delay after name reveal starts
+                >
+                  <SplitText
+                    text="Hello! I'm"
+                    className="text-3xl md:text-4xl font-semibold mb-6 text-cyan-400 drop-shadow-lg"
+                    splitType="words"
+                    delay={120}
+                    duration={1}
+                    ease="power3.out"
+                  />
+                </motion.div>
               </div>
               
               <NameRevealAnimation showName={showName} />
 
+              {/* UPDATED: Skill text appears after name stroke completes (4s + 4.5s = 8.5s) */}
               <div className="min-h-[60px] md:min-h-[80px] mt-8">
                 <AnimatePresence mode="wait">
                   <motion.div
@@ -520,7 +531,7 @@ export default function HeroSection() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.4, delay: 5.2 }}
+                    transition={{ duration: 0.4, delay: 4.5 }} // After name stroke completes
                     className="text-xl md:text-3xl font-mono text-cyan-400 drop-shadow-lg"
                     style={{
                       textRendering: "optimizeLegibility",
@@ -550,11 +561,12 @@ export default function HeroSection() {
                 </AnimatePresence>
               </div>
               
+              {/* UPDATED: Tagline appears after skill text */}
               <motion.p
                 className="text-xl md:text-2xl text-gray-300 mt-6"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 6.5, duration: 0.8 }}
+                transition={{ delay: 5.5, duration: 0.8 }}
                 style={{
                   textRendering: "optimizeLegibility",
                   WebkitFontSmoothing: "antialiased",
@@ -563,11 +575,12 @@ export default function HeroSection() {
                 Creating digital experiences that matter
               </motion.p>
               
+              {/* UPDATED: Button appears last */}
               <motion.div
                 className="mt-8 flex justify-center"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 7, duration: 0.8 }}
+                transition={{ delay: 6.5, duration: 0.8 }}
               >
                 <LetsConnectButton onClick={openModal} />
               </motion.div>
