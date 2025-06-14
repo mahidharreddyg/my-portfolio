@@ -126,7 +126,7 @@ function FuturisticBackgroundAnimation() {
   )
 }
 
-// --- Name Reveal Animation Component ---
+// --- FIXED Name Reveal Animation Component ---
 function NameRevealAnimation({ showName }: { showName: boolean }) {
   const textRef = useRef<SVGTextElement>(null)
   const styleRef = useRef<HTMLStyleElement | null>(null)
@@ -135,29 +135,33 @@ function NameRevealAnimation({ showName }: { showName: boolean }) {
     return `
       @keyframes stroke {
         0% {
-          fill: rgba(237, 245, 253, 0);
+          fill: transparent;
           stroke: #edf5fd;
           stroke-dashoffset: 25%;
           stroke-dasharray: 0 50%;
           stroke-width: 1;
+          opacity: 1;
         }
-        70% {
-          fill: rgba(237, 245, 253, 0);
+        50% {
+          fill: transparent;
           stroke: #edf5fd;
           stroke-dashoffset: 0%;
           stroke-dasharray: 50% 0;
+          opacity: 1;
         }
-        80% {
-          fill: rgba(237, 245, 253, 0);
+        70% {
+          fill: transparent;
           stroke: #edf5fd;
           stroke-width: 1;
+          opacity: 1;
         }
         100% {
           fill: #edf5fd;
-          stroke: rgba(237, 245, 253, 0);
+          stroke: transparent;
           stroke-dashoffset: -25%;
           stroke-dasharray: 50% 0;
           stroke-width: 0;
+          opacity: 1;
         }
       }
     `;
@@ -169,13 +173,23 @@ function NameRevealAnimation({ showName }: { showName: boolean }) {
     const text = textRef.current;
     if (!text) return;
 
+    // Ensure text is completely hidden initially
+    text.style.opacity = "0";
+    text.style.fill = "transparent";
+    text.style.stroke = "transparent";
+
     const style = document.createElement("style");
     style.setAttribute("data-component", "hero-stroke-animation");
     style.textContent = generateKeyframes();
     document.head.appendChild(style);
     styleRef.current = style;
 
-    text.style.animation = "stroke 4.5s ease-in-out forwards";
+    // Small delay to ensure styles are applied before animation starts
+    setTimeout(() => {
+      if (text) {
+        text.style.animation = "stroke 4.5s ease-in-out forwards";
+      }
+    }, 100);
 
     return () => {
       if (styleRef.current && document.head.contains(styleRef.current)) {
@@ -196,11 +210,14 @@ function NameRevealAnimation({ showName }: { showName: boolean }) {
           y="50%"
           dy=".35em"
           textAnchor="middle"
-          className="uppercase fill-transparent stroke-[#edf5fd] stroke-1"
+          className="uppercase"
           style={{
             fontFamily: "'Russo One', sans-serif",
             fontSize: "clamp(40px, 8vw, 100px)",
-            strokeLinejoin: "round"
+            strokeLinejoin: "round",
+            fill: "transparent",
+            stroke: "transparent",
+            opacity: 0, // Start completely hidden
           }}
         >
           MAHIDHAR REDDY G
@@ -343,7 +360,6 @@ export default function HeroSection() {
     },
   ]
 
-  // UPDATED: Circle animation duration reduced by 1 second (5s -> 4s)
   const animationDuration = 4
 
   const handleHover = useCallback(
@@ -370,12 +386,17 @@ export default function HeroSection() {
     [allArrivedGlow],
   )
 
-  // UPDATED: Synchronized timing - circle glow and name reveal both trigger at 4s
+  // UPDATED: Synchronized timing - name reveal at 1 second, circle glow at 5.5 seconds (when name fill completes)
   useEffect(() => {
-    const totalDelay = animationDuration * 1000 // 4 seconds
+    // Name reveal starts at 1 second
+    const nameRevealTimer = setTimeout(() => {
+      setShowName(true)
+    }, 2000) // 1 second
+
+    // Circle glow happens at 5.5 seconds (when name fill animation completes)
+    // Name animation: starts at 1s + 4.5s duration = completes at 5.5s
     const glowTimer = setTimeout(() => {
       setAllArrivedGlow(true)
-      setShowName(true) // This now triggers exactly when circles glow
       const glowAnimation = {
         boxShadow: [
           "0 0 30px rgba(41,141,238,0.35)",
@@ -391,10 +412,13 @@ export default function HeroSection() {
       ]).then(() => {
         setAllArrivedGlow(false)
       })
-    }, totalDelay)
+    }, 5500) // 5.5 seconds - synchronized with name fill completion
 
-    return () => clearTimeout(glowTimer)
-  }, [glowControls1, glowControls2, glowControls3, animationDuration])
+    return () => {
+      clearTimeout(nameRevealTimer)
+      clearTimeout(glowTimer)
+    }
+  }, [glowControls1, glowControls2, glowControls3])
 
   const openModal = () => setShowConnectModal(true)
   const closeModal = () => setShowConnectModal(false)
@@ -470,7 +494,7 @@ export default function HeroSection() {
                 rotate: [360, 180, 0],
                 opacity: [0, 0.5, 0.8],
                 transition: {
-                  duration: animationDuration, // Now 4 seconds instead of 5
+                  duration: animationDuration,
                   delay: config.delay,
                   times: [0, 0.5, 1],
                   ease: "easeOut",
@@ -490,7 +514,6 @@ export default function HeroSection() {
           ))}
         </div>
 
-        {/* UPDATED: Main content container with adjusted timing */}
         <motion.div
           className="text-center space-y-4 relative z-20"
           initial={{ opacity: 0, y: 0 }}
@@ -503,12 +526,11 @@ export default function HeroSection() {
         >
           {showName && (
             <>
-              {/* UPDATED: "Hello! I'm" appears after the synchronized glow moment */}
               <div>
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 1, delay: 0.5 }} // Delay after name reveal starts
+                  transition={{ duration: 1, delay: 0.5 }}
                 >
                   <SplitText
                     text="Hello! I'm"
@@ -523,7 +545,6 @@ export default function HeroSection() {
               
               <NameRevealAnimation showName={showName} />
 
-              {/* UPDATED: Skill text appears after name stroke completes (4s + 4.5s = 8.5s) */}
               <div className="min-h-[60px] md:min-h-[80px] mt-8">
                 <AnimatePresence mode="wait">
                   <motion.div
@@ -531,7 +552,7 @@ export default function HeroSection() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.4, delay: 4.5 }} // After name stroke completes
+                    transition={{ duration: 0.4, delay: 4.5 }}
                     className="text-xl md:text-3xl font-mono text-cyan-400 drop-shadow-lg"
                     style={{
                       textRendering: "optimizeLegibility",
@@ -561,7 +582,6 @@ export default function HeroSection() {
                 </AnimatePresence>
               </div>
               
-              {/* UPDATED: Tagline appears after skill text */}
               <motion.p
                 className="text-xl md:text-2xl text-gray-300 mt-6"
                 initial={{ opacity: 0, y: 20 }}
@@ -575,7 +595,6 @@ export default function HeroSection() {
                 Creating digital experiences that matter
               </motion.p>
               
-              {/* UPDATED: Button appears last */}
               <motion.div
                 className="mt-8 flex justify-center"
                 initial={{ opacity: 0, y: 20 }}
