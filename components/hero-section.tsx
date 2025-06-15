@@ -149,7 +149,7 @@ function NameRevealAnimation({ showName }: { showName: boolean }) {
           stroke-dasharray: 50% 0;
           opacity: 1;
         }
-        70% {
+        60% {
           fill: transparent;
           stroke: #edf5fd;
           stroke-width: 1;
@@ -386,15 +386,14 @@ export default function HeroSection() {
     [allArrivedGlow],
   )
 
-  // UPDATED: Synchronized timing - name reveal at 1 second, circle glow at 5.5 seconds (when name fill completes)
+  // UPDATED: Name reveal starts at 800ms for longer duration
   useEffect(() => {
-    // Name reveal starts at 1 second
+    // Name reveal starts at 800ms
     const nameRevealTimer = setTimeout(() => {
       setShowName(true)
-    }, 2000) // 1 second
+    }, 2000) // Changed from (animationDuration - 3) * 1000 to 800ms
 
-    // Circle glow happens at 5.5 seconds (when name fill animation completes)
-    // Name animation: starts at 1s + 4.5s duration = completes at 5.5s
+    // Circle glow still happens at 4 seconds
     const glowTimer = setTimeout(() => {
       setAllArrivedGlow(true)
       const glowAnimation = {
@@ -412,13 +411,13 @@ export default function HeroSection() {
       ]).then(() => {
         setAllArrivedGlow(false)
       })
-    }, 5500) // 5.5 seconds - synchronized with name fill completion
+    }, animationDuration * 1000) // 4 seconds
 
     return () => {
       clearTimeout(nameRevealTimer)
       clearTimeout(glowTimer)
     }
-  }, [glowControls1, glowControls2, glowControls3])
+  }, [glowControls1, glowControls2, glowControls3, animationDuration])
 
   const openModal = () => setShowConnectModal(true)
   const closeModal = () => setShowConnectModal(false)
