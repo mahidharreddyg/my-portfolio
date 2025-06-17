@@ -41,9 +41,44 @@ export default function Navbar() {
         >
           <div className="max-w-7xl mx-auto">
             <motion.div
-              className="relative bg-black/80 backdrop-blur-xl rounded-full px-6 py-4 flex items-center justify-between border border-cyan-800/50 shadow-2xl group transition-all duration-300"
+              className="relative rounded-full px-6 py-4 flex items-center justify-between shadow-2xl group transition-all duration-300"
+              style={{
+                // True Liquid Glass Background - High Transparency, Minimal Blur
+                background: 'rgba(255, 255, 255, 0.03)', // Much more transparent
+                backdropFilter: 'blur(1px) saturate(200%)', // Minimal blur for clarity
+                WebkitBackdropFilter: 'blur(1px) saturate(200%)',
+                border: '1px solid rgba(255, 255, 255, 0.15)', // Subtle border
+                boxShadow: `
+                  0 8px 32px rgba(0, 0, 0, 0.08),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                  inset 0 -1px 0 rgba(255, 255, 255, 0.05)
+                `,
+                // Liquid Glass Shine Effects
+                position: 'relative',
+                overflow: 'hidden',
+              }}
             >
-              {/* Profile Info */}
+              {/* Liquid Glass Highlight Layer */}
+              <div 
+                className="absolute inset-0 rounded-full pointer-events-none"
+                style={{
+                  background: `
+                    linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+                    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.12) 0%, transparent 60%)
+                  `,
+                  opacity: 0.8,
+                }}
+              />
+
+              {/* Specular Reflection */}
+              <div 
+                className="absolute top-0 left-0 right-0 h-1/2 rounded-t-full pointer-events-none"
+                style={{
+                  background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 100%)',
+                }}
+              />
+
+              {/* Profile Info - UNCHANGED */}
               <div className="flex items-center gap-4 relative z-10">
                 <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-gray-700/50">
                   <Image
@@ -88,7 +123,7 @@ export default function Navbar() {
                 </div>
               </div>
 
-              {/* Navigation + Copy Button */}
+              {/* Navigation + Copy Button - UNCHANGED */}
               <div className="hidden md:flex items-center gap-4 ml-32 relative z-10">
                 <nav className="flex items-center gap-8">
                   {["About", "Skills", "Experience", "Projects", "Certifications"].map((item) => (
@@ -123,7 +158,7 @@ export default function Navbar() {
                   ))}
                 </nav>
 
-                {/* Copy Button */}
+                {/* Copy Button - UNCHANGED */}
                 <motion.div className="relative z-10 ml-4">
                   <Button
                     onClick={copyEmail}

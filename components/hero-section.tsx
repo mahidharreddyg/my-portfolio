@@ -2,13 +2,193 @@
 
 import type React from "react"
 import { useState, useEffect, useRef, useCallback } from "react"
-import { motion, useAnimation, AnimatePresence, type AnimationControls } from "framer-motion"
+import { motion, useAnimation, AnimatePresence, AnimationControls } from "framer-motion"
 import SplitText from "../src/components/TextAnimations/SplitText/SplitText"
 import LetsConnectModal from "./letsconnectmodal"
+import ShinyText from "@/src/components/ShinyText/ShinyText"
+import { HyperText } from "@/src/components/HyperText/HyperText"
 
-// --- Welcome Banner Component ---
+// --- Enhanced Typewriter Component for "Hello, I'm" ---
+function TypewriterHello() {
+  return (
+    <div className="text-center space-y-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.3 }}
+        className="text-4xl md:text-6xl font-bold"
+      >
+        <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-300 bg-clip-text text-transparent">
+          Hello, I'm
+        </span>
+      </motion.div>
+    </div>
+  )
+}
+
+// --- Glitch Effect "Hello, I'm" Component ---
+function GlitchHello() {
+  const [isGlitching, setIsGlitching] = useState(false)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsGlitching(true)
+      setTimeout(() => setIsGlitching(false), 200)
+    }, 4000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 1, delay: 0.5 }}
+      className="relative text-center"
+    >
+      <h1 
+        className={`text-5xl md:text-7xl font-bold transition-all duration-200 ${
+          isGlitching ? 'animate-pulse' : ''
+        }`}
+        style={{
+          textShadow: isGlitching 
+            ? '2px 0 #ff0000, -2px 0 #00ff00, 0 2px #0000ff' 
+            : '0 0 20px rgba(59, 130, 246, 0.3)',
+        }}
+      >
+        <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+          Hello, I'm
+        </span>
+      </h1>
+      
+      {isGlitching && (
+        <>
+          <div className="absolute inset-0 text-5xl md:text-7xl font-bold text-red-500 opacity-70 transform translate-x-1">
+            Hello, I'm
+          </div>
+          <div className="absolute inset-0 text-5xl md:text-7xl font-bold text-green-500 opacity-70 transform -translate-x-1">
+            Hello, I'm
+          </div>
+        </>
+      )}
+    </motion.div>
+  )
+}
+
+// --- Morphing Text "Hello, I'm" Component ---
+function MorphingHello() {
+  const greetings = [
+    "Hello, I'm",
+    "Hi, I'm", 
+    "Hey, I'm",
+    "Greetings, I'm",
+    "Welcome, I'm"
+  ]
+  
+  const [currentGreeting, setCurrentGreeting] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentGreeting((prev) => (prev + 1) % greetings.length)
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [greetings.length])
+
+  return (
+    <div className="text-center">
+      <AnimatePresence mode="wait">
+        <motion.h1
+          key={currentGreeting}
+          initial={{ opacity: 0, y: 20, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -20, scale: 1.1 }}
+          transition={{ duration: 0.5 }}
+          className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent"
+        >
+          {greetings[currentGreeting]}
+        </motion.h1>
+      </AnimatePresence>
+    </div>
+  )
+}
+
+// --- Updated Interactive "Hello, I'm" Component (Removed 5 Dots) ---
+function ParticleHello() {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect()
+      setMousePosition({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      })
+    }
+  }, [])
+
+  return (
+    <div 
+      ref={containerRef}
+      className="relative text-center py-12"
+      onMouseMove={handleMouseMove}
+    >
+      <motion.h1
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+        className="text-5xl md:text-7xl font-bold relative z-10"
+      >
+        <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+          Hello, I'm
+        </span>
+      </motion.h1>
+    </div>
+  )
+}
+
+// --- Updated Welcome Banner with Glassy Effect ---
 function WelcomeBanner() {
   const [isHovered, setIsHovered] = useState(false)
+  const glowControls = useAnimation()
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      glowControls.start({
+        boxShadow: [
+          "0 0 12px rgba(41,141,238,0.2), 0 0 20px rgba(59, 130, 246, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 0 8px rgba(41,141,238,0.05)",
+          "0 0 16px rgba(41,141,238,0.25), 0 0 25px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 0 12px rgba(41,141,238,0.08)",
+          "0 0 12px rgba(41,141,238,0.2), 0 0 20px rgba(59, 130, 246, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 0 8px rgba(41,141,238,0.05)",
+        ],
+        transition: { 
+          duration: 3, 
+          times: [0, 0.5, 1],
+          ease: "easeInOut"
+        },
+      })
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [glowControls])
+
+  const handleHover = () => {
+    setIsHovered(true)
+    glowControls.start({
+      scale: 1.02,
+      boxShadow: "0 0 20px rgba(41,141,238,0.3), 0 0 30px rgba(59, 130, 246, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 0 15px rgba(41,141,238,0.1)",
+      transition: { duration: 0.3 }
+    })
+  }
+
+  const handleHoverEnd = () => {
+    setIsHovered(false)
+    glowControls.start({
+      scale: 1,
+      boxShadow: "0 0 12px rgba(41,141,238,0.2), 0 0 20px rgba(59, 130, 246, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 0 8px rgba(41,141,238,0.05)",
+      transition: { duration: 0.3 }
+    })
+  }
 
   return (
     <motion.div
@@ -17,59 +197,54 @@ function WelcomeBanner() {
       transition={{ duration: 0.8, delay: 1.5 }}
       className="mb-8"
     >
-      <a 
-        className="group relative inline-flex cursor-pointer items-center rounded-full border border-white/10 bg-white/5 text-sm backdrop-blur-xl transition-all duration-500 ease-out lg:text-base hover:bg-white/8 hover:border-white/20 hover:scale-105 overflow-hidden max-w-fit mx-auto px-4 py-2" 
+      <motion.a 
+        className="group relative inline-flex cursor-pointer items-center justify-center overflow-hidden rounded-full border border-white/40 bg-white/15 py-[6px] px-5 text-sm font-medium opacity-95 backdrop-blur-xl transition-all duration-300 ease-in-out lg:text-base max-w-fit mx-auto"
         href="/portfolio"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onMouseEnter={handleHover}
+        onMouseLeave={handleHoverEnd}
+        animate={glowControls}
+        style={{
+          boxShadow: "0 0 12px rgba(41,141,238,0.2), 0 0 20px rgba(59, 130, 246, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 0 8px rgba(41,141,238,0.05)",
+          borderColor: "rgba(255, 255, 255, 0.4)",
+          background: "linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.05) 100%)",
+        }}
       >
-        {/* Shimmer effect overlay */}
+        {/* Enhanced glass overlay layers */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/8 to-transparent rounded-full" />
+        <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/5 to-white/10 rounded-full" />
+        
+        {/* Subtle inner glow */}
         <div 
-          className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 transition-transform duration-1000 ${
-            isHovered ? 'translate-x-full' : '-translate-x-full'
-          }`}
+          className="absolute inset-[1px] rounded-full opacity-60"
           style={{
-            width: '100%',
-            height: '100%',
+            background: "linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.05) 100%)",
+            boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.05)",
           }}
         />
         
-        {/* Metallic gradient text */}
-        <span 
-          className="relative z-10 bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 bg-clip-text text-transparent font-medium tracking-wide"
+        {/* Frosted glass effect */}
+        <div 
+          className="absolute inset-0 rounded-full opacity-30"
           style={{
-            backgroundSize: '200% 100%',
-            animation: isHovered ? 'metallicShine 2s ease-in-out' : 'none',
-            textShadow: '0 0 10px rgba(251, 191, 36, 0.3), 0 0 20px rgba(251, 191, 36, 0.2)',
+            background: "radial-gradient(ellipse at top, rgba(255, 255, 255, 0.15) 0%, transparent 70%)",
+            filter: "blur(0.5px)",
           }}
-        >
-          Welcome to my creative universe
-        </span>
+        />
         
-        {/* Metallic arrow */}
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          width="18" 
-          height="18" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="currentColor" 
-          strokeWidth="2" 
-          strokeLinecap="round" 
-          strokeLinejoin="round" 
-          className="ml-2 transition-all duration-300 ease-in-out group-hover:translate-x-1 text-amber-300"
-          style={{
-            filter: 'drop-shadow(0 0 4px rgba(251, 191, 36, 0.4))',
-          }}
-        >
-          <path d="m9 18 6-6-6-6"></path>
-        </svg>
-      </a>
+        <div className="relative z-10">
+          <ShinyText 
+            text="Welcome to My Creative World ✨" 
+            disabled={false} 
+            speed={2.7} 
+            className='custom-class' 
+          />
+        </div>
+      </motion.a>
     </motion.div>
   )
 }
 
-// --- Enhanced Parallax Stars Background ---
+// --- Enhanced Parallax Stars Background (Removed Z-Axis Circuit Lines) ---
 function ParallaxStarsBackground() {
   const interactiveRef = useRef<HTMLDivElement>(null)
   const [curX, setCurX] = useState(0)
@@ -78,7 +253,6 @@ function ParallaxStarsBackground() {
   const [tgY, setTgY] = useState(0)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   
-  // Fix for hydration error - generate stars only on client
   const [stars, setStars] = useState({
     small: '',
     medium: '',
@@ -86,7 +260,6 @@ function ParallaxStarsBackground() {
   })
   const [isClient, setIsClient] = useState(false)
 
-  // Generate stars only on client side
   useEffect(() => {
     setIsClient(true)
     const generateStars = (count: number) => {
@@ -102,8 +275,7 @@ function ParallaxStarsBackground() {
     })
   }, [])
 
-  // Fix for infinite loop - use useRef for animation frame
-  const animationFrameRef = useRef<number | undefined>(undefined)
+  const animationFrameRef = useRef<number>()
 
   useEffect(() => {
     function move() {
@@ -162,7 +334,6 @@ function ParallaxStarsBackground() {
     };
   }, []);
 
-  // Don't render stars until client-side
   if (!isClient) {
     return (
       <div
@@ -203,21 +374,14 @@ function ParallaxStarsBackground() {
           }
         }
         
-        @keyframes metallicShine {
-          0% {
-            background-position: -200% 0;
-          }
-          100% {
-            background-position: 200% 0;
-          }
-        }
-        
-        @keyframes glassShimmer {
+        @keyframes particleFloat {
           0%, 100% {
-            background-position: -200% 0;
+            transform: translateY(0px) scale(1);
+            opacity: 0.6;
           }
           50% {
-            background-position: 200% 0;
+            transform: translateY(-8px) scale(1.1);
+            opacity: 1;
           }
         }
         
@@ -310,7 +474,7 @@ function ParallaxStarsBackground() {
           }}
         ></div>
 
-        {/* Enhanced grid overlay with subtle animation */}
+        {/* Enhanced grid overlay */}
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSg1NiwgMTgyLCAyNTUsIDAuMDMpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-25"></div>
 
         {/* Enhanced circuit lines with glow effect */}
@@ -330,7 +494,6 @@ function ParallaxStarsBackground() {
                 </feMerge>
               </filter>
             </defs>
-
             <path
               d="M0,300 Q300,400 600,350 T1000,400 T1400,350"
               fill="none"
@@ -497,7 +660,7 @@ function NameRevealAnimation({ showName }: { showName: boolean }) {
           textAnchor="middle"
           className="uppercase"
           style={{
-            fontFamily: "'Russo One', sans-serif",
+            fontFamily: "'Lily Script One', system-ui",
             fontSize: "clamp(40px, 8vw, 100px)",
             strokeLinejoin: "round",
             fill: "transparent",
@@ -512,7 +675,74 @@ function NameRevealAnimation({ showName }: { showName: boolean }) {
   );
 }
 
-// --- Simple "Let's Connect" Button ---
+
+
+// --- Cinematic Roles Component with Center-Out HyperText Animation ---
+function RolesDecryption({ showRoles }: { showRoles: boolean }) {
+  const roles = [
+    "Full Stack Developer",
+    "UI/UX Designer", 
+    "AI/ML Enthusiast",
+    "Creative Problem Solver",
+    "Digital Innovator"
+  ]
+  
+  const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
+  const [triggerAnimation, setTriggerAnimation] = useState(false)
+
+  useEffect(() => {
+    if (!showRoles) return
+    
+    const interval = setInterval(() => {
+      setCurrentRoleIndex((prev) => (prev + 1) % roles.length)
+      
+      // Trigger animation
+      setTriggerAnimation(true)
+      
+      // Reset trigger after a short delay
+      setTimeout(() => {
+        setTriggerAnimation(false)
+      }, 100)
+      
+    }, 6000)
+
+    // Initial animation trigger
+    setTimeout(() => {
+      setTriggerAnimation(true)
+      setTimeout(() => setTriggerAnimation(false), 100)
+    }, 500)
+
+    return () => clearInterval(interval)
+  }, [showRoles, roles.length])
+
+  if (!showRoles) return null
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: 5.0 }}
+      className="text-center mt-6"
+    >
+      <div className="text-2xl md:text-3xl font-semibold text-white">
+        <HyperText
+          key={`role-${currentRoleIndex}`}
+          triggerAnimation={triggerAnimation}
+          animateOnHover={true}
+          duration={2500}
+          animationDirection="center-out"
+          className="bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent"
+          characterSet={["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","0","1","2","3","4","5","6","7","8","9","!","@","#","$","%","^","&","*","(",")"]}
+        >
+          {roles[currentRoleIndex]}
+        </HyperText>
+      </div>
+    </motion.div>
+  )
+}
+
+
+// --- Glass Effect "Let's Connect" Button ---
 interface LetsConnectButtonProps {
   onClick: () => void
 }
@@ -526,41 +756,95 @@ function LetsConnectButton({ onClick }: LetsConnectButtonProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className="
-        relative flex items-center justify-center gap-3 px-8 py-4 rounded-lg
-        bg-white/[0.03] border border-white/[0.08]
-        text-white font-medium text-lg
-        backdrop-blur-xl
-        transition-all duration-300 ease-out
-        hover:bg-white/[0.06] hover:border-white/[0.12]
-        hover:shadow-lg hover:shadow-blue-500/[0.05]
-        hover:scale-105
+        group relative inline-flex cursor-pointer items-center justify-between 
+        overflow-hidden rounded-full border border-white/20 bg-white/10 
+        py-[6px] pr-[6px] pl-4 text-base font-medium opacity-90 
+        backdrop-blur-md transition-all duration-300 ease-in-out
+        hover:bg-transparent hover:border-white/30
+        md:py-2 md:pr-2 md:pl-5
       "
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
+      style={{
+        boxShadow: isHovered 
+          ? '0 8px 32px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)' 
+          : '0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+      }}
     >
-      <span className="tracking-wide">Let's Connect</span>
-      <motion.div
-        className="w-5 h-5"
-        animate={{
-          x: isHovered ? 4 : 0,
-          rotate: isHovered ? 45 : 0,
+      <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-transparent rounded-full" />
+      
+      <span className="z-10 px-3 text-white transition-colors duration-300 group-hover:text-black">
+        Let's Connect
+      </span>
+      
+      <span 
+        className="
+          absolute inset-0 translate-x-[45%] scale-0 rounded-full 
+          bg-gradient-to-br from-white/95 via-white/90 to-white/85
+          opacity-0 transition-all duration-300 ease-in-out 
+          group-hover:translate-x-0 group-hover:scale-100 group-hover:opacity-100
+          backdrop-blur-sm
+        "
+        style={{
+          boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 0 25px rgba(255, 255, 255, 0.3), 0 4px 16px rgba(255, 255, 255, 0.1)',
+          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 50%, rgba(255, 255, 255, 0.75) 100%)',
         }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      />
+      
+      <span className="
+        z-10 flex items-center justify-center overflow-hidden rounded-full 
+        bg-gradient-to-br from-white/30 via-white/20 to-white/10
+        border border-white/30 backdrop-blur-md
+        p-2 transition-all duration-300 
+        group-hover:bg-gradient-to-br group-hover:from-white/95 group-hover:via-white/90 group-hover:to-white/85
+        group-hover:border-white/40 group-hover:shadow-lg
+        md:p-2.5
+      "
+      style={{
+        boxShadow: isHovered 
+          ? 'inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 0 15px rgba(255, 255, 255, 0.2)' 
+          : 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 8px rgba(255, 255, 255, 0.05)',
+      }}
       >
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width="18" 
+          height="18" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          strokeWidth="2" 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+          className="
+            text-white transition-all duration-300 
+            group-hover:translate-x-5 group-hover:opacity-0
+          "
         >
-          <path d="M7 17L17 7" />
-          <path d="M7 7h10v10" />
+          <path d="M5 12h14" />
+          <path d="m12 5 7 7-7 7" />
         </svg>
-      </motion.div>
+        
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width="18" 
+          height="18" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          strokeWidth="2" 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+          className="
+            absolute -translate-x-5 text-black opacity-0 
+            transition-all duration-300 
+            group-hover:translate-x-0 group-hover:opacity-100
+          "
+        >
+          <path d="M5 12h14" />
+          <path d="m12 5 7 7-7 7" />
+        </svg>
+      </span>
     </motion.button>
   )
 }
@@ -569,52 +853,10 @@ function LetsConnectButton({ onClick }: LetsConnectButtonProps) {
 export default function HeroSection() {
   const [allArrivedGlow, setAllArrivedGlow] = useState(false)
   const [showName, setShowName] = useState(false)
+  const [showRoles, setShowRoles] = useState(false)
+  const [helloVariant, setHelloVariant] = useState<'typewriter' | 'glitch' | 'morphing' | 'particle'>('typewriter')
   const circleContainerRef = useRef<HTMLDivElement>(null)
   const [showConnectModal, setShowConnectModal] = useState(false)
-
-  const skills = ["Full Stack Developer", "UI/UX Designer", "AI/ML Enthusiast"]
-  const [currentSkillIndex, setCurrentSkillIndex] = useState(0)
-  const currentSkill = skills[currentSkillIndex]
-
-  useEffect(() => {
-    if (!showName) return
-    const interval = setInterval(() => {
-      setCurrentSkillIndex((prev) => (prev + 1) % skills.length)
-    }, 4000)
-    return () => clearInterval(interval)
-  }, [skills.length, showName])
-
-  const textVariants = {
-    hidden: {
-      opacity: 0,
-      y: 20,
-      scale: 0.98,
-    },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: {
-        delay: i * 0.03,
-        duration: 0.4,
-        ease: [0.25, 0.46, 0.45, 0.94],
-        type: "spring",
-        stiffness: 100,
-        damping: 15,
-      },
-    }),
-  }
-
-  const cursorVariants = {
-    blinking: {
-      opacity: [0, 0, 1, 1],
-      transition: {
-        duration: 1.4,
-        repeat: Number.POSITIVE_INFINITY,
-        times: [0, 0.5, 0.5, 1],
-      },
-    },
-  }
 
   const glowControls1 = useAnimation()
   const glowControls2 = useAnimation()
@@ -650,7 +892,7 @@ export default function HeroSection() {
     (controls: AnimationControls) => {
       if (!allArrivedGlow) {
         controls.start({
-          boxShadow: "0 0 80px rgba(41,141,238,1)",
+          boxShadow: "0 0 80px rgba(41,141,238,0.9)",
           transition: { duration: 0.2 },
         })
       }
@@ -662,7 +904,7 @@ export default function HeroSection() {
     (controls: AnimationControls) => {
       if (!allArrivedGlow) {
         controls.start({
-          boxShadow: "0 0 30px rgba(41,141,238,0.35)",
+          boxShadow: "0 0 40px rgba(41,141,238,0.4)",
           transition: { duration: 0.2 },
         })
       }
@@ -675,13 +917,17 @@ export default function HeroSection() {
       setShowName(true)
     }, 2000)
 
+    const rolesRevealTimer = setTimeout(() => {
+      setShowRoles(true)
+    }, 4500)
+
     const glowTimer = setTimeout(() => {
       setAllArrivedGlow(true)
       const glowAnimation = {
         boxShadow: [
-          "0 0 30px rgba(41,141,238,0.35)",
-          "0 0 60px rgba(41,141,238,0.8)",
-          "0 0 30px rgba(41,141,238,0.35)",
+          "0 0 20px rgba(41,141,238,0.25)",
+          "0 0 35px rgba(41,141,238,0.5)",
+          "0 0 20px rgba(41,141,238,0.25)",
         ],
         transition: { duration: 1, times: [0, 0.5, 1] },
       }
@@ -694,19 +940,44 @@ export default function HeroSection() {
       })
     }, animationDuration * 1000)
 
+    const variantTimer = setInterval(() => {
+      const variants: Array<typeof helloVariant> = ['typewriter', 'glitch', 'morphing', 'particle']
+      setHelloVariant(prev => {
+        const currentIndex = variants.indexOf(prev)
+        return variants[(currentIndex + 1) % variants.length]
+      })
+    }, 15000)
+
     return () => {
       clearTimeout(nameRevealTimer)
+      clearTimeout(rolesRevealTimer)
       clearTimeout(glowTimer)
+      clearInterval(variantTimer)
     }
   }, [glowControls1, glowControls2, glowControls3, animationDuration])
 
   const openModal = () => setShowConnectModal(true)
   const closeModal = () => setShowConnectModal(false)
 
+  const renderHelloVariant = () => {
+    switch (helloVariant) {
+      case 'typewriter':
+        return <TypewriterHello />
+      case 'glitch':
+        return <GlitchHello />
+      case 'morphing':
+        return <MorphingHello />
+      case 'particle':
+        return <ParticleHello />
+      default:
+        return <TypewriterHello />
+    }
+  }
+
   return (
     <>
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Russo+One&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Lily+Script+One&display=swap');
       `}</style>
       
       <section
@@ -730,21 +1001,9 @@ export default function HeroSection() {
               style={{
                 width: config.size,
                 height: config.size,
-                background: "rgba(255, 255, 255, 0.05)",
-                backdropFilter: "blur(30px) saturate(180%) contrast(110%)",
-                WebkitBackdropFilter: "blur(30px) saturate(180%) contrast(110%)",
-                border: "1px solid rgba(255, 255, 255, 0.15)",
-                borderTop: "1px solid rgba(255, 255, 255, 0.25)",
-                borderLeft: "1px solid rgba(255, 255, 255, 0.2)",
-                boxShadow: `
-                  inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                  inset 1px 0 0 rgba(255, 255, 255, 0.15),
-                  inset -1px 0 0 rgba(255, 255, 255, 0.08),
-                  inset 0 -1px 0 rgba(255, 255, 255, 0.05),
-                  0 20px 40px rgba(0, 0, 0, 0.1),
-                  0 10px 20px rgba(0, 0, 0, 0.05),
-                  0 0 30px rgba(41, 141, 238, 0.2)
-                `,
+                background: "radial-gradient(circle, #091119 55%, rgba(255, 255, 255, 0.25) 100%)",
+                border: "0.1px solid rgba(255, 255, 255, 0.12)",
+                boxShadow: "0 0 20px rgba(41, 141, 238, 0.25)",
                 willChange: "transform",
               }}
               initial={{
@@ -770,46 +1029,11 @@ export default function HeroSection() {
               onHoverStart={() => handleHover(config.glowControls)}
               onHoverEnd={() => handleHoverEnd(config.glowControls)}
             >
-              {/* Glass reflection overlay */}
-              <div 
-                className="absolute inset-0 rounded-full pointer-events-none"
-                style={{
-                  background: `
-                    linear-gradient(135deg, 
-                      rgba(255, 255, 255, 0.4) 0%, 
-                      rgba(255, 255, 255, 0.2) 15%, 
-                      rgba(255, 255, 255, 0.05) 30%, 
-                      transparent 40%, 
-                      transparent 60%, 
-                      rgba(255, 255, 255, 0.03) 70%, 
-                      rgba(255, 255, 255, 0.1) 85%, 
-                      rgba(255, 255, 255, 0.2) 100%
-                    )
-                  `,
-                  opacity: 0.7,
-                }}
-              />
-              
-              {/* Glass surface texture */}
-              <div 
-                className="absolute inset-0 rounded-full pointer-events-none"
-                style={{
-                  background: `
-                    radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
-                    radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
-                    linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.08) 50%, transparent 60%)
-                  `,
-                  opacity: 0.5,
-                  animation: 'glassShimmer 6s ease-in-out infinite',
-                  backgroundSize: '200% 200%',
-                }}
-              />
-              
               <motion.div
                 className="absolute inset-0 rounded-full pointer-events-none"
                 animate={config.glowControls}
                 style={{
-                  boxShadow: "0 0 30px rgba(41,141,238,0.35)",
+                  boxShadow: "0 0 20px rgba(41,141,238,0.25)",
                 }}
               />
             </motion.div>
@@ -828,77 +1052,15 @@ export default function HeroSection() {
         >
           {showName && (
             <>
-              {/* Welcome Banner */}
               <WelcomeBanner />
               
-              <div>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 1, delay: 0.5 }}
-                >
-                  <SplitText
-                    text="Hello! I'm"
-                    className="text-3xl md:text-4xl font-semibold mb-6 text-cyan-400 drop-shadow-lg"
-                    splitType="words"
-                    delay={120}
-                    duration={1}
-                    ease="power3.out"
-                  />
-                </motion.div>
+              <div className="mb-8">
+                {renderHelloVariant()}
               </div>
               
               <NameRevealAnimation showName={showName} />
-
-              <div className="min-h-[60px] md:min-h-[80px] mt-8">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={currentSkillIndex}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.4, delay: 4.5 }}
-                    className="text-xl md:text-3xl font-mono text-cyan-400 drop-shadow-lg"
-                    style={{
-                      textRendering: "optimizeLegibility",
-                      WebkitFontSmoothing: "antialiased",
-                      MozOsxFontSmoothing: "grayscale",
-                    }}
-                  >
-                    {currentSkill.split("").map((char, index: number) => (
-                      <motion.span
-                        key={index}
-                        custom={index}
-                        initial="hidden"
-                        animate="visible"
-                        variants={textVariants}
-                        style={{
-                          display: "inline-block",
-                          willChange: "transform, opacity",
-                        }}
-                      >
-                        {char}
-                      </motion.span>
-                    ))}
-                    <motion.span variants={cursorVariants} animate="blinking" className="ml-1">
-                      |
-                    </motion.span>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
               
-              <motion.p
-                className="text-xl md:text-2xl text-gray-300 mt-6"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 5.5, duration: 0.8 }}
-                style={{
-                  textRendering: "optimizeLegibility",
-                  WebkitFontSmoothing: "antialiased",
-                }}
-              >
-                Creating digital experiences that matter
-              </motion.p>
+              <RolesDecryption showRoles={showRoles} />
               
               <motion.div
                 className="mt-8 flex justify-center"
