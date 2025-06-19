@@ -1,15 +1,19 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 import { useState, useEffect, useRef, useCallback } from "react"
 import { motion, useAnimation, AnimatePresence, AnimationControls } from "framer-motion"
-import SplitText from "../src/components/TextAnimations/SplitText/SplitText"
 import LetsConnectModal from "./letsconnectmodal"
 import ShinyText from "@/src/components/ShinyText/ShinyText"
 import { HyperText } from "@/src/components/HyperText/HyperText"
+import XMarquee from "./ui/XMarquee"
 
-// --- Enhanced Typewriter Component for "Hello, I'm" ---
-function TypewriterHello() {
+
+
+
+
+// --- Static Hello Component ---
+function StaticHello() {
   return (
     <div className="text-center space-y-4">
       <motion.div
@@ -22,128 +26,6 @@ function TypewriterHello() {
           Hello, I'm
         </span>
       </motion.div>
-    </div>
-  )
-}
-
-// --- Glitch Effect "Hello, I'm" Component ---
-function GlitchHello() {
-  const [isGlitching, setIsGlitching] = useState(false)
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsGlitching(true)
-      setTimeout(() => setIsGlitching(false), 200)
-    }, 4000)
-
-    return () => clearInterval(interval)
-  }, [])
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 1, delay: 0.5 }}
-      className="relative text-center"
-    >
-      <h1 
-        className={`text-5xl md:text-7xl font-bold transition-all duration-200 ${
-          isGlitching ? 'animate-pulse' : ''
-        }`}
-        style={{
-          textShadow: isGlitching 
-            ? '2px 0 #ff0000, -2px 0 #00ff00, 0 2px #0000ff' 
-            : '0 0 20px rgba(59, 130, 246, 0.3)',
-        }}
-      >
-        <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-          Hello, I'm
-        </span>
-      </h1>
-      
-      {isGlitching && (
-        <>
-          <div className="absolute inset-0 text-5xl md:text-7xl font-bold text-red-500 opacity-70 transform translate-x-1">
-            Hello, I'm
-          </div>
-          <div className="absolute inset-0 text-5xl md:text-7xl font-bold text-green-500 opacity-70 transform -translate-x-1">
-            Hello, I'm
-          </div>
-        </>
-      )}
-    </motion.div>
-  )
-}
-
-// --- Morphing Text "Hello, I'm" Component ---
-function MorphingHello() {
-  const greetings = [
-    "Hello, I'm",
-    "Hi, I'm", 
-    "Hey, I'm",
-    "Greetings, I'm",
-    "Welcome, I'm"
-  ]
-  
-  const [currentGreeting, setCurrentGreeting] = useState(0)
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentGreeting((prev) => (prev + 1) % greetings.length)
-    }, 3000)
-
-    return () => clearInterval(interval)
-  }, [greetings.length])
-
-  return (
-    <div className="text-center">
-      <AnimatePresence mode="wait">
-        <motion.h1
-          key={currentGreeting}
-          initial={{ opacity: 0, y: 20, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -20, scale: 1.1 }}
-          transition={{ duration: 0.5 }}
-          className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent"
-        >
-          {greetings[currentGreeting]}
-        </motion.h1>
-      </AnimatePresence>
-    </div>
-  )
-}
-
-// --- Updated Interactive "Hello, I'm" Component (Removed 5 Dots) ---
-function ParticleHello() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect()
-      setMousePosition({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      })
-    }
-  }, [])
-
-  return (
-    <div 
-      ref={containerRef}
-      className="relative text-center py-12"
-      onMouseMove={handleMouseMove}
-    >
-      <motion.h1
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-        className="text-5xl md:text-7xl font-bold relative z-10"
-      >
-        <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-          Hello, I'm
-        </span>
-      </motion.h1>
     </div>
   )
 }
@@ -209,11 +91,8 @@ function WelcomeBanner() {
           background: "linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.05) 100%)",
         }}
       >
-        {/* Enhanced glass overlay layers */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/8 to-transparent rounded-full" />
         <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/5 to-white/10 rounded-full" />
-        
-        {/* Subtle inner glow */}
         <div 
           className="absolute inset-[1px] rounded-full opacity-60"
           style={{
@@ -221,8 +100,6 @@ function WelcomeBanner() {
             boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.05)",
           }}
         />
-        
-        {/* Frosted glass effect */}
         <div 
           className="absolute inset-0 rounded-full opacity-30"
           style={{
@@ -230,7 +107,6 @@ function WelcomeBanner() {
             filter: "blur(0.5px)",
           }}
         />
-        
         <div className="relative z-10">
           <ShinyText 
             text="Welcome to My Creative World ✨" 
@@ -244,8 +120,8 @@ function WelcomeBanner() {
   )
 }
 
-// --- Enhanced Parallax Stars Background (Removed Z-Axis Circuit Lines) ---
-function ParallaxStarsBackground() {
+// --- Enhanced Background with Gradient (No Circuit Lines) ---
+function EnhancedBackground() {
   const interactiveRef = useRef<HTMLDivElement>(null)
   const [curX, setCurX] = useState(0)
   const [curY, setCurY] = useState(0)
@@ -321,19 +197,6 @@ function ParallaxStarsBackground() {
     setIsSafari(/^((?!chrome|android).)*safari/i.test(navigator.userAgent))
   }, [])
 
-  useEffect(() => {
-    const link = document.createElement('link');
-    link.href = 'https://fonts.googleapis.com/css?family=Lato:300,400,700';
-    link.rel = 'stylesheet';
-    document.head.appendChild(link);
-    
-    return () => {
-      if (document.head.contains(link)) {
-        document.head.removeChild(link);
-      }
-    };
-  }, []);
-
   if (!isClient) {
     return (
       <div
@@ -341,10 +204,9 @@ function ParallaxStarsBackground() {
         style={{
           background: `
             radial-gradient(ellipse at bottom, #081626 0%, #041018 100%),
-            radial-gradient(ellipse at top left, rgba(8, 22, 38, 0.8) 0%, transparent 60%),
-            radial-gradient(ellipse at top right, rgba(6, 18, 32, 0.7) 0%, transparent 60%),
-            radial-gradient(ellipse at bottom left, rgba(41, 141, 238, 0.05) 0%, transparent 50%),
-            radial-gradient(ellipse at bottom right, rgba(0, 255, 255, 0.04) 0%, transparent 50%)
+            linear-gradient(135deg, rgba(41, 141, 238, 0.08) 0%, rgba(6, 18, 32, 0.9) 50%, rgba(8, 22, 38, 0.95) 100%),
+            radial-gradient(ellipse at top left, rgba(41, 141, 238, 0.12) 0%, transparent 60%),
+            radial-gradient(ellipse at bottom right, rgba(0, 255, 255, 0.06) 0%, transparent 50%)
           `,
         }}
       />
@@ -363,30 +225,30 @@ function ParallaxStarsBackground() {
           }
         }
         
-        @keyframes fadeInDown {
-          from {
-            opacity: 0;
-            transform: translateY(-20px);
+        @keyframes marquee-diagonal-1 {
+          0% {
+            transform: rotate(25deg) translateX(-100%);
           }
-          to {
-            opacity: 1;
-            transform: translateY(0);
+          100% {
+            transform: rotate(25deg) translateX(100%);
           }
         }
         
-        @keyframes particleFloat {
-          0%, 100% {
-            transform: translateY(0px) scale(1);
-            opacity: 0.6;
+        @keyframes marquee-diagonal-2 {
+          0% {
+            transform: rotate(-25deg) translateX(100%);
           }
-          50% {
-            transform: translateY(-8px) scale(1.1);
-            opacity: 1;
+          100% {
+            transform: rotate(-25deg) translateX(-100%);
           }
         }
         
-        .animate-fadeInDown {
-          animation: fadeInDown 0.8s ease-out;
+        .animate-marquee-diagonal-1 {
+          animation: marquee-diagonal-1 20s linear infinite;
+        }
+        
+        .animate-marquee-diagonal-2 {
+          animation: marquee-diagonal-2 25s linear infinite;
         }
         
         #stars:after {
@@ -431,10 +293,9 @@ function ParallaxStarsBackground() {
         style={{
           background: `
             radial-gradient(ellipse at bottom, #081626 0%, #041018 100%),
-            radial-gradient(ellipse at top left, rgba(8, 22, 38, 0.8) 0%, transparent 60%),
-            radial-gradient(ellipse at top right, rgba(6, 18, 32, 0.7) 0%, transparent 60%),
-            radial-gradient(ellipse at bottom left, rgba(41, 141, 238, 0.05) 0%, transparent 50%),
-            radial-gradient(ellipse at bottom right, rgba(0, 255, 255, 0.04) 0%, transparent 50%)
+            linear-gradient(135deg, rgba(41, 141, 238, 0.08) 0%, rgba(6, 18, 32, 0.9) 50%, rgba(8, 22, 38, 0.95) 100%),
+            radial-gradient(ellipse at top left, rgba(41, 141, 238, 0.12) 0%, transparent 60%),
+            radial-gradient(ellipse at bottom right, rgba(0, 255, 255, 0.06) 0%, transparent 50%)
           `,
         }}
         onMouseMove={handleMouseMove}
@@ -474,54 +335,12 @@ function ParallaxStarsBackground() {
           }}
         ></div>
 
-        {/* Enhanced grid overlay */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSg1NiwgMTgyLCAyNTUsIDAuMDMpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-25"></div>
-
-        {/* Enhanced circuit lines with glow effect */}
-        <div className="absolute inset-0 opacity-20">
-          <svg width="100%" height="100%" className="opacity-40">
-            <defs>
-              <linearGradient id="circuitGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#00FFFF" stopOpacity="0.5" />
-                <stop offset="50%" stopColor="#0088FF" stopOpacity="0.3" />
-                <stop offset="100%" stopColor="#0044BB" stopOpacity="0.2" />
-              </linearGradient>
-              <filter id="circuitGlow">
-                <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
-                <feMerge> 
-                  <feMergeNode in="coloredBlur"/>
-                  <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-              </filter>
-            </defs>
-            <path
-              d="M0,300 Q300,400 600,350 T1000,400 T1400,350"
-              fill="none"
-              stroke="url(#circuitGradient)"
-              strokeWidth="1"
-              filter="url(#circuitGlow)"
-            />
-            <path
-              d="M300,0 Q350,200 300,400 T350,800 T300,1200"
-              fill="none"
-              stroke="url(#circuitGradient)"
-              strokeWidth="1"
-              filter="url(#circuitGlow)"
-            />
-            <path
-              d="M800,100 Q900,300 800,500 T900,900"
-              fill="none"
-              stroke="url(#circuitGradient)"
-              strokeWidth="0.8"
-              filter="url(#circuitGlow)"
-              opacity="0.7"
-            />
-          </svg>
-        </div>
+        {/* Subtle grid overlay */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSg1NiwgMTgyLCAyNTUsIDAuMDIpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-15"></div>
 
         {/* Noise texture overlay for depth */}
         <div 
-          className="absolute inset-0 opacity-[0.015] mix-blend-overlay"
+          className="absolute inset-0 opacity-[0.01] mix-blend-overlay"
           style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
           }}
@@ -542,31 +361,24 @@ function ParallaxStarsBackground() {
             "gradients-container h-full w-full blur-lg " + (isSafari ? "blur-2xl" : "[filter:url(#blurMe)_blur(40px)]")
           }
         >
-          <div className="absolute w-[80%] h-[80%] top-[10%] left-[10%] bg-gradient-radial from-blue-600/30 to-transparent rounded-full mix-blend-multiply animate-first"></div>
-          <div className="absolute w-[80%] h-[80%] top-[10%] left-[10%] bg-gradient-radial from-cyan-600/25 to-transparent rounded-full mix-blend-multiply animate-second origin-[calc(50%-400px)]"></div>
-          <div className="absolute w-[80%] h-[80%] top-[10%] left-[10%] bg-gradient-radial from-purple-600/25 to-transparent rounded-full mix-blend-multiply animate-third origin-[calc(50%+400px)]"></div>
-          <div className="absolute w-[80%] h-[80%] top-[10%] left-[10%] bg-gradient-radial from-violet-600/20 to-transparent rounded-full mix-blend-multiply animate-fourth origin-[calc(50%-200px)]"></div>
-          <div className="absolute w-[80%] h-[80%] top-[10%] left-[10%] bg-gradient-radial from-emerald-600/25 to-transparent rounded-full mix-blend-multiply animate-fifth origin-[calc(50%-800px)_calc(50%+800px)]"></div>
+          <div className="absolute w-[80%] h-[80%] top-[10%] left-[10%] bg-gradient-radial from-blue-600/25 to-transparent rounded-full mix-blend-multiply animate-first"></div>
+          <div className="absolute w-[80%] h-[80%] top-[10%] left-[10%] bg-gradient-radial from-cyan-600/20 to-transparent rounded-full mix-blend-multiply animate-second origin-[calc(50%-400px)]"></div>
+          <div className="absolute w-[80%] h-[80%] top-[10%] left-[10%] bg-gradient-radial from-purple-600/20 to-transparent rounded-full mix-blend-multiply animate-third origin-[calc(50%+400px)]"></div>
+          <div className="absolute w-[80%] h-[80%] top-[10%] left-[10%] bg-gradient-radial from-violet-600/15 to-transparent rounded-full mix-blend-multiply animate-fourth origin-[calc(50%-200px)]"></div>
+          <div className="absolute w-[80%] h-[80%] top-[10%] left-[10%] bg-gradient-radial from-emerald-600/20 to-transparent rounded-full mix-blend-multiply animate-fifth origin-[calc(50%-800px)_calc(50%+800px)]"></div>
           <div
             ref={interactiveRef}
-            className="absolute w-full h-full -top-1/2 -left-1/2 bg-gradient-radial from-blue-500/20 to-transparent rounded-full mix-blend-multiply opacity-70"
+            className="absolute w-full h-full -top-1/2 -left-1/2 bg-gradient-radial from-blue-500/15 to-transparent rounded-full mix-blend-multiply opacity-70"
           ></div>
-        </div>
-
-        {/* Enhanced scan line */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute inset-0 opacity-12">
-            <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-cyan-400 to-transparent absolute animate-scanline"></div>
-          </div>
         </div>
 
         {/* Enhanced cursor glow effect */}
         <div
-          className="pointer-events-none absolute w-[250px] h-[250px] rounded-full bg-gradient-radial from-cyan-500/25 to-transparent blur-xl"
+          className="pointer-events-none absolute w-[200px] h-[200px] rounded-full bg-gradient-radial from-cyan-500/20 to-transparent blur-xl"
           style={{
             left: `${mousePosition.x}px`,
             top: `${mousePosition.y}px`,
-            opacity: 0.4,
+            opacity: 0.3,
             transform: "translate(-50%, -50%)",
             transition: "opacity 0.2s ease",
           }}
@@ -675,8 +487,6 @@ function NameRevealAnimation({ showName }: { showName: boolean }) {
   );
 }
 
-
-
 // --- Cinematic Roles Component with Center-Out HyperText Animation ---
 function RolesDecryption({ showRoles }: { showRoles: boolean }) {
   const roles = [
@@ -740,7 +550,6 @@ function RolesDecryption({ showRoles }: { showRoles: boolean }) {
     </motion.div>
   )
 }
-
 
 // --- Glass Effect "Let's Connect" Button ---
 interface LetsConnectButtonProps {
@@ -854,7 +663,6 @@ export default function HeroSection() {
   const [allArrivedGlow, setAllArrivedGlow] = useState(false)
   const [showName, setShowName] = useState(false)
   const [showRoles, setShowRoles] = useState(false)
-  const [helloVariant, setHelloVariant] = useState<'typewriter' | 'glitch' | 'morphing' | 'particle'>('typewriter')
   const circleContainerRef = useRef<HTMLDivElement>(null)
   const [showConnectModal, setShowConnectModal] = useState(false)
 
@@ -940,39 +748,15 @@ export default function HeroSection() {
       })
     }, animationDuration * 1000)
 
-    const variantTimer = setInterval(() => {
-      const variants: Array<typeof helloVariant> = ['typewriter', 'glitch', 'morphing', 'particle']
-      setHelloVariant(prev => {
-        const currentIndex = variants.indexOf(prev)
-        return variants[(currentIndex + 1) % variants.length]
-      })
-    }, 15000)
-
     return () => {
       clearTimeout(nameRevealTimer)
       clearTimeout(rolesRevealTimer)
       clearTimeout(glowTimer)
-      clearInterval(variantTimer)
     }
   }, [glowControls1, glowControls2, glowControls3, animationDuration])
 
   const openModal = () => setShowConnectModal(true)
   const closeModal = () => setShowConnectModal(false)
-
-  const renderHelloVariant = () => {
-    switch (helloVariant) {
-      case 'typewriter':
-        return <TypewriterHello />
-      case 'glitch':
-        return <GlitchHello />
-      case 'morphing':
-        return <MorphingHello />
-      case 'particle':
-        return <ParticleHello />
-      default:
-        return <TypewriterHello />
-    }
-  }
 
   return (
     <>
@@ -987,7 +771,7 @@ export default function HeroSection() {
           MozOsxFontSmoothing: "grayscale",
         }}
       >
-        <ParallaxStarsBackground />
+        <EnhancedBackground />
 
         <div
           className="absolute top-1/2 left-1/2 w-[130vmin] h-[130vmin] -translate-x-1/2 -translate-y-1/2 z-10"
@@ -1055,7 +839,7 @@ export default function HeroSection() {
               <WelcomeBanner />
               
               <div className="mb-8">
-                {renderHelloVariant()}
+                <StaticHello />
               </div>
               
               <NameRevealAnimation showName={showName} />
@@ -1073,6 +857,9 @@ export default function HeroSection() {
             </>
           )}
         </motion.div>
+
+        {/* X-Shaped Marquee for Section Transition */}
+        <XMarquee></XMarquee>
       </section>
 
       <LetsConnectModal isOpen={showConnectModal} onClose={closeModal} />
