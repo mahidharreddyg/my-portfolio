@@ -1,30 +1,185 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 import { useState, useEffect, useRef, useCallback } from "react"
-import { motion, useAnimation, AnimatePresence, type AnimationControls } from "framer-motion"
-import SplitText from "../src/components/TextAnimations/SplitText/SplitText"
+import { motion, useAnimation, AnimatePresence, AnimationControls } from "framer-motion"
 import LetsConnectModal from "./letsconnectmodal"
-import Particles from "./Particles"
+import ShinyText from "@/src/components/ShinyText/ShinyText"
+import { HyperText } from "@/src/components/HyperText/HyperText"
 
-// --- Refined Futuristic Background Animation ---
-function FuturisticBackgroundAnimation() {
+
+
+
+// --- Static Hello Component ---
+function StaticHello() {
+  return (
+    <div className="text-center space-y-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.3 }}
+        className="text-4xl md:text-6xl font-bold"
+      >
+        <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-300 bg-clip-text text-transparent">
+          Hello, I'm
+        </span>
+      </motion.div>
+    </div>
+  )
+}
+
+// --- Updated Welcome Banner with Glassy Effect ---
+function WelcomeBanner() {
+  const [isHovered, setIsHovered] = useState(false)
+  const glowControls = useAnimation()
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      glowControls.start({
+        boxShadow: [
+          "0 0 12px rgba(41,141,238,0.2), 0 0 20px rgba(59, 130, 246, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 0 8px rgba(41,141,238,0.05)",
+          "0 0 16px rgba(41,141,238,0.25), 0 0 25px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 0 12px rgba(41,141,238,0.08)",
+          "0 0 12px rgba(41,141,238,0.2), 0 0 20px rgba(59, 130, 246, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 0 8px rgba(41,141,238,0.05)",
+        ],
+        transition: { 
+          duration: 3, 
+          times: [0, 0.5, 1],
+          ease: "easeInOut"
+        },
+      })
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [glowControls])
+
+  const handleHover = () => {
+    setIsHovered(true)
+    glowControls.start({
+      scale: 1.02,
+      boxShadow: "0 0 20px rgba(41,141,238,0.3), 0 0 30px rgba(59, 130, 246, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 0 15px rgba(41,141,238,0.1)",
+      transition: { duration: 0.3 }
+    })
+  }
+
+  const handleHoverEnd = () => {
+    setIsHovered(false)
+    glowControls.start({
+      scale: 1,
+      boxShadow: "0 0 12px rgba(41,141,238,0.2), 0 0 20px rgba(59, 130, 246, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 0 8px rgba(41,141,238,0.05)",
+      transition: { duration: 0.3 }
+    })
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: 1.5 }}
+      className="mb-8"
+    >
+      <motion.a 
+        className="group relative inline-flex cursor-pointer items-center justify-center overflow-hidden rounded-full border border-white/40 bg-white/15 py-[6px] px-5 text-sm font-medium opacity-95 backdrop-blur-xl transition-all duration-300 ease-in-out lg:text-base max-w-fit mx-auto"
+        href="/portfolio"
+        onMouseEnter={handleHover}
+        onMouseLeave={handleHoverEnd}
+        animate={glowControls}
+        style={{
+          boxShadow: "0 0 12px rgba(41,141,238,0.2), 0 0 20px rgba(59, 130, 246, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 0 8px rgba(41,141,238,0.05)",
+          borderColor: "rgba(255, 255, 255, 0.4)",
+          background: "linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.05) 100%)",
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/8 to-transparent rounded-full" />
+        <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/5 to-white/10 rounded-full" />
+        <div 
+          className="absolute inset-[1px] rounded-full opacity-60"
+          style={{
+            background: "linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.05) 100%)",
+            boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.05)",
+          }}
+        />
+        <div 
+          className="absolute inset-0 rounded-full opacity-30"
+          style={{
+            background: "radial-gradient(ellipse at top, rgba(255, 255, 255, 0.15) 0%, transparent 70%)",
+            filter: "blur(0.5px)",
+          }}
+        />
+        <div className="relative z-10">
+          <ShinyText 
+            text="Welcome to My Creative World ✨" 
+            disabled={false} 
+            speed={2.7} 
+            className='custom-class' 
+          />
+        </div>
+      </motion.a>
+    </motion.div>
+  )
+}
+
+// --- Enhanced Background with Gradient (No Circuit Lines) ---
+function EnhancedBackground() {
   const interactiveRef = useRef<HTMLDivElement>(null)
   const [curX, setCurX] = useState(0)
   const [curY, setCurY] = useState(0)
   const [tgX, setTgX] = useState(0)
   const [tgY, setTgY] = useState(0)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  
+  const [stars, setStars] = useState({
+    small: '',
+    medium: '',
+    large: ''
+  })
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+    const generateStars = (count: number) => {
+      return Array.from({ length: count }, () => 
+        `${Math.floor(Math.random() * 2000)}px ${Math.floor(Math.random() * 2000)}px #FFF`
+      ).join(', ');
+    };
+
+    setStars({
+      small: generateStars(700),
+      medium: generateStars(200),
+      large: generateStars(100)
+    })
+  }, [])
+
+  const animationFrameRef = useRef<number>()
 
   useEffect(() => {
     function move() {
       if (!interactiveRef.current) return
-      setCurX(curX + (tgX - curX) / 20)
-      setCurY(curY + (tgY - curY) / 20)
-      interactiveRef.current.style.transform = `translate(${Math.round(curX)}px, ${Math.round(curY)}px)`
+      
+      setCurX(prev => {
+        const newX = prev + (tgX - prev) / 20
+        setCurY(prevY => {
+          const newY = prevY + (tgY - prevY) / 20
+          if (interactiveRef.current) {
+            interactiveRef.current.style.transform = `translate(${Math.round(newX)}px, ${Math.round(newY)}px)`
+          }
+          return newY
+        })
+        return newX
+      })
+      
+      animationFrameRef.current = requestAnimationFrame(move)
     }
-    move()
-  }, [tgX, tgY, curX, curY])
+    
+    if (tgX !== 0 || tgY !== 0) {
+      animationFrameRef.current = requestAnimationFrame(move)
+    }
+    
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
+    }
+  }, [tgX, tgY])
 
   const handleMouseMove = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
     if (interactiveRef.current) {
@@ -40,89 +195,194 @@ function FuturisticBackgroundAnimation() {
     setIsSafari(/^((?!chrome|android).)*safari/i.test(navigator.userAgent))
   }, [])
 
-  return (
-    <div
-      className="absolute inset-0 overflow-hidden"
-      style={{
-        background: "linear-gradient(135deg, #040B1A 0%, #0A1A2E 50%, #061325 100%)",
-      }}
-      onMouseMove={handleMouseMove}
-    >
-      {/* Subtle grid overlay */}
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSg1NiwgMTgyLCAyNTUsIDAuMDMpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
-
-      {/* Minimal circuit lines */}
-      <div className="absolute inset-0 opacity-20">
-        <svg width="100%" height="100%" className="opacity-30">
-          <defs>
-            <linearGradient id="circuitGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#00FFFF" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#0088FF" stopOpacity="0.2" />
-            </linearGradient>
-          </defs>
-
-          {/* Simple horizontal line */}
-          <path
-            d="M0,300 Q300,400 600,350 T1000,400 T1400,350"
-            fill="none"
-            stroke="url(#circuitGradient)"
-            strokeWidth="1"
-          />
-
-          {/* Simple vertical line */}
-          <path
-            d="M300,0 Q350,200 300,400 T350,800 T300,1200"
-            fill="none"
-            stroke="url(#circuitGradient)"
-            strokeWidth="1"
-          />
-        </svg>
-      </div>
-
-      <svg className="hidden">
-        <defs>
-          <filter id="blurMe">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
-            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
-            <feBlend in="SourceGraphic" in2="goo" />
-          </filter>
-        </defs>
-      </svg>
+  if (!isClient) {
+    return (
       <div
-        className={
-          "gradients-container h-full w-full blur-lg " + (isSafari ? "blur-2xl" : "[filter:url(#blurMe)_blur(40px)]")
+        className="absolute inset-0 overflow-hidden"
+        style={{
+          background: `
+            radial-gradient(ellipse at bottom, #081626 0%, #041018 100%),
+            linear-gradient(135deg, rgba(41, 141, 238, 0.08) 0%, rgba(6, 18, 32, 0.9) 50%, rgba(8, 22, 38, 0.95) 100%),
+            radial-gradient(ellipse at top left, rgba(41, 141, 238, 0.12) 0%, transparent 60%),
+            radial-gradient(ellipse at bottom right, rgba(0, 255, 255, 0.06) 0%, transparent 50%)
+          `,
+        }}
+      />
+    )
+  }
+
+  return (
+    <>
+      <style suppressHydrationWarning>{`
+        @keyframes animStar {
+          from { 
+            transform: translateY(0px);
+          }
+          to { 
+            transform: translateY(-2000px);
+          }
         }
+        
+        @keyframes marquee-diagonal-1 {
+          0% {
+            transform: rotate(25deg) translateX(-100%);
+          }
+          100% {
+            transform: rotate(25deg) translateX(100%);
+          }
+        }
+        
+        @keyframes marquee-diagonal-2 {
+          0% {
+            transform: rotate(-25deg) translateX(100%);
+          }
+          100% {
+            transform: rotate(-25deg) translateX(-100%);
+          }
+        }
+        
+        .animate-marquee-diagonal-1 {
+          animation: marquee-diagonal-1 20s linear infinite;
+        }
+        
+        .animate-marquee-diagonal-2 {
+          animation: marquee-diagonal-2 25s linear infinite;
+        }
+        
+        #stars:after {
+          content: " ";
+          position: absolute;
+          top: 2000px;
+          width: 1px;
+          height: 1px;
+          background: transparent;
+          box-shadow: ${stars.small};
+        }
+        
+        #stars2:after {
+          content: " ";
+          position: absolute;
+          top: 2000px;
+          width: 2px;
+          height: 2px;
+          background: transparent;
+          box-shadow: ${stars.medium};
+        }
+        
+        #stars3:after {
+          content: " ";
+          position: absolute;
+          top: 2000px;
+          width: 3px;
+          height: 3px;
+          background: transparent;
+          box-shadow: ${stars.large};
+        }
+        
+        .stars-layer {
+          position: absolute;
+          top: 0;
+          left: 0;
+        }
+      `}</style>
+      
+      <div
+        className="absolute inset-0 overflow-hidden"
+        style={{
+          background: `
+            radial-gradient(ellipse at bottom, #081626 0%, #041018 100%),
+            linear-gradient(135deg, rgba(41, 141, 238, 0.08) 0%, rgba(6, 18, 32, 0.9) 50%, rgba(8, 22, 38, 0.95) 100%),
+            radial-gradient(ellipse at top left, rgba(41, 141, 238, 0.12) 0%, transparent 60%),
+            radial-gradient(ellipse at bottom right, rgba(0, 255, 255, 0.06) 0%, transparent 50%)
+          `,
+        }}
+        onMouseMove={handleMouseMove}
       >
-        <div className="absolute w-[80%] h-[80%] top-[10%] left-[10%] bg-gradient-radial from-blue-600/30 to-transparent rounded-full mix-blend-multiply animate-first"></div>
-        <div className="absolute w-[80%] h-[80%] top-[10%] left-[10%] bg-gradient-radial from-cyan-600/25 to-transparent rounded-full mix-blend-multiply animate-second origin-[calc(50%-400px)]"></div>
-        <div className="absolute w-[80%] h-[80%] top-[10%] left-[10%] bg-gradient-radial from-purple-600/25 to-transparent rounded-full mix-blend-multiply animate-third origin-[calc(50%+400px)]"></div>
-        <div className="absolute w-[80%] h-[80%] top-[10%] left-[10%] bg-gradient-radial from-violet-600/20 to-transparent rounded-full mix-blend-multiply animate-fourth origin-[calc(50%-200px)]"></div>
-        <div className="absolute w-[80%] h-[80%] top-[10%] left-[10%] bg-gradient-radial from-emerald-600/25 to-transparent rounded-full mix-blend-multiply animate-fifth origin-[calc(50%-800px)_calc(50%+800px)]"></div>
+        {/* Parallax Stars Layers */}
+        <div 
+          id="stars" 
+          className="stars-layer"
+          style={{
+            width: '1px',
+            height: '1px',
+            background: 'transparent',
+            boxShadow: stars.small,
+            animation: 'animStar 50s linear infinite'
+          }}
+        ></div>
+        <div 
+          id="stars2" 
+          className="stars-layer"
+          style={{
+            width: '2px',
+            height: '2px',
+            background: 'transparent',
+            boxShadow: stars.medium,
+            animation: 'animStar 100s linear infinite'
+          }}
+        ></div>
+        <div 
+          id="stars3" 
+          className="stars-layer"
+          style={{
+            width: '3px',
+            height: '3px',
+            background: 'transparent',
+            boxShadow: stars.large,
+            animation: 'animStar 150s linear infinite'
+          }}
+        ></div>
+
+        {/* Subtle grid overlay */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSg1NiwgMTgyLCAyNTUsIDAuMDIpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-15"></div>
+
+        {/* Noise texture overlay for depth */}
+        <div 
+          className="absolute inset-0 opacity-[0.01] mix-blend-overlay"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+          }}
+        ></div>
+
+        {/* Animated gradient blobs */}
+        <svg className="hidden">
+          <defs>
+            <filter id="blurMe">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+              <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+              <feBlend in="SourceGraphic" in2="goo" />
+            </filter>
+          </defs>
+        </svg>
         <div
-          ref={interactiveRef}
-          className="absolute w-full h-full -top-1/2 -left-1/2 bg-gradient-radial from-blue-500/20 to-transparent rounded-full mix-blend-multiply opacity-70"
+          className={
+            "gradients-container h-full w-full blur-lg " + (isSafari ? "blur-2xl" : "[filter:url(#blurMe)_blur(40px)]")
+          }
+        >
+          <div className="absolute w-[80%] h-[80%] top-[10%] left-[10%] bg-gradient-radial from-blue-600/25 to-transparent rounded-full mix-blend-multiply animate-first"></div>
+          <div className="absolute w-[80%] h-[80%] top-[10%] left-[10%] bg-gradient-radial from-cyan-600/20 to-transparent rounded-full mix-blend-multiply animate-second origin-[calc(50%-400px)]"></div>
+          <div className="absolute w-[80%] h-[80%] top-[10%] left-[10%] bg-gradient-radial from-purple-600/20 to-transparent rounded-full mix-blend-multiply animate-third origin-[calc(50%+400px)]"></div>
+          <div className="absolute w-[80%] h-[80%] top-[10%] left-[10%] bg-gradient-radial from-violet-600/15 to-transparent rounded-full mix-blend-multiply animate-fourth origin-[calc(50%-200px)]"></div>
+          <div className="absolute w-[80%] h-[80%] top-[10%] left-[10%] bg-gradient-radial from-emerald-600/20 to-transparent rounded-full mix-blend-multiply animate-fifth origin-[calc(50%-800px)_calc(50%+800px)]"></div>
+          <div
+            ref={interactiveRef}
+            className="absolute w-full h-full -top-1/2 -left-1/2 bg-gradient-radial from-blue-500/15 to-transparent rounded-full mix-blend-multiply opacity-70"
+          ></div>
+        </div>
+
+        {/* Enhanced cursor glow effect */}
+        <div
+          className="pointer-events-none absolute w-[200px] h-[200px] rounded-full bg-gradient-radial from-cyan-500/20 to-transparent blur-xl"
+          style={{
+            left: `${mousePosition.x}px`,
+            top: `${mousePosition.y}px`,
+            opacity: 0.3,
+            transform: "translate(-50%, -50%)",
+            transition: "opacity 0.2s ease",
+          }}
         ></div>
       </div>
-
-      {/* Single subtle scan line */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 opacity-10">
-          <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-cyan-400 to-transparent absolute animate-scanline"></div>
-        </div>
-      </div>
-
-      {/* Subtle cursor glow effect */}
-      <div
-        className="pointer-events-none absolute w-[200px] h-[200px] rounded-full bg-gradient-radial from-cyan-500/20 to-transparent blur-xl"
-        style={{
-          left: `${mousePosition.x}px`,
-          top: `${mousePosition.y}px`,
-          opacity: 0.3,
-          transform: "translate(-50%, -50%)",
-          transition: "opacity 0.2s ease",
-        }}
-      ></div>
-    </div>
+    </>
   )
 }
 
@@ -135,29 +395,33 @@ function NameRevealAnimation({ showName }: { showName: boolean }) {
     return `
       @keyframes stroke {
         0% {
-          fill: rgba(237, 245, 253, 0);
+          fill: transparent;
           stroke: #edf5fd;
           stroke-dashoffset: 25%;
           stroke-dasharray: 0 50%;
           stroke-width: 1;
+          opacity: 1;
         }
-        70% {
-          fill: rgba(237, 245, 253, 0);
+        50% {
+          fill: transparent;
           stroke: #edf5fd;
           stroke-dashoffset: 0%;
           stroke-dasharray: 50% 0;
+          opacity: 1;
         }
-        80% {
-          fill: rgba(237, 245, 253, 0);
+        60% {
+          fill: transparent;
           stroke: #edf5fd;
           stroke-width: 1;
+          opacity: 1;
         }
         100% {
           fill: #edf5fd;
-          stroke: rgba(237, 245, 253, 0);
+          stroke: transparent;
           stroke-dashoffset: -25%;
           stroke-dasharray: 50% 0;
           stroke-width: 0;
+          opacity: 1;
         }
       }
     `;
@@ -169,13 +433,21 @@ function NameRevealAnimation({ showName }: { showName: boolean }) {
     const text = textRef.current;
     if (!text) return;
 
+    text.style.opacity = "0";
+    text.style.fill = "transparent";
+    text.style.stroke = "transparent";
+
     const style = document.createElement("style");
     style.setAttribute("data-component", "hero-stroke-animation");
     style.textContent = generateKeyframes();
     document.head.appendChild(style);
     styleRef.current = style;
 
-    text.style.animation = "stroke 4.5s ease-in-out forwards";
+    setTimeout(() => {
+      if (text) {
+        text.style.animation = "stroke 4.5s ease-in-out forwards";
+      }
+    }, 100);
 
     return () => {
       if (styleRef.current && document.head.contains(styleRef.current)) {
@@ -196,11 +468,14 @@ function NameRevealAnimation({ showName }: { showName: boolean }) {
           y="50%"
           dy=".35em"
           textAnchor="middle"
-          className="uppercase fill-transparent stroke-[#edf5fd] stroke-1"
+          className="uppercase"
           style={{
-            fontFamily: "'Russo One', sans-serif",
+            fontFamily: "'Lily Script One', system-ui",
             fontSize: "clamp(40px, 8vw, 100px)",
-            strokeLinejoin: "round"
+            strokeLinejoin: "round",
+            fill: "transparent",
+            stroke: "transparent",
+            opacity: 0,
           }}
         >
           MAHIDHAR REDDY G
@@ -210,7 +485,71 @@ function NameRevealAnimation({ showName }: { showName: boolean }) {
   );
 }
 
-// --- Simple "Let's Connect" Button ---
+// --- Cinematic Roles Component with Center-Out HyperText Animation ---
+function RolesDecryption({ showRoles }: { showRoles: boolean }) {
+  const roles = [
+    "Full Stack Developer",
+    "UI/UX Designer", 
+    "AI/ML Enthusiast",
+    "Creative Problem Solver",
+    "Digital Innovator"
+  ]
+  
+  const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
+  const [triggerAnimation, setTriggerAnimation] = useState(false)
+
+  useEffect(() => {
+    if (!showRoles) return
+    
+    const interval = setInterval(() => {
+      setCurrentRoleIndex((prev) => (prev + 1) % roles.length)
+      
+      // Trigger animation
+      setTriggerAnimation(true)
+      
+      // Reset trigger after a short delay
+      setTimeout(() => {
+        setTriggerAnimation(false)
+      }, 100)
+      
+    }, 6000)
+
+    // Initial animation trigger
+    setTimeout(() => {
+      setTriggerAnimation(true)
+      setTimeout(() => setTriggerAnimation(false), 100)
+    }, 500)
+
+    return () => clearInterval(interval)
+  }, [showRoles, roles.length])
+
+  if (!showRoles) return null
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: 5.0 }}
+      className="text-center mt-6"
+    >
+      <div className="text-2xl md:text-3xl font-semibold text-white">
+        <HyperText
+          key={`role-${currentRoleIndex}`}
+          triggerAnimation={triggerAnimation}
+          animateOnHover={true}
+          duration={2500}
+          animationDirection="center-out"
+          className="bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent"
+          characterSet={["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","0","1","2","3","4","5","6","7","8","9","!","@","#","$","%","^","&","*","(",")"]}
+        >
+          {roles[currentRoleIndex]}
+        </HyperText>
+      </div>
+    </motion.div>
+  )
+}
+
+// --- Glass Effect "Let's Connect" Button ---
 interface LetsConnectButtonProps {
   onClick: () => void
 }
@@ -224,41 +563,95 @@ function LetsConnectButton({ onClick }: LetsConnectButtonProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className="
-        relative flex items-center justify-center gap-3 px-8 py-4 rounded-lg
-        bg-white/[0.03] border border-white/[0.08]
-        text-white font-medium text-lg
-        backdrop-blur-xl
-        transition-all duration-300 ease-out
-        hover:bg-white/[0.06] hover:border-white/[0.12]
-        hover:shadow-lg hover:shadow-blue-500/[0.05]
-        hover:scale-105
+        group relative inline-flex cursor-pointer items-center justify-between 
+        overflow-hidden rounded-full border border-white/20 bg-white/10 
+        py-[6px] pr-[6px] pl-4 text-base font-medium opacity-90 
+        backdrop-blur-md transition-all duration-300 ease-in-out
+        hover:bg-transparent hover:border-white/30
+        md:py-2 md:pr-2 md:pl-5
       "
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
+      style={{
+        boxShadow: isHovered 
+          ? '0 8px 32px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)' 
+          : '0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+      }}
     >
-      <span className="tracking-wide">Let's Connect</span>
-      <motion.div
-        className="w-5 h-5"
-        animate={{
-          x: isHovered ? 4 : 0,
-          rotate: isHovered ? 45 : 0,
+      <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-transparent rounded-full" />
+      
+      <span className="z-10 px-3 text-white transition-colors duration-300 group-hover:text-black">
+        Let's Connect
+      </span>
+      
+      <span 
+        className="
+          absolute inset-0 translate-x-[45%] scale-0 rounded-full 
+          bg-gradient-to-br from-white/95 via-white/90 to-white/85
+          opacity-0 transition-all duration-300 ease-in-out 
+          group-hover:translate-x-0 group-hover:scale-100 group-hover:opacity-100
+          backdrop-blur-sm
+        "
+        style={{
+          boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 0 25px rgba(255, 255, 255, 0.3), 0 4px 16px rgba(255, 255, 255, 0.1)',
+          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 50%, rgba(255, 255, 255, 0.75) 100%)',
         }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      />
+      
+      <span className="
+        z-10 flex items-center justify-center overflow-hidden rounded-full 
+        bg-gradient-to-br from-white/30 via-white/20 to-white/10
+        border border-white/30 backdrop-blur-md
+        p-2 transition-all duration-300 
+        group-hover:bg-gradient-to-br group-hover:from-white/95 group-hover:via-white/90 group-hover:to-white/85
+        group-hover:border-white/40 group-hover:shadow-lg
+        md:p-2.5
+      "
+      style={{
+        boxShadow: isHovered 
+          ? 'inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 0 15px rgba(255, 255, 255, 0.2)' 
+          : 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 8px rgba(255, 255, 255, 0.05)',
+      }}
       >
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width="18" 
+          height="18" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          strokeWidth="2" 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+          className="
+            text-white transition-all duration-300 
+            group-hover:translate-x-5 group-hover:opacity-0
+          "
         >
-          <path d="M7 17L17 7" />
-          <path d="M7 7h10v10" />
+          <path d="M5 12h14" />
+          <path d="m12 5 7 7-7 7" />
         </svg>
-      </motion.div>
+        
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width="18" 
+          height="18" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          strokeWidth="2" 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+          className="
+            absolute -translate-x-5 text-black opacity-0 
+            transition-all duration-300 
+            group-hover:translate-x-0 group-hover:opacity-100
+          "
+        >
+          <path d="M5 12h14" />
+          <path d="m12 5 7 7-7 7" />
+        </svg>
+      </span>
     </motion.button>
   )
 }
@@ -267,53 +660,9 @@ function LetsConnectButton({ onClick }: LetsConnectButtonProps) {
 export default function HeroSection() {
   const [allArrivedGlow, setAllArrivedGlow] = useState(false)
   const [showName, setShowName] = useState(false)
+  const [showRoles, setShowRoles] = useState(false)
   const circleContainerRef = useRef<HTMLDivElement>(null)
   const [showConnectModal, setShowConnectModal] = useState(false)
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  const skills = ["Full Stack Developer", "UI/UX Designer", "AI/ML Enthusiast"]
-  const [currentSkillIndex, setCurrentSkillIndex] = useState(0)
-  const currentSkill = skills[currentSkillIndex]
-
-  useEffect(() => {
-    if (!showName) return
-    const interval = setInterval(() => {
-      setCurrentSkillIndex((prev) => (prev + 1) % skills.length)
-    }, 4000)
-    return () => clearInterval(interval)
-  }, [skills.length, showName])
-
-  const textVariants = {
-    hidden: {
-      opacity: 0,
-      y: 20,
-      scale: 0.98,
-    },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: {
-        delay: i * 0.03,
-        duration: 0.4,
-        ease: [0.25, 0.46, 0.45, 0.94],
-        type: "spring",
-        stiffness: 100,
-        damping: 15,
-      },
-    }),
-  }
-
-  const cursorVariants = {
-    blinking: {
-      opacity: [0, 0, 1, 1],
-      transition: {
-        duration: 1.4,
-        repeat: Number.POSITIVE_INFINITY,
-        times: [0, 0.5, 0.5, 1],
-      },
-    },
-  }
 
   const glowControls1 = useAnimation()
   const glowControls2 = useAnimation()
@@ -343,13 +692,13 @@ export default function HeroSection() {
     },
   ]
 
-  const animationDuration = 5
+  const animationDuration = 4
 
   const handleHover = useCallback(
     (controls: AnimationControls) => {
       if (!allArrivedGlow) {
         controls.start({
-          boxShadow: "0 0 80px rgba(41,141,238,1)",
+          boxShadow: "0 0 80px rgba(41,141,238,0.9)",
           transition: { duration: 0.2 },
         })
       }
@@ -361,7 +710,7 @@ export default function HeroSection() {
     (controls: AnimationControls) => {
       if (!allArrivedGlow) {
         controls.start({
-          boxShadow: "0 0 30px rgba(41,141,238,0.35)",
+          boxShadow: "0 0 40px rgba(41,141,238,0.4)",
           transition: { duration: 0.2 },
         })
       }
@@ -370,15 +719,21 @@ export default function HeroSection() {
   )
 
   useEffect(() => {
-    const totalDelay = animationDuration * 1000
+    const nameRevealTimer = setTimeout(() => {
+      setShowName(true)
+    }, 2000)
+
+    const rolesRevealTimer = setTimeout(() => {
+      setShowRoles(true)
+    }, 4500)
+
     const glowTimer = setTimeout(() => {
       setAllArrivedGlow(true)
-      setShowName(true)
       const glowAnimation = {
         boxShadow: [
-          "0 0 30px rgba(41,141,238,0.35)",
-          "0 0 60px rgba(41,141,238,0.8)",
-          "0 0 30px rgba(41,141,238,0.35)",
+          "0 0 20px rgba(41,141,238,0.25)",
+          "0 0 35px rgba(41,141,238,0.5)",
+          "0 0 20px rgba(41,141,238,0.25)",
         ],
         transition: { duration: 1, times: [0, 0.5, 1] },
       }
@@ -389,10 +744,14 @@ export default function HeroSection() {
       ]).then(() => {
         setAllArrivedGlow(false)
       })
-    }, totalDelay)
+    }, animationDuration * 1000)
 
-    return () => clearTimeout(glowTimer)
-  }, [glowControls1, glowControls2, glowControls3])
+    return () => {
+      clearTimeout(nameRevealTimer)
+      clearTimeout(rolesRevealTimer)
+      clearTimeout(glowTimer)
+    }
+  }, [glowControls1, glowControls2, glowControls3, animationDuration])
 
   const openModal = () => setShowConnectModal(true)
   const closeModal = () => setShowConnectModal(false)
@@ -400,7 +759,7 @@ export default function HeroSection() {
   return (
     <>
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Russo+One&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Lily+Script+One&display=swap');
       `}</style>
       
       <section
@@ -410,32 +769,7 @@ export default function HeroSection() {
           MozOsxFontSmoothing: "grayscale",
         }}
       >
-        <FuturisticBackgroundAnimation />
-
-        <div
-          ref={containerRef}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            minHeight: "100%",
-            zIndex: 1,
-            display: "block",
-          }}
-        >
-          <Particles
-            particleColors={["#00FFFF", "#80FFFF", "#1DE9B6", "#7FDBFF", "#3EF8F8"]}
-            particleCount={150}
-            particleSpread={10}
-            speed={0.1}
-            particleBaseSize={100}
-            moveParticlesOnHover={true}
-            alphaParticles={false}
-            disableRotation={false}
-          />
-        </div>
+        <EnhancedBackground />
 
         <div
           className="absolute top-1/2 left-1/2 w-[130vmin] h-[130vmin] -translate-x-1/2 -translate-y-1/2 z-10"
@@ -451,7 +785,7 @@ export default function HeroSection() {
                 height: config.size,
                 background: "radial-gradient(circle, #091119 55%, rgba(255, 255, 255, 0.25) 100%)",
                 border: "0.1px solid rgba(255, 255, 255, 0.12)",
-                boxShadow: "0 0 30px rgba(41, 141, 238, 0.35)",
+                boxShadow: "0 0 20px rgba(41, 141, 238, 0.25)",
                 willChange: "transform",
               }}
               initial={{
@@ -481,7 +815,7 @@ export default function HeroSection() {
                 className="absolute inset-0 rounded-full pointer-events-none"
                 animate={config.glowControls}
                 style={{
-                  boxShadow: "0 0 30px rgba(41,141,238,0.35)",
+                  boxShadow: "0 0 20px rgba(41,141,238,0.25)",
                 }}
               />
             </motion.div>
@@ -500,80 +834,28 @@ export default function HeroSection() {
         >
           {showName && (
             <>
-              <div>
-                <SplitText
-                  text="Hello! I'm"
-                  className="text-3xl md:text-4xl font-semibold mb-6 text-cyan-400 drop-shadow-lg"
-                  splitType="words"
-                  delay={120}
-                  duration={1}
-                  ease="power3.out"
-                />
+              <WelcomeBanner />
+              
+              <div className="mb-8">
+                <StaticHello />
               </div>
               
               <NameRevealAnimation showName={showName} />
-
-              <div className="min-h-[60px] md:min-h-[80px] mt-8">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={currentSkillIndex}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.4, delay: 5.2 }}
-                    className="text-xl md:text-3xl font-mono text-cyan-400 drop-shadow-lg"
-                    style={{
-                      textRendering: "optimizeLegibility",
-                      WebkitFontSmoothing: "antialiased",
-                      MozOsxFontSmoothing: "grayscale",
-                    }}
-                  >
-                    {currentSkill.split("").map((char, index: number) => (
-                      <motion.span
-                        key={index}
-                        custom={index}
-                        initial="hidden"
-                        animate="visible"
-                        variants={textVariants}
-                        style={{
-                          display: "inline-block",
-                          willChange: "transform, opacity",
-                        }}
-                      >
-                        {char}
-                      </motion.span>
-                    ))}
-                    <motion.span variants={cursorVariants} animate="blinking" className="ml-1">
-                      |
-                    </motion.span>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
               
-              <motion.p
-                className="text-xl md:text-2xl text-gray-300 mt-6"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 6.5, duration: 0.8 }}
-                style={{
-                  textRendering: "optimizeLegibility",
-                  WebkitFontSmoothing: "antialiased",
-                }}
-              >
-                Creating digital experiences that matter
-              </motion.p>
+              <RolesDecryption showRoles={showRoles} />
               
               <motion.div
                 className="mt-8 flex justify-center"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 7, duration: 0.8 }}
+                transition={{ delay: 6.5, duration: 0.8 }}
               >
                 <LetsConnectButton onClick={openModal} />
               </motion.div>
             </>
           )}
         </motion.div>
+
       </section>
 
       <LetsConnectModal isOpen={showConnectModal} onClose={closeModal} />

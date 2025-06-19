@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
+import clipPath from "tailwind-clip-path"; // 👈 Import legacy clip-path plugin
 
-const config = {
+const config: Config = {
   darkMode: ["class"],
   content: [
     "./pages/**/*.{ts,tsx}",
@@ -60,7 +61,6 @@ const config = {
         sm: "calc(var(--radius) - 4px)",
       },
       keyframes: {
-        // Your existing keyframes
         "accordion-down": {
           from: { height: "0" },
           to: { height: "var(--radix-accordion-content-height)" },
@@ -109,7 +109,6 @@ const config = {
             transform: "translateY(0)",
           },
         },
-        // Aceternity UI-style animated background keyframes
         moveHorizontal: {
           "0%": {
             transform: "translateX(-50%) translateY(-10%)",
@@ -151,16 +150,24 @@ const config = {
         glow: "glow 3s ease-in-out infinite",
         float: "float 5s ease-in-out infinite",
         fadeInUp: "fadeInUp 1.5s ease-out forwards",
-        // Aceternity UI-style animated background animations
         first: "moveVertical 30s ease infinite",
         second: "moveInCircle 20s reverse infinite",
         third: "moveInCircle 40s linear infinite",
         fourth: "moveHorizontal 40s ease infinite",
         fifth: "moveInCircle 20s ease infinite",
       },
+      clipPath: {
+        // 👇 You can customize these or add more as needed
+        'top-triangle': 'polygon(0 0, 100% 10%, 100% 100%, 0% 100%)',
+        'bottom-triangle': 'polygon(0 0, 100% 0, 100% 90%, 0 100%)',
+        'angled': 'polygon(0 10%, 100% 0%, 100% 100%, 0% 100%)',
+      },
     },
   },
-  plugins: [require("tailwindcss-animate")],
-} satisfies Config;
+  plugins: [
+    require("tailwindcss-animate"),
+    clipPath // 👈 Registered here
+  ],
+};
 
 export default config;
