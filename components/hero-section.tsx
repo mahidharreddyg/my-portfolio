@@ -6,8 +6,6 @@ import { motion, useAnimation, AnimatePresence, AnimationControls } from "framer
 import LetsConnectModal from "./letsconnectmodal"
 import ShinyText from "@/src/components/ShinyText/ShinyText"
 import { HyperText } from "@/src/components/HyperText/HyperText"
-import XMarquee from "./ui/XMarquee"
-
 
 
 
@@ -858,8 +856,6 @@ export default function HeroSection() {
           )}
         </motion.div>
 
-        {/* X-Shaped Marquee for Section Transition */}
-        <XMarquee></XMarquee>
       </section>
 
       <LetsConnectModal isOpen={showConnectModal} onClose={closeModal} />
