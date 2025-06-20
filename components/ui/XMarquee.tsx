@@ -180,6 +180,13 @@ const TOP_BAND_TEXT =
 const BOTTOM_BAND_TEXT =
   "ACTUATE   INNOVATE   IDEATE   ACTUATE   INNOVATE   IDEATE";
 
+const FIXED_Y_PEAK = 40; // px, the Y value where the bands and section meet (was 80)
+const BAND_ANGLE_DEG = 12;
+const BAND_ANGLE_RAD = BAND_ANGLE_DEG * Math.PI / 180;
+// To have the bottom edge at Y = FIXED_Y_PEAK, band is centered at (centerX, FIXED_Y_PEAK)
+// So bandHeight = 2 * FIXED_Y_PEAK
+const BAND_HEIGHT = 80; // restore to slim band
+
 export default function XVelocityBandsCorrected({
   topText = TOP_BAND_TEXT,
   bottomText = BOTTOM_BAND_TEXT,
@@ -241,10 +248,10 @@ export default function XVelocityBandsCorrected({
       <div
         className={cn("absolute z-50 pointer-events-none overflow-hidden matrix-band")}
         style={{
-          height: "80px",
+          height: `${BAND_HEIGHT}px`,
           width: "200vw",
           left: "50%",
-          top: "50%",
+          top: `${FIXED_Y_PEAK}px`,
           transform: "translate(-50%, -50%) rotate(12deg)",
           transformOrigin: "center center",
         }}
@@ -261,10 +268,10 @@ export default function XVelocityBandsCorrected({
       <div
         className={cn("absolute z-50 pointer-events-none overflow-hidden matrix-band")}
         style={{
-          height: "80px",
+          height: `${BAND_HEIGHT}px`,
           width: "200vw",
           left: "50%",
-          top: "50%",
+          top: `${FIXED_Y_PEAK}px`,
           transform: "translate(-50%, -50%) rotate(168deg)",
           transformOrigin: "center center",
         }}
