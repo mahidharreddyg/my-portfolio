@@ -7,9 +7,6 @@ import LetsConnectModal from "./letsconnectmodal"
 import ShinyText from "@/src/components/ShinyText/ShinyText"
 import { HyperText } from "@/src/components/HyperText/HyperText"
 
-
-
-
 // --- Static Hello Component ---
 function StaticHello() {
   return (
