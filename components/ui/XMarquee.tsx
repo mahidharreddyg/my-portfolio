@@ -51,10 +51,11 @@ function ParallaxText({
     }
   });
 
+  // Smooth velocity handling
   const smoothVelocity = useSpring(scrollVelocity, {
-    damping: 40,
-    stiffness: 200,
-    mass: 0.5,
+    damping: 30,
+    stiffness: 180,
+    mass: 0.25,
   });
 
   const velocityFactor = useTransform(
@@ -79,7 +80,7 @@ function ParallaxText({
   }, []);
 
   useEffect(() => {
-    const timeoutId: ReturnType<typeof setTimeout> | undefined = setTimeout(calculateRepetitions, 100);
+    const timeoutId = setTimeout(calculateRepetitions, 100);
 
     const handleResize = () => {
       if (resizeTimeoutRef.current) {
@@ -92,7 +93,7 @@ function ParallaxText({
     window.addEventListener("resize", handleResize);
 
     return () => {
-      if (timeoutId !== undefined) clearTimeout(timeoutId);
+      clearTimeout(timeoutId);
       if (resizeTimeoutRef.current) {
         clearTimeout(resizeTimeoutRef.current);
         resizeTimeoutRef.current = undefined;
@@ -103,20 +104,20 @@ function ParallaxText({
 
   const x = useTransform(baseX, (v) => `${wrap(-100 / repetitions, 0, v)}%`);
 
-  const directionFactor = useRef<number>(1);
-
   useAnimationFrame((_t, delta) => {
     if (!hasInitialized.current) return;
 
-    let moveBy = directionFactor.current * baseVelocity * (delta / 1000);
     const currentVelocity = velocityFactor.get();
+    const base = baseVelocity * (delta / 1000);
+
+    let moveBy = base;
+
+    const easeFactor = 0.75;
 
     if (scrollDirection === "up") {
-      directionFactor.current = -1;
-      moveBy -= Math.abs(currentVelocity) * baseVelocity * (delta / 1000) * 1.5;
-    } else if (scrollDirection === "down") {
-      directionFactor.current = 1;
-      moveBy += Math.abs(currentVelocity) * baseVelocity * (delta / 1000) * 1.5;
+      moveBy = -base - easeFactor * Math.abs(currentVelocity) * base;
+    } else {
+      moveBy = base + easeFactor * Math.abs(currentVelocity) * base;
     }
 
     baseX.set(baseX.get() + moveBy);
@@ -132,6 +133,8 @@ function ParallaxText({
         className="inline-block"
         style={{
           x,
+          willChange: "transform",
+          transform: "translate3d(0, 0, 0)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -172,15 +175,6 @@ export default function XVelocityBandsCorrected({
   bottomText = BOTTOM_BAND_TEXT,
   defaultVelocity = 1.2,
 }: VelocityBandsProps) {
-  const componentInitialized = useRef(false);
-
-  useEffect(() => {
-    if (!componentInitialized.current) {
-      console.log("XVelocityBands initialized once");
-      componentInitialized.current = true;
-    }
-  }, []);
-
   return (
     <>
       <style jsx global>{`
@@ -218,7 +212,7 @@ export default function XVelocityBandsCorrected({
         }
       `}</style>
 
-      {/* Top band */}
+      {/* Top Band */}
       <div
         className={cn(
           "absolute z-50 pointer-events-none overflow-hidden matrix-band",
@@ -239,7 +233,7 @@ export default function XVelocityBandsCorrected({
         </ParallaxText>
       </div>
 
-      {/* Bottom band */}
+      {/* Bottom Band */}
       <div
         className={cn(
           "absolute z-50 pointer-events-none overflow-hidden matrix-band",
