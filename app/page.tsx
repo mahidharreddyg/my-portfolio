@@ -15,16 +15,21 @@ export default function Home() {
       if (!sectionRef.current) return;
 
       const vw = window.innerWidth;
-      const bandCenterY = 40; // Center Y position where bands intersect
-      const bandHeight = 80; // Total height of the band container
+      const bandCenterY = 40; // Fixed Y position where bands intersect
       const angleRad = (12 * Math.PI) / 180;
       
-      // Move to the END (bottom) of the bands
-      const bandEndY = bandCenterY + (bandHeight / 2); // This moves from center (40px) to bottom (80px)
-      
-      const tanAngle = Math.tan(angleRad);
+      // Responsive band height based on your new sizing
+      let bandHeight;
+      if (vw <= 768) {
+        bandHeight = 40; // h-10 on mobile/tablet
+      } else {
+        bandHeight = 80; // h-20 on desktop (md:h-20)
+      }
       
       // Calculate intersection points at the END of the bands
+      const tanAngle = Math.tan(angleRad);
+      const bandEndY = bandCenterY + (bandHeight / 2); // Move to bottom edge
+      
       const leftY = bandEndY + (vw * 0.5 * tanAngle);
       const rightY = bandEndY + (vw * 0.5 * tanAngle);
       const centerY = bandEndY;
@@ -70,7 +75,7 @@ export default function Home() {
             >
               <Section id="about" title="About Me" className="bg-transparent">
                 <p className="pt-16 text-center max-w-3xl mx-auto leading-relaxed">
-                  Perfect transition at the end of the bands creating seamless flow.
+                  Perfect responsive triangle alignment with your new band sizing.
                 </p>
               </Section>
             </div>
