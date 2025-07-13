@@ -5,6 +5,8 @@ import Navbar from "@/components/navbar";
 import HeroSection from "@/components/hero-section";
 import Section from "@/components/section";
 import XMarquee from "@/components/ui/XMarquee";
+import { BentoGridDemo } from "@/components/BentoGridDemo";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   const sectionRef = useRef(null);
@@ -15,7 +17,9 @@ export default function Home() {
       if (!sectionRef.current) return;
 
       const vw = window.innerWidth;
-      const bandCenterY = 40; // Fixed Y position where bands intersect
+      const vh = window.innerHeight;
+      const sectionHeight = vh * 2; // 200vh converted to pixels
+      const bandCenterY = 120; // Updated to match FIXED_Y_PEAK
       const angleRad = (12 * Math.PI) / 180;
       
       // Responsive band height based on your new sizing
@@ -30,6 +34,7 @@ export default function Home() {
       const tanAngle = Math.tan(angleRad);
       const bandEndY = bandCenterY + (bandHeight / 2); // Move to bottom edge
       
+      // Calculate points using the actual section height instead of viewport height
       const leftY = bandEndY + (vw * 0.5 * tanAngle);
       const rightY = bandEndY + (vw * 0.5 * tanAngle);
       const centerY = bandEndY;
@@ -39,8 +44,8 @@ export default function Home() {
           0% ${leftY}px,
           50% ${centerY}px, 
           100% ${rightY}px,
-          100% 100%,
-          0% 100%
+          100% ${sectionHeight}px,
+          0% ${sectionHeight}px
         )
       `.replace(/\s+/g, ' '));
     }
@@ -61,7 +66,7 @@ export default function Home() {
           <div className="relative min-h-screen">
             <div
               className="absolute inset-x-0 top-0 flex justify-center pointer-events-none"
-              style={{ height: "80px" }}
+              style={{ height: "160px" }}
             >
               <XMarquee
                 topText="ABOUT EXPERIENCE SKILLS"
@@ -70,18 +75,19 @@ export default function Home() {
             </div>
             <div
               ref={sectionRef}
-              className="relative min-h-screen bg-zinc-800 overflow-hidden"
+              className="relative min-h-[200vh] bg-gradient-to-br from-blue-900 via-black to-black overflow-hidden flex items-center justify-center"
               style={{ clipPath }}
             >
               <Section id="about" title="About Me" className="bg-transparent">
-                <p className="pt-16 text-center max-w-3xl mx-auto leading-relaxed">
-                  Perfect responsive triangle alignment with your new band sizing.
-                </p>
+                <div className="py-12 flex items-center justify-center min-h-[120vh]">
+                  <BentoGridDemo />
+                </div>
               </Section>
             </div>
           </div>
         </div>
       </div>
+      <Footer />
     </main>
   );
 }
