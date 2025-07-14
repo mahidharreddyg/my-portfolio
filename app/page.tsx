@@ -56,7 +56,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="relative text-white min-h-screen overflow-x-hidden">
+    <main className="relative text-white min-h-screen">
       <Navbar />
       <div className="marquee-hero-wrapper">
         <div className="sticky top-0 h-screen z-10">
