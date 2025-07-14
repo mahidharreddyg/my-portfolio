@@ -27,19 +27,21 @@ export default function Section({ id, title, children, className = "" }: Section
       transition={{ duration: 0.6 }}
     >
       {/* Animated background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-black to-zinc-800">
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-cyan-500/5"
-          animate={{
-            backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Number.POSITIVE_INFINITY,
-            ease: "linear",
-          }}
-        />
-      </div>
+      {!className.includes('bg-transparent') && (
+        <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-black to-zinc-800">
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-cyan-500/5"
+            animate={{
+              backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Number.POSITIVE_INFINITY,
+              ease: "linear",
+            }}
+          />
+        </div>
+      )}
 
       {/* Content container */}
       <div className="relative z-10 max-w-6xl mx-auto px-4">

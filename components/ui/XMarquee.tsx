@@ -51,74 +51,52 @@ function ParallaxText({
     }
   });
 
-  // Smooth velocity handling
+  // Smooth velocity handling with better spring settings
   const smoothVelocity = useSpring(scrollVelocity, {
-    damping: 30,
-    stiffness: 180,
-    mass: 0.25,
+    damping: 50,
+    stiffness: 400,
   });
 
   const velocityFactor = useTransform(
     smoothVelocity,
-    [-80, 80],
-    [-1.5, 1.5],
+    [0, 1000],
+    [0, 5],
     { clamp: false }
   );
 
   const [repetitions, setRepetitions] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
-  const resizeTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-
-  const calculateRepetitions = useCallback(() => {
-    if (containerRef.current && textRef.current) {
-      const containerWidth = containerRef.current.offsetWidth;
-      const textWidth = textRef.current.offsetWidth;
-      const newReps = Math.ceil(containerWidth / textWidth) + 2;
-      setRepetitions(newReps);
-    }
-  }, []);
 
   useEffect(() => {
-    const timeoutId = setTimeout(calculateRepetitions, 100);
-
-    const handleResize = () => {
-      if (resizeTimeoutRef.current) {
-        clearTimeout(resizeTimeoutRef.current);
-        resizeTimeoutRef.current = undefined;
+    const calculateRepetitions = () => {
+      if (containerRef.current && textRef.current) {
+        const containerWidth = containerRef.current.offsetWidth;
+        const textWidth = textRef.current.offsetWidth;
+        const newRepetitions = Math.ceil(containerWidth / textWidth) + 2;
+        setRepetitions(newRepetitions);
       }
-      resizeTimeoutRef.current = setTimeout(calculateRepetitions, 150);
     };
 
-    window.addEventListener("resize", handleResize);
+    calculateRepetitions();
 
-    return () => {
-      clearTimeout(timeoutId);
-      if (resizeTimeoutRef.current) {
-        clearTimeout(resizeTimeoutRef.current);
-        resizeTimeoutRef.current = undefined;
-      }
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [calculateRepetitions, children]);
+    window.addEventListener("resize", calculateRepetitions);
+    return () => window.removeEventListener("resize", calculateRepetitions);
+  }, [children]);
 
   const x = useTransform(baseX, (v) => `${wrap(-100 / repetitions, 0, v)}%`);
 
-  useAnimationFrame((_t, delta) => {
-    if (!hasInitialized.current) return;
+  const directionFactor = React.useRef<number>(1);
+  useAnimationFrame((t, delta) => {
+    let moveBy = directionFactor.current * baseVelocity * (delta / 1000);
 
-    const currentVelocity = velocityFactor.get();
-    const base = baseVelocity * (delta / 1000);
-
-    let moveBy = base;
-
-    const easeFactor = 0.75;
-
-    if (scrollDirection === "up") {
-      moveBy = -base - easeFactor * Math.abs(currentVelocity) * base;
-    } else {
-      moveBy = base + easeFactor * Math.abs(currentVelocity) * base;
+    if (velocityFactor.get() < 0) {
+      directionFactor.current = -1;
+    } else if (velocityFactor.get() > 0) {
+      directionFactor.current = 1;
     }
+
+    moveBy += directionFactor.current * moveBy * velocityFactor.get();
 
     baseX.set(baseX.get() + moveBy);
   });
@@ -168,7 +146,7 @@ interface VelocityBandsProps {
 
 const TOP_BAND_TEXT = "ACTUATE   INNOVATE   IDEATE   ACTUATE   INNOVATE   IDEATE";
 const BOTTOM_BAND_TEXT = "ACTUATE   INNOVATE   IDEATE   ACTUATE   INNOVATE   IDEATE";
-const FIXED_Y_PEAK = 40;
+const FIXED_Y_PEAK = 120; // Moved down further from 80 to 120
 
 export default function XVelocityBandsCorrected({
   topText = TOP_BAND_TEXT,
@@ -249,6 +227,7 @@ export default function XVelocityBandsCorrected({
         <ParallaxText
           baseVelocity={-defaultVelocity}
           className="text-blue-300 text-sm sm:text-base md:text-lg lg:text-xl font-extrabold tracking-wider matrix-text"
+          style={{ transform: "rotate(180deg)" }}
         >
           {bottomText}
         </ParallaxText>

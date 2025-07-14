@@ -2,10 +2,11 @@
 
 import React from "react"
 import { useState, useEffect, useRef, useCallback } from "react"
-import { motion, useAnimation, AnimatePresence, AnimationControls } from "framer-motion"
+import { motion, useAnimation, AnimatePresence } from "framer-motion"
 import LetsConnectModal from "./letsconnectmodal"
 import ShinyText from "@/src/components/ShinyText/ShinyText"
 import { HyperText } from "@/src/components/HyperText/HyperText"
+import XMarquee from "./ui/XMarquee"
 
 // --- Static Hello Component ---
 function StaticHello() {
@@ -134,7 +135,7 @@ function EnhancedBackground() {
   useEffect(() => {
     setIsClient(true)
     const generateStars = (count: number) => {
-      return Array.from({ length: count }, () =>
+      return Array.from({ length: count }, (_, i) =>
         `${Math.floor(Math.random() * 2000)}px ${Math.floor(Math.random() * 2000)}px #FFF`
       ).join(', ');
     };
@@ -146,7 +147,7 @@ function EnhancedBackground() {
     })
   }, [])
 
-  const animationFrameRef = useRef<number>()
+  const animationFrameRef = useRef<number | undefined>()
 
   useEffect(() => {
     function move() {
@@ -238,12 +239,38 @@ function EnhancedBackground() {
           }
         }
         
+        @keyframes marquee-left {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
+        }
+        
+        @keyframes marquee-right {
+          0% {
+            transform: translateX(100%);
+          }
+          100% {
+            transform: translateX(-100%);
+          }
+        }
+        
         .animate-marquee-diagonal-1 {
           animation: marquee-diagonal-1 20s linear infinite;
         }
         
         .animate-marquee-diagonal-2 {
           animation: marquee-diagonal-2 25s linear infinite;
+        }
+        
+        .animate-marquee-left {
+          animation: marquee-left 8s linear infinite;
+        }
+        
+        .animate-marquee-right {
+          animation: marquee-right 8s linear infinite;
         }
         
         #stars:after {
@@ -693,7 +720,7 @@ export default function HeroSection() {
 
   // ORIGINAL HOVER GLOW EFFECTS RESTORED
   const handleHover = useCallback(
-    (controls: AnimationControls) => {
+    (controls: any) => {
       if (!allArrivedGlow) {
         controls.start({
           boxShadow: "0 0 80px rgba(41,141,238,0.9), 0 0 120px rgba(41,141,238,0.6)",
@@ -705,7 +732,7 @@ export default function HeroSection() {
   )
 
   const handleHoverEnd = useCallback(
-    (controls: AnimationControls) => {
+    (controls: any) => {
       if (!allArrivedGlow) {
         controls.start({
           boxShadow: "0 0 40px rgba(41,141,238,0.4), 0 0 60px rgba(41,141,238,0.2)",
@@ -768,6 +795,29 @@ export default function HeroSection() {
         }}
       >
         <EnhancedBackground />
+
+        {/* Corner Marquees */}
+        <div className="absolute top-0 left-0 z-30 pointer-events-none">
+          <div className="w-32 h-8 overflow-hidden transform -rotate-45 origin-bottom-left">
+            <div className="flex whitespace-nowrap animate-marquee-left">
+              <span className="text-blue-300 text-xs font-bold tracking-wider mx-2">PORTFOLIO</span>
+              <span className="text-blue-300 text-xs font-bold tracking-wider mx-2">PORTFOLIO</span>
+              <span className="text-blue-300 text-xs font-bold tracking-wider mx-2">PORTFOLIO</span>
+              <span className="text-blue-300 text-xs font-bold tracking-wider mx-2">PORTFOLIO</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="absolute top-0 right-0 z-30 pointer-events-none">
+          <div className="w-32 h-8 overflow-hidden transform rotate-45 origin-bottom-right">
+            <div className="flex whitespace-nowrap animate-marquee-right">
+              <span className="text-blue-300 text-xs font-bold tracking-wider mx-2">DEVELOPER</span>
+              <span className="text-blue-300 text-xs font-bold tracking-wider mx-2">DEVELOPER</span>
+              <span className="text-blue-300 text-xs font-bold tracking-wider mx-2">DEVELOPER</span>
+              <span className="text-blue-300 text-xs font-bold tracking-wider mx-2">DEVELOPER</span>
+            </div>
+          </div>
+        </div>
 
         {/* Original Circles with Restored Hover Effects */}
         <div
