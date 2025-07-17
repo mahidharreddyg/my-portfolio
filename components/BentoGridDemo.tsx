@@ -23,14 +23,32 @@ export function BentoGridDemo() {
           header={item.header}
           icon={item.icon}
           className={
-            i === 1 ? "md:h-44 md:mt-auto" : // Push to bottom with margin-top auto
-            i === 2 ? "md:h-[438px] md:mt-auto md:translate-y-[70px]" : // Increased custom height
+            i === 0 ? "md:row-span-2" : // Item 0 now spans 2 rows to include the small box space
+            i === 1 ? "md:h-44 md:mt-16" : // Keep original positioning
+            i === 2 ? "md:h-[443.5px] md:mt-16" : // Keep original positioning  
             i === 3 ? "md:row-span-2" : 
             i === 5 ? "md:col-span-2" : ""
-          }                                           
-          
+          }
         />
       ))}
+      
+      {/* Small box above item 1 (positioned in grid column 2, row 1) */}
+      <BentoGridItem
+        title="Quick Access"
+        description="Essential tools and shortcuts."
+        header={<Skeleton />}
+        icon={<IconBoxAlignTopLeft className="h-5 w-5 text-neutral-500" />}
+        className="md:h-12 md:col-start-2 md:row-start-1"
+      />
+      
+      {/* Small box above item 2 (positioned in grid column 3, row 1) */}
+      <BentoGridItem
+        title="Updates"
+        description="Latest news and notifications."
+        header={<Skeleton />}
+        icon={<IconArrowWaveRightUp className="h-5 w-5 text-neutral-500" />}
+        className="md:h-12 md:col-start-3 md:row-start-1"
+      />
     </BentoGrid>
   );
 }
