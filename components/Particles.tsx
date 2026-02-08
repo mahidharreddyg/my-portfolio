@@ -123,7 +123,7 @@ const Particles: React.FC<ParticlesProps> = ({
       const height = container.clientHeight;
       renderer.setSize(width, height);
       camera.perspective({ aspect: gl.canvas.width / gl.canvas.height });
-      
+
       // Force canvas to fill parent visually
       gl.canvas.style.pointerEvents = 'auto'; // allow hover/click
       gl.canvas.style.position = 'absolute';
@@ -136,7 +136,17 @@ const Particles: React.FC<ParticlesProps> = ({
 
     // Initial resize after appending canvas
     resize();
-    window.addEventListener("resize", resize, false);
+    // Use ResizeObserver for more robust resizing (handles container size changes not triggered by window resize)
+    const resizeObserver = new ResizeObserver(() => {
+      resize();
+    });
+
+    if (container) {
+      resizeObserver.observe(container);
+    }
+
+    // Initial resize
+    resize();
 
     const handleMouseMove = (e: MouseEvent) => {
       const rect = container.getBoundingClientRect();
@@ -224,7 +234,7 @@ const Particles: React.FC<ParticlesProps> = ({
     animationFrameId = requestAnimationFrame(update);
 
     return () => {
-      window.removeEventListener("resize", resize);
+      resizeObserver.disconnect();
       if (moveParticlesOnHover) {
         container.removeEventListener("mousemove", handleMouseMove);
       }

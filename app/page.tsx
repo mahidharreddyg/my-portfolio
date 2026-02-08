@@ -21,7 +21,7 @@ export default function Home() {
       const sectionHeight = vh * 2; // 200vh converted to pixels
       const bandCenterY = 120; // Updated to match FIXED_Y_PEAK
       const angleRad = (12 * Math.PI) / 180;
-      
+
       // Responsive band height based on your new sizing
       let bandHeight;
       if (vw <= 768) {
@@ -29,11 +29,11 @@ export default function Home() {
       } else {
         bandHeight = 80; // h-20 on desktop (md:h-20)
       }
-      
+
       // Calculate intersection points at the END of the bands
       const tanAngle = Math.tan(angleRad);
       const bandEndY = bandCenterY + (bandHeight / 2); // Move to bottom edge
-      
+
       // Calculate points using the actual section height instead of viewport height
       const leftY = bandEndY + (vw * 0.5 * tanAngle);
       const rightY = bandEndY + (vw * 0.5 * tanAngle);
@@ -51,8 +51,23 @@ export default function Home() {
     }
 
     updateClipPath();
+
+    // Use ResizeObserver to detect size changes of the section itself
+    const resizeObserver = new ResizeObserver(() => {
+      updateClipPath();
+    });
+
+    if (sectionRef.current) {
+      resizeObserver.observe(sectionRef.current);
+    }
+
+    // Keep window resize as a fallback for viewport changes that might not trigger element resize
     window.addEventListener("resize", updateClipPath);
-    return () => window.removeEventListener("resize", updateClipPath);
+
+    return () => {
+      window.removeEventListener("resize", updateClipPath);
+      resizeObserver.disconnect();
+    };
   }, []);
 
   return (
