@@ -5,7 +5,7 @@ import Navbar from "@/components/navbar";
 import HeroSection from "@/components/hero-section";
 import Section from "@/components/section";
 import XMarquee from "@/components/ui/XMarquee";
-import { BentoGridDemo } from "@/components/BentoGridDemo";
+import { BentoGridRedesign } from "@/components/BentoGridRedesign";
 import Footer from "@/components/Footer";
 
 export default function Home() {
@@ -94,8 +94,8 @@ export default function Home() {
               style={{ clipPath }}
             >
               <Section id="about" title="About Me" className="bg-transparent">
-                <div className="py-12 flex items-center justify-center min-h-[80vh]">
-                  <BentoGridDemo />
+                <div className="py-4 md:py-12 flex items-center justify-center min-h-[80vh]">
+                  <BentoGridRedesign />
                 </div>
               </Section>
             </div>
