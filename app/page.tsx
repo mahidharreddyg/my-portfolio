@@ -18,16 +18,16 @@ export default function Home() {
 
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      const sectionHeight = vh * 2; // 200vh converted to pixels
-      const bandCenterY = 120; // Updated to match FIXED_Y_PEAK
+      const sectionHeight = vh * 1.3; // REDUCED from 200vh to 130vh
+      const bandCenterY = 120;
       const angleRad = (12 * Math.PI) / 180;
 
       // Responsive band height based on your new sizing
       let bandHeight;
       if (vw <= 768) {
-        bandHeight = 40; // h-10 on mobile/tablet
+        bandHeight = 40;
       } else {
-        bandHeight = 80; // h-20 on desktop (md:h-20)
+        bandHeight = 80;
       }
 
       // Calculate intersection points at the END of the bands
@@ -90,11 +90,11 @@ export default function Home() {
             </div>
             <div
               ref={sectionRef}
-              className="relative min-h-[200vh] bg-gradient-to-br from-blue-900 via-black to-black overflow-hidden flex items-center justify-center"
+              className="relative min-h-[130vh] bg-gradient-to-br from-blue-900 via-black to-black overflow-hidden flex items-center justify-center"
               style={{ clipPath }}
             >
               <Section id="about" title="About Me" className="bg-transparent">
-                <div className="py-12 flex items-center justify-center min-h-[120vh]">
+                <div className="py-12 flex items-center justify-center min-h-[80vh]">
                   <BentoGridDemo />
                 </div>
               </Section>

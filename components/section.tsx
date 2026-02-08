@@ -15,7 +15,7 @@ interface SectionProps {
 
 export default function Section({ id, title, children, className = "" }: SectionProps) {
   const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: "-100px" })
+  const isInView = useInView(ref, { once: true, margin: "-10px" })
 
   return (
     <motion.section
@@ -24,7 +24,7 @@ export default function Section({ id, title, children, className = "" }: Section
       className={`min-h-screen flex items-center justify-center relative overflow-hidden ${className}`}
       initial={{ opacity: 0 }}
       animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-      transition={{ duration: 0.6 }}
+      transition={{ duration: 0.4 }}
     >
       {/* Animated background gradient */}
       {!className.includes('bg-transparent') && (
@@ -46,12 +46,12 @@ export default function Section({ id, title, children, className = "" }: Section
       {/* Content container */}
       <div className="relative z-10 max-w-6xl mx-auto px-4">
         <motion.div
-          initial={{ y: 100, opacity: 0 }}
-          animate={isInView ? { y: 0, opacity: 1 } : { y: 100, opacity: 0 }}
+          initial={{ y: 20, opacity: 0 }}
+          animate={isInView ? { y: 0, opacity: 1 } : { y: 20, opacity: 0 }}
           transition={{
-            duration: 0.8,
+            duration: 0.4,
             ease: [0.25, 0.46, 0.45, 0.94],
-            delay: 0.2,
+            delay: 0,
           }}
           className="text-center"
         >
@@ -68,12 +68,12 @@ export default function Section({ id, title, children, className = "" }: Section
 
           {children && (
             <motion.div
-              initial={{ y: 50, opacity: 0 }}
-              animate={isInView ? { y: 0, opacity: 1 } : { y: 50, opacity: 0 }}
+              initial={{ y: 20, opacity: 0 }}
+              animate={isInView ? { y: 0, opacity: 1 } : { y: 20, opacity: 0 }}
               transition={{
-                duration: 0.8,
+                duration: 0.4,
                 ease: [0.25, 0.46, 0.45, 0.94],
-                delay: 0.4,
+                delay: 0.05,
               }}
             >
               {children}

@@ -2,11 +2,10 @@
 
 import React from "react"
 import { useState, useEffect, useRef, useCallback } from "react"
-import { motion, useAnimation, AnimatePresence } from "framer-motion"
+import { motion, useAnimation } from "framer-motion"
 import LetsConnectModal from "./letsconnectmodal"
 import ShinyText from "@/src/components/ShinyText/ShinyText"
 import { HyperText } from "@/src/components/HyperText/HyperText"
-import XMarquee from "./ui/XMarquee"
 
 // --- Static Hello Component ---
 function StaticHello() {
@@ -15,11 +14,11 @@ function StaticHello() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.3 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
         className="text-4xl md:text-6xl font-bold"
       >
         <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-300 bg-clip-text text-transparent">
-          Hello, I'm
+          Hello, I&apos;m
         </span>
       </motion.div>
     </div>
@@ -28,7 +27,6 @@ function StaticHello() {
 
 // --- Updated Welcome Banner with Glassy Effect ---
 function WelcomeBanner() {
-  const [isHovered, setIsHovered] = useState(false)
   const glowControls = useAnimation()
 
   useEffect(() => {
@@ -51,7 +49,6 @@ function WelcomeBanner() {
   }, [glowControls])
 
   const handleHover = () => {
-    setIsHovered(true)
     glowControls.start({
       scale: 1.02,
       boxShadow: "0 0 20px rgba(41,141,238,0.3), 0 0 30px rgba(59, 130, 246, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 0 15px rgba(41,141,238,0.1)",
@@ -60,7 +57,6 @@ function WelcomeBanner() {
   }
 
   const handleHoverEnd = () => {
-    setIsHovered(false)
     glowControls.start({
       scale: 1,
       boxShadow: "0 0 12px rgba(41,141,238,0.2), 0 0 20px rgba(59, 130, 246, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 0 8px rgba(41,141,238,0.05)",
@@ -72,7 +68,7 @@ function WelcomeBanner() {
     <motion.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 1.5 }}
+      transition={{ duration: 0.6, delay: 0.2 }}
       className="mb-8"
     >
       <motion.a
@@ -119,8 +115,8 @@ function WelcomeBanner() {
 // --- Enhanced Background with Gradient (No Circuit Lines) ---
 function EnhancedBackground() {
   const interactiveRef = useRef<HTMLDivElement>(null)
-  const [curX, setCurX] = useState(0)
-  const [curY, setCurY] = useState(0)
+  const [, setCurX] = useState(0)
+  const [, setCurY] = useState(0)
   const [tgX, setTgX] = useState(0)
   const [tgY, setTgY] = useState(0)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
@@ -135,7 +131,7 @@ function EnhancedBackground() {
   useEffect(() => {
     setIsClient(true)
     const generateStars = (count: number) => {
-      return Array.from({ length: count }, (_, i) =>
+      return Array.from({ length: count }, () =>
         `${Math.floor(Math.random() * 2000)}px ${Math.floor(Math.random() * 2000)}px #FFF`
       ).join(', ');
     };
@@ -605,7 +601,7 @@ function LetsConnectButton({ onClick }: LetsConnectButtonProps) {
       <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-transparent rounded-full" />
 
       <span className="z-10 px-3 text-white transition-colors duration-300 group-hover:text-black">
-        Let's Connect
+        Let&apos;s Connect
       </span>
 
       <span
@@ -720,6 +716,7 @@ export default function HeroSection() {
 
   // ORIGINAL HOVER GLOW EFFECTS RESTORED
   const handleHover = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (controls: any) => {
       if (!allArrivedGlow) {
         controls.start({
@@ -732,6 +729,7 @@ export default function HeroSection() {
   )
 
   const handleHoverEnd = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (controls: any) => {
       if (!allArrivedGlow) {
         controls.start({
@@ -807,7 +805,7 @@ export default function HeroSection() {
             </div>
           </div>
         </div>
-        
+
         <div className="absolute top-0 right-0 z-30 pointer-events-none">
           <div className="w-32 h-8 overflow-hidden transform rotate-45 origin-bottom-right">
             <div className="flex whitespace-nowrap animate-marquee-right">
