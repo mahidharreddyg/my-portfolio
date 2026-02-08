@@ -3015,12 +3015,12 @@ body {
     margin-top: 4rem;
   }
 
-  .md\:mt-0 {
-    margin-top: 0px;
-  }
-
   .md\:flex {
     display: flex;
+  }
+
+  .md\:h-12 {
+    height: 3rem;
   }
 
   .md\:h-20 {
@@ -3037,10 +3037,6 @@ body {
 
   .md\:h-\[443\.5px\] {
     height: 443.5px;
-  }
-
-  .md\:h-12 {
-    height: 3rem;
   }
 
   .md\:w-\[200vw\] {

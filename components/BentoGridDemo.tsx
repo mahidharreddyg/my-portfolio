@@ -23,12 +23,12 @@ export function BentoGridDemo() {
           header={item.header}
           icon={item.icon}
           className={
-            i === 0 ? "md:row-span-2" : // Item 0 now spans 2 rows to include the small box space
-            i === 1 ? "md:h-44 md:mt-16" : // Keep original positioning
-            i === 2 ? "md:h-[443.5px] md:mt-16" : // Keep original positioning  
+            i === 0 || i === 1 ? "md:h-44 md:mt-16" : // Apply to both index 0 and 1
+            i === 2 ? "md:h-[443.5px] md:mt-16" :
             i === 3 ? "md:row-span-2" : 
             i === 5 ? "md:col-span-2" : ""
           }
+          
         />
       ))}
       

@@ -19,7 +19,7 @@ export default function Navbar() {
       setIsVisible(scrollY.get() > heroHeight * 0.6)
     }
 
-    const unsubscribe = scrollY.onChange(updateNavbarVisibility)
+    const unsubscribe = scrollY.on("change", updateNavbarVisibility)
     return () => unsubscribe()
   }, [scrollY])
 
