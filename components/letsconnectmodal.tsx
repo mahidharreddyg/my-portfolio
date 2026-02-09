@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState as useStateTransition, useTransition } from "react";
+import { useTransition } from "react";
 import { QRCodeSVG } from 'qrcode.react';
 
 const socials = [
@@ -28,7 +28,7 @@ const socials = [
     color: "#FFA116",
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.83 5.83 0 0 0 .349 1.017 5.938 5.938 0 0 0 1.271 1.818l4.277 4.193.039.038c2.248 2.165 5.852 2.133 8.063-.074l2.396-2.392c.54-.54.54-1.414.003-1.955a1.378 1.378 0 0 0-1.951-.003l-2.396 2.392a3.021 3.021 0 0 1-4.205.038l-.02-.019-4.276-4.193c-.652-.64-.972-1.469-.948-2.263a2.68 2.68 0 0 1 .066-.523 2.545 2.545 0 0 1 .619-1.164L9.13 8.114c1.058-1.134 3.204-1.27 4.43-.278l3.501 2.831c.593.48 1.461.387 1.94-.207a1.384 1.384 0 0 0-.207-1.943l-3.5-2.831c-.8-.647-1.766-1.045-2.774-1.202l2.015-2.158A1.384 1.384 0 0 0 13.483 0zm-2.866 12.815a1.38 1.38 0 0 0-1.38 1.382 1.38 1.38 0 0 0 1.38 1.382H20.79a1.38 1.38 0 0 0 1.38-1.382 1.38 1.38 0 0 0-1.38-1.382H10.617z"/>
+        <path d="M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.83 5.83 0 0 0 .349 1.017 5.938 5.938 0 0 0 1.271 1.818l4.277 4.193.039.038c2.248 2.165 5.852 2.133 8.063-.074l2.396-2.392c.54-.54.54-1.414.003-1.955a1.378 1.378 0 0 0-1.951-.003l-2.396 2.392a3.021 3.021 0 0 1-4.205.038l-.02-.019-4.276-4.193c-.652-.64-.972-1.469-.948-2.263a2.68 2.68 0 0 1 .066-.523 2.545 2.545 0 0 1 .619-1.164L9.13 8.114c1.058-1.134 3.204-1.27 4.43-.278l3.501 2.831c.593.48 1.461.387 1.94-.207a1.384 1.384 0 0 0-.207-1.943l-3.5-2.831c-.8-.647-1.766-1.045-2.774-1.202l2.015-2.158A1.384 1.384 0 0 0 13.483 0zm-2.866 12.815a1.38 1.38 0 0 0-1.38 1.382 1.38 1.38 0 0 0 1.38 1.382H20.79a1.38 1.38 0 0 0 1.38-1.382 1.38 1.38 0 0 0-1.38-1.382H10.617z" />
       </svg>
     ),
   },
@@ -59,13 +59,13 @@ const socials = [
 // Copy to clipboard utility
 const useCopyToClipboard = () => {
   const [copiedText, setCopiedText] = useState(null);
-  
+
   const copy = async (text) => {
     if (!navigator?.clipboard) {
       console.warn('Clipboard not supported');
       return false;
     }
-    
+
     try {
       await navigator.clipboard.writeText(text);
       setCopiedText(text);
@@ -77,7 +77,7 @@ const useCopyToClipboard = () => {
       return false;
     }
   };
-  
+
   return [copiedText, copy];
 };
 
@@ -102,24 +102,24 @@ interface LetsConnectModalProps {
   websiteUrl?: string;
 }
 
-export default function LetsConnectModal({ 
-  isOpen, 
-  onClose, 
+export default function LetsConnectModal({
+  isOpen,
+  onClose,
   slideDirection = "up",
   websiteUrl = "https://yourwebsite.com"
 }: LetsConnectModalProps) {
   const [tab, setTab] = useState<string>("quick");
-  const [form, setForm] = useState<{ name: string; email: string; message: string }>({ 
-    name: "", 
-    email: "", 
-    message: "" 
+  const [form, setForm] = useState<{ name: string; email: string; message: string }>({
+    name: "",
+    email: "",
+    message: ""
   });
   const [isPending, startTransition] = useTransition();
   const [copiedText, copyToClipboard] = useCopyToClipboard();
-  
+
   // State to control share view within the same panel
   const [showShareView, setShowShareView] = useState(false);
-  
+
   const MODAL_CONTENT_HEIGHT = 560;
   const currentVariant = slideDirection === "down" ? modalVariants.slideDown : modalVariants.slideUp;
 
@@ -129,7 +129,7 @@ export default function LetsConnectModal({
   // 3D Rotation effect handlers
   const handleQRMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!qrContainerRef.current) return;
-    
+
     const rect = qrContainerRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -238,17 +238,16 @@ export default function LetsConnectModal({
 
           {/* Modal */}
           <motion.div
-            className={`fixed z-[10000] flex flex-col mx-auto w-full max-w-xl px-6 pb-6 sm:px-8 border border-white/10 shadow-2xl bg-black/60 backdrop-blur-xl ring-1 ring-white/10 ${
-              slideDirection === "down" 
-                ? "inset-x-0 top-0 rounded-b-2xl" 
-                : "inset-x-0 bottom-0 rounded-t-2xl"
-            }`}
+            className={`fixed z-[10000] flex flex-col mx-auto w-full max-w-xl px-6 pb-6 sm:px-8 border border-white/10 shadow-2xl bg-black/60 backdrop-blur-xl ring-1 ring-white/10 ${slideDirection === "down"
+              ? "inset-x-0 top-0 rounded-b-2xl"
+              : "inset-x-0 bottom-0 rounded-t-2xl"
+              }`}
             tabIndex={-1}
             style={{
               pointerEvents: "auto",
               minHeight: MODAL_CONTENT_HEIGHT,
               maxHeight: MODAL_CONTENT_HEIGHT,
-              ...(slideDirection === "down" 
+              ...(slideDirection === "down"
                 ? { borderTopLeftRadius: 0, borderTopRightRadius: 0 }
                 : { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }
               )
@@ -275,7 +274,7 @@ export default function LetsConnectModal({
                   rel="noopener noreferrer"
                   className="social-icon-link group relative"
                   style={{
-                    animationDelay: `${index * 0.1}s`
+                    animationDelay: `${index * 0.05}s`
                   }}
                 >
                   <div className="social-icon-container">
@@ -327,8 +326,8 @@ export default function LetsConnectModal({
                   type="button"
                   onClick={() => handleTabChange("quick")}
                   className={`relative z-10 inline-flex h-[calc(100%-2px)] flex-1 items-center justify-center gap-1.5 rounded-lg border border-transparent px-2 py-1 text-base font-medium whitespace-nowrap cursor-pointer will-change-transform transition-all duration-500 ${tab === "quick"
-                      ? "text-white"
-                      : "text-neutral-300"
+                    ? "text-white"
+                    : "text-neutral-300"
                     }`}
                 >
                   <span>Quick connect</span>
@@ -337,8 +336,8 @@ export default function LetsConnectModal({
                   type="button"
                   onClick={() => handleTabChange("form")}
                   className={`relative z-10 inline-flex h-[calc(100%-2px)] flex-1 items-center justify-center gap-1.5 rounded-lg border border-transparent px-2 py-1 text-base font-medium whitespace-nowrap cursor-pointer will-change-transform transition-all duration-500 ${tab === "form"
-                      ? "text-white"
-                      : "text-neutral-300"
+                    ? "text-white"
+                    : "text-neutral-300"
                     }`}
                 >
                   <span>Fill a form</span>
@@ -445,7 +444,7 @@ export default function LetsConnectModal({
                       {!showShareView ? (
                         <>
                           <div className="mb-4 sm:mb-6"></div>
-                          
+
                           <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2 mb-3 sm:mb-4">
                             {/* Email Card */}
                             <a
@@ -454,7 +453,7 @@ export default function LetsConnectModal({
                               rel="noopener noreferrer"
                               aria-label="Email"
                               href="mailto:mahidhar.reddy2003@gmail.com"
-                              style={{ 
+                              style={{
                                 animation: !isPending ? 'fadeInUp 0.5s ease-out 0.1s both' : 'none',
                                 minHeight: '100px'
                               }}
@@ -509,7 +508,7 @@ export default function LetsConnectModal({
                             <div
                               className="group contact-card block overflow-hidden rounded-lg border border-white/10 bg-black/30 shadow-sm transition-all duration-500 hover:border-purple-500/40 hover:shadow-lg hover:shadow-purple-900/20 relative cursor-pointer"
                               onClick={handleShareCardClick}
-                              style={{ 
+                              style={{
                                 animation: !isPending ? 'fadeInUp 0.5s ease-out 0.2s both' : 'none',
                                 minHeight: '100px'
                               }}
@@ -531,11 +530,11 @@ export default function LetsConnectModal({
                                       strokeLinecap="round"
                                       strokeLinejoin="round"
                                     >
-                                      <circle cx="18" cy="5" r="3"/>
-                                      <circle cx="6" cy="12" r="3"/>
-                                      <circle cx="18" cy="19" r="3"/>
-                                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-                                      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                                      <circle cx="18" cy="5" r="3" />
+                                      <circle cx="6" cy="12" r="3" />
+                                      <circle cx="18" cy="19" r="3" />
+                                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                                      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
                                     </svg>
                                   </div>
                                   <h3 className="text-sm sm:text-base font-medium text-white group-hover:text-purple-100 transition-all duration-500">Share</h3>
@@ -612,15 +611,15 @@ export default function LetsConnectModal({
                               className="group flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/10 transition-all duration-300"
                             >
                               <svg width="16" height="16" className="text-neutral-400 group-hover:text-white group-hover:-translate-x-0.5 transition-all duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M19 12H5"/>
-                                <path d="M12 19l-7-7 7-7"/>
+                                <path d="M19 12H5" />
+                                <path d="M12 19l-7-7 7-7" />
                               </svg>
                             </button>
                           </div>
 
                           {/* 3D Rotation QR Code Container */}
                           <div className="flex-1 flex flex-col items-center justify-start !-mt-6 qr-3d-perspective">
-                            <div 
+                            <div
                               ref={qrContainerRef}
                               className="qr-compact-hologram-container qr-3d-container relative !mb-6"
                               onMouseMove={handleQRMouseMove}
@@ -652,7 +651,7 @@ export default function LetsConnectModal({
                               >
                                 <div className="share-compact-glow-cyan absolute inset-0 opacity-0 transition-all duration-500 group-hover:opacity-100" />
                                 <div className="share-compact-shimmer absolute inset-0 opacity-0 group-hover:opacity-100" />
-                                
+
                                 <div className="flex items-center gap-2 relative z-10">
                                   <div className="share-compact-icon-container">
                                     <svg
@@ -666,8 +665,8 @@ export default function LetsConnectModal({
                                       strokeLinecap="round"
                                       strokeLinejoin="round"
                                     >
-                                      <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
-                                      <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+                                      <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                                      <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
                                     </svg>
                                   </div>
                                   <div className="flex-1">
@@ -681,12 +680,12 @@ export default function LetsConnectModal({
                                   <div className="flex items-center justify-center w-4 h-4">
                                     {copiedText === websiteUrl ? (
                                       <svg width="10" height="10" className="text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <polyline points="20,6 9,17 4,12"/>
+                                        <polyline points="20,6 9,17 4,12" />
                                       </svg>
                                     ) : (
                                       <svg width="8" height="8" className="opacity-0 group-hover:opacity-100 transition-all duration-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <path d="M7 17L17 7"/>
-                                        <path d="M7 7h10v10"/>
+                                        <path d="M7 17L17 7" />
+                                        <path d="M7 7h10v10" />
                                       </svg>
                                     )}
                                   </div>
@@ -700,7 +699,7 @@ export default function LetsConnectModal({
                               >
                                 <div className="share-compact-glow-purple absolute inset-0 opacity-0 transition-all duration-500 group-hover:opacity-100" />
                                 <div className="share-compact-shimmer absolute inset-0 opacity-0 group-hover:opacity-100" />
-                                
+
                                 <div className="flex items-center gap-2 relative z-10">
                                   <div className="share-compact-icon-container">
                                     <svg
@@ -714,11 +713,11 @@ export default function LetsConnectModal({
                                       strokeLinecap="round"
                                       strokeLinejoin="round"
                                     >
-                                      <circle cx="18" cy="5" r="3"/>
-                                      <circle cx="6" cy="12" r="3"/>
-                                      <circle cx="18" cy="19" r="3"/>
-                                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-                                      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                                      <circle cx="18" cy="5" r="3" />
+                                      <circle cx="6" cy="12" r="3" />
+                                      <circle cx="18" cy="19" r="3" />
+                                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                                      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
                                     </svg>
                                   </div>
                                   <div className="flex-1">
@@ -730,8 +729,8 @@ export default function LetsConnectModal({
                                     </p>
                                   </div>
                                   <svg width="8" height="8" className="opacity-0 group-hover:opacity-100 transition-all duration-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M7 17L17 7"/>
-                                    <path d="M7 7h10v10"/>
+                                    <path d="M7 17L17 7" />
+                                    <path d="M7 7h10v10" />
                                   </svg>
                                 </div>
                               </button>

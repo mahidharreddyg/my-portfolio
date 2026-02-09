@@ -10,7 +10,7 @@ import {
   useVelocity,
   useMotionValueEvent,
 } from "motion/react";
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 // Utility to wrap motion values
@@ -34,27 +34,20 @@ function ParallaxText({
   const baseX = useMotionValue(0);
   const { scrollY } = useScroll();
   const scrollVelocity = useVelocity(scrollY);
-  const [scrollDirection, setScrollDirection] = useState<"up" | "down">("down");
   const hasInitialized = useRef(false);
 
-  useMotionValueEvent(scrollY, "change", (current) => {
+  useMotionValueEvent(scrollY, "change", () => {
     if (!hasInitialized.current) {
       hasInitialized.current = true;
       return;
-    }
-
-    const previous = scrollY.getPrevious() ?? 0;
-    const diff = current - previous;
-
-    if (Math.abs(diff) > 0.1) {
-      setScrollDirection(diff > 0 ? "down" : "up");
     }
   });
 
   // Smooth velocity handling with better spring settings
   const smoothVelocity = useSpring(scrollVelocity, {
-    damping: 50,
+    damping: 40,
     stiffness: 400,
+    mass: 1,
   });
 
   const velocityFactor = useTransform(
@@ -173,10 +166,8 @@ export default function XVelocityBandsCorrected({
         .matrix-text {
           text-shadow:
             0 0 10px rgba(41, 141, 238, 0.8),
-            0 0 20px rgba(41, 141, 238, 0.6),
-            0 0 30px rgba(41, 141, 238, 0.4),
             0 2px 4px rgba(0, 0, 0, 0.8);
-          filter: drop-shadow(0 0 8px rgba(41, 141, 238, 0.5));
+          /* Removed expensive filter: drop-shadow */
         }
 
         @media (max-width: 768px) {

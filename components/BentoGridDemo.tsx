@@ -1,4 +1,3 @@
-import { cn } from "@/lib/utils";
 import React from "react";
 import { BentoGrid, BentoGridItem } from "./ui/bento-grid";
 import {
@@ -24,14 +23,14 @@ export function BentoGridDemo() {
           icon={item.icon}
           className={
             i === 0 || i === 1 ? "md:h-44 md:mt-16" : // Apply to both index 0 and 1
-            i === 2 ? "md:h-[443.5px] md:mt-16" :
-            i === 3 ? "md:row-span-2" : 
-            i === 5 ? "md:col-span-2" : ""
+              i === 2 ? "md:h-[443.5px] md:mt-16" :
+                i === 3 ? "md:row-span-2" :
+                  i === 5 ? "md:col-span-2" : ""
           }
-          
+
         />
       ))}
-      
+
       {/* Small box above item 1 (positioned in grid column 2, row 1) */}
       <BentoGridItem
         title="Quick Access"
@@ -40,7 +39,7 @@ export function BentoGridDemo() {
         icon={<IconBoxAlignTopLeft className="h-5 w-5 text-neutral-500" />}
         className="md:h-12 md:col-start-2 md:row-start-1"
       />
-      
+
       {/* Small box above item 2 (positioned in grid column 3, row 1) */}
       <BentoGridItem
         title="Updates"
