@@ -11,6 +11,11 @@ import Footer from "@/components/Footer";
 export default function Home() {
   const sectionRef = useRef(null);
   const [clipPath, setClipPath] = useState("");
+  const [isMonochrome, setIsMonochrome] = useState(false);
+
+  const toggleTheme = () => {
+    setIsMonochrome((prev) => !prev);
+  }
 
   useEffect(() => {
     function updateClipPath() {
@@ -73,36 +78,45 @@ export default function Home() {
   return (
     <main className="relative text-white min-h-screen">
       <Navbar />
-      <div className="marquee-hero-wrapper">
-        <div className="sticky top-0 h-screen z-10">
-          <HeroSection />
-        </div>
-        <div className="relative z-20">
-          <div className="relative min-h-screen">
-            <div
-              className="absolute inset-x-0 top-0 flex justify-center pointer-events-none"
-              style={{ height: "160px" }}
-            >
-              <XMarquee
-                topText="ABOUT EXPERIENCE SKILLS"
-                bottomText="DEVELOPER CREATOR INNOVATOR"
-              />
-            </div>
-            <div
-              ref={sectionRef}
-              className="relative min-h-[130vh] bg-gradient-to-br from-blue-900 via-black to-black overflow-hidden flex items-center justify-center"
-              style={{ clipPath }}
-            >
-              <Section id="about" title="About Me" className="bg-transparent">
-                <div className="py-4 md:py-12 flex items-center justify-center min-h-[80vh]">
-                  <BentoGridRedesign />
-                </div>
-              </Section>
+
+      {/* Content Wrapper for Monochrome Toggle */}
+      <div
+        style={{
+          filter: isMonochrome ? 'grayscale(85%) contrast(110%)' : 'none',
+          transition: 'filter 1s ease-in-out'
+        }}
+      >
+        <div className="marquee-hero-wrapper">
+          <div className="sticky top-0 h-screen z-10">
+            <HeroSection onThemeToggle={toggleTheme} />
+          </div>
+          <div className="relative z-20">
+            <div className="relative min-h-screen">
+              <div
+                className="absolute inset-x-0 top-0 flex justify-center pointer-events-none"
+                style={{ height: "160px" }}
+              >
+                <XMarquee
+                  topText="ABOUT EXPERIENCE SKILLS"
+                  bottomText="DEVELOPER CREATOR INNOVATOR"
+                />
+              </div>
+              <div
+                ref={sectionRef}
+                className="relative min-h-[130vh] bg-gradient-to-br from-blue-900 via-black to-black overflow-hidden flex items-center justify-center"
+                style={{ clipPath }}
+              >
+                <Section id="about" title="About Me" className="bg-transparent">
+                  <div className="py-4 md:py-12 flex items-center justify-center min-h-[80vh]">
+                    <BentoGridRedesign />
+                  </div>
+                </Section>
+              </div>
             </div>
           </div>
         </div>
+        <Footer />
       </div>
-      <Footer />
     </main>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTransition } from "react";
 import { QRCodeSVG } from 'qrcode.react';
@@ -116,6 +117,7 @@ export default function LetsConnectModal({
   });
   const [isPending, startTransition] = useTransition();
   const [copiedText, copyToClipboard] = useCopyToClipboard();
+  const [mounted, setMounted] = useState(false);
 
   // State to control share view within the same panel
   const [showShareView, setShowShareView] = useState(false);
@@ -125,6 +127,11 @@ export default function LetsConnectModal({
 
   // Ref for QR container for 3D rotation effect
   const qrContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   // 3D Rotation effect handlers
   const handleQRMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -152,25 +159,25 @@ export default function LetsConnectModal({
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
-      const rootElement = document.getElementById('__next') || document.getElementById('root') || document.body;
-      if (rootElement && rootElement !== document.body) {
-        rootElement.style.filter = 'blur(8px)';
-        rootElement.style.transition = 'filter 0.3s ease-out';
-      }
+      // const rootElement = document.getElementById('__next') || document.getElementById('root') || document.body;
+      // if (rootElement && rootElement !== document.body) {
+      //   rootElement.style.filter = 'blur(8px)';
+      //   rootElement.style.transition = 'filter 0.3s ease-out';
+      // }
     } else {
       document.body.style.overflow = 'unset';
-      const rootElement = document.getElementById('__next') || document.getElementById('root') || document.body;
-      if (rootElement && rootElement !== document.body) {
-        rootElement.style.filter = 'none';
-      }
+      // const rootElement = document.getElementById('__next') || document.getElementById('root') || document.body;
+      // if (rootElement && rootElement !== document.body) {
+      //   rootElement.style.filter = 'none';
+      // }
     }
 
     return () => {
       document.body.style.overflow = 'unset';
-      const rootElement = document.getElementById('__next') || document.getElementById('root') || document.body;
-      if (rootElement && rootElement !== document.body) {
-        rootElement.style.filter = 'none';
-      }
+      // const rootElement = document.getElementById('__next') || document.getElementById('root') || document.body;
+      // if (rootElement && rootElement !== document.body) {
+      //   rootElement.style.filter = 'none';
+      // }
     };
   }, [isOpen]);
 
@@ -216,9 +223,9 @@ export default function LetsConnectModal({
     setShowShareView(false);
   };
 
-  if (!isOpen) return null;
+  if (!mounted) return null;
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
@@ -753,7 +760,6 @@ export default function LetsConnectModal({
           </motion.div>
         </>
       )}
-
       {/* Enhanced Styles with 3D Rotation Effects */}
       <style jsx>{`
         /* 3D Perspective and Container */
@@ -802,405 +808,107 @@ export default function LetsConnectModal({
         .qr-compact-hologram-ring {
           position: absolute;
           inset: -6px;
-          border-radius: 14px;
-          border: 2px solid transparent;
-          background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ffff) border-box;
-          mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-          mask-composite: subtract;
-          opacity: 0.7;
-          animation: compactHoloRing 4s linear infinite;
+          border-radius: 20px;
+          border: 1px solid rgba(0, 255, 255, 0.3);
+          box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+          animation: compactRingPulse 4s infinite linear;
         }
 
         .qr-compact-code-wrapper {
           position: relative;
+          z-index: 10;
           background: rgba(0, 0, 0, 0.8);
-          border-radius: 10px;
-          padding: 12px;
-          backdrop-filter: blur(8px);
+          padding: 10px;
+          border-radius: 16px;
           border: 1px solid rgba(255, 255, 255, 0.1);
+          box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
           overflow: hidden;
-          box-shadow: 
-            0 4px 8px rgba(0, 0, 0, 0.3),
-            0 0 20px rgba(0, 255, 255, 0.1);
         }
 
         .qr-compact-code-svg {
           position: relative;
           z-index: 2;
-          filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.3));
+          filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.5));
         }
 
         .qr-compact-hologram-overlay {
           position: absolute;
           inset: 0;
-          border-radius: 10px;
-          background: linear-gradient(
-            45deg,
-            transparent 30%,
-            rgba(0, 255, 255, 0.1) 50%,
-            transparent 70%
-          );
-          opacity: 0.6;
-          animation: compactHoloShimmer 2s linear infinite;
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(0, 255, 255, 0.05) 100%);
           pointer-events: none;
+          z-index: 3;
         }
 
         .qr-compact-scan-line {
           position: absolute;
-          top: 12px;
-          left: 12px;
-          right: 12px;
-          height: 2px;
-          background: linear-gradient(90deg, transparent, #00ffff, transparent);
-          opacity: 0.8;
-          animation: compactScanLine 3s ease-in-out infinite;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 4px;
+          background: rgba(0, 255, 255, 0.8);
+          box-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+          animation: compactScan 2.5s linear infinite;
+          opacity: 0.7;
+          z-index: 4;
+          pointer-events: none;
         }
 
-        /* Improved Compact Share Option Styles */
+        /* Compact Share Option Styles */
         .share-compact-option {
-          transform-style: preserve-3d;
-        }
-
-        .share-compact-option:hover {
-          transform: translateY(-1px) scale(1.01);
+          /* Base styles in tailwind classes */
         }
 
         .share-compact-glow-cyan {
-          background: radial-gradient(circle at center, rgba(0, 255, 255, 0.15) 0%, transparent 70%);
-          filter: blur(12px);
+          background: radial-gradient(circle at center, rgba(34, 211, 238, 0.3) 0%, transparent 70%);
+          filter: blur(8px);
         }
 
         .share-compact-glow-purple {
-          background: radial-gradient(circle at center, rgba(147, 51, 234, 0.15) 0%, transparent 70%);
-          filter: blur(12px);
+          background: radial-gradient(circle at center, rgba(168, 85, 247, 0.3) 0%, transparent 70%);
+          filter: blur(8px);
         }
 
         .share-compact-shimmer {
-          background: linear-gradient(
-            90deg,
-            transparent 0%,
-            rgba(255, 255, 255, 0.1) 50%,
-            transparent 100%
-          );
-          transform: translateX(-100%);
-          transition: transform 0.6s ease-out;
+          background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+          transform: skewX(-20deg) translateX(-150%);
+          animation: shimmer 3s infinite;
         }
 
-        .share-compact-option:hover .share-compact-shimmer {
-          transform: translateX(100%);
-        }
-
-        .share-compact-icon-container {
-          position: relative;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 24px;
-          height: 24px;
-          border-radius: 6px;
-          background: rgba(255, 255, 255, 0.05);
-          transition: all 0.3s ease;
-        }
-
-        .share-compact-option:hover .share-compact-icon-container {
-          transform: scale(1.05);
-          background: rgba(255, 255, 255, 0.1);
-        }
-
-        /* Animations */
         @keyframes compactHoloGlow {
-          0% { 
-            transform: scale(1) rotate(0deg);
-            opacity: 0.6;
-          }
-          100% { 
-            transform: scale(1.06) rotate(180deg);
-            opacity: 0.9;
-          }
+          0% { opacity: 0.5; transform: scale(0.95); }
+          100% { opacity: 0.8; transform: scale(1.05); }
         }
 
-        @keyframes compactHoloRing {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+        @keyframes compactRingPulse {
+          0% { box-shadow: 0 0 10px rgba(0, 255, 255, 0.1); }
+          50% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.3); border-color: rgba(0, 255, 255, 0.5); }
+          100% { box-shadow: 0 0 10px rgba(0, 255, 255, 0.1); }
         }
 
-        @keyframes compactHoloShimmer {
-          0% { transform: translateX(-100%) rotate(45deg); }
-          100% { transform: translateX(170%) rotate(45deg); }
+        @keyframes compactScan {
+          0% { top: -10%; opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { top: 110%; opacity: 0; }
         }
 
-        @keyframes compactScanLine {
-          0%, 20% { 
-            transform: translateY(0);
-            opacity: 0;
-          }
-          50% { 
-            opacity: 1;
-          }
-          80%, 100% { 
-            transform: translateY(86px);
-            opacity: 0;
-          }
-        }
-
-        /* All existing styles remain the same... */
-        .social-icon-link {
-          animation: socialIconFloat 0.6s ease-out both;
-        }
-
-        .social-icon-container {
-          position: relative;
-          width: 44px;
-          height: 44px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .social-icon-glow {
-          position: absolute;
-          inset: -8px;
-          border-radius: 50%;
-          opacity: 0;
-          transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-          transform: scale(0.8);
-          z-index: 0;
-        }
-
-        .social-icon-main {
-          position: relative;
-          width: 44px;
-          height: 44px;
-          border-radius: 12px;
-          background: rgba(255, 255, 255, 0.05);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #a1a1aa;
-          transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-          z-index: 2;
-          overflow: hidden;
-        }
-
-        .social-icon-main::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-          opacity: 0;
-          transition: opacity 0.3s ease;
-        }
-
-        .social-icon-ripple {
-          position: absolute;
-          inset: -2px;
-          border-radius: 14px;
-          border: 2px solid transparent;
-          opacity: 0;
-          transform: scale(0.9);
-          transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-          z-index: 1;
-        }
-
-        .social-icon-tooltip {
-          position: absolute;
-          top: -40px;
-          left: 50%;
-          transform: translateX(-50%) translateY(10px);
-          background: rgba(0, 0, 0, 0.9);
-          color: white;
-          padding: 6px 12px;
-          border-radius: 8px;
-          font-size: 12px;
-          font-weight: 500;
-          white-space: nowrap;
-          opacity: 0;
-          pointer-events: none;
-          transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          z-index: 10;
-        }
-
-        .social-icon-tooltip::after {
-          content: '';
-          position: absolute;
-          top: 100%;
-          left: 50%;
-          transform: translateX(-50%);
-          border: 5px solid transparent;
-          border-top-color: rgba(0, 0, 0, 0.9);
-        }
-
-        .social-icon-link:hover .social-icon-glow {
-          opacity: 1;
-          transform: scale(1.1);
-        }
-
-        .social-icon-link:hover .social-icon-main {
-          transform: translateY(-3px) scale(1.05);
-          background: rgba(255, 255, 255, 0.1);
-          border-color: rgba(255, 255, 255, 0.2);
-          color: white;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .social-icon-link:hover .social-icon-main::before {
-          opacity: 1;
-        }
-
-        .social-icon-link:hover .social-icon-ripple {
-          opacity: 0.6;
-          transform: scale(1.1);
-        }
-
-        .social-icon-link:hover .social-icon-tooltip {
-          opacity: 1;
-          transform: translateX(-50%) translateY(0);
-        }
-
-        .social-icon-link:hover .social-icon-main svg {
-          filter: drop-shadow(0 0 8px currentColor);
-        }
-
-        .contact-card {
-          position: relative;
-          transform-style: preserve-3d;
-        }
-
-        .contact-card:hover {
-          transform: translateY(-4px) scale(1.02);
-        }
-
-        .contact-glow {
-          background: radial-gradient(circle at center, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
-          filter: blur(20px);
-        }
-
-        .contact-glow-purple {
-          background: radial-gradient(circle at center, rgba(147, 51, 234, 0.15) 0%, transparent 70%);
-          filter: blur(20px);
-        }
-
-        .contact-shimmer {
-          background: linear-gradient(
-            90deg,
-            transparent 0%,
-            rgba(255, 255, 255, 0.1) 50%,
-            transparent 100%
-          );
-          transform: translateX(-100%);
-          transition: transform 0.8s ease-out;
-        }
-
-        .contact-card:hover .contact-shimmer {
-          transform: translateX(100%);
-        }
-
-        .contact-icon-container {
-          position: relative;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .contact-icon {
-          transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .contact-card:hover .contact-icon {
-          transform: scale(1.1) rotate(5deg);
-        }
-
-        .availability-status {
-          position: relative;
-          overflow: hidden;
-        }
-
-        .availability-status:hover {
-          transform: translateY(-2px) scale(1.01);
-          border-color: rgba(34, 197, 94, 0.6);
-          box-shadow: none !important;
-        }
-
-        .availability-shimmer {
-          background: linear-gradient(
-            90deg,
-            transparent 0%,
-            rgba(255, 255, 255, 0.2) 50%,
-            transparent 100%
-          );
-          transform: translateX(-100%);
-          transition: transform 1s ease-out;
-        }
-
-        .availability-status:hover .availability-shimmer {
-          transform: translateX(100%);
-        }
-
-        .availability-glow {
-          background: radial-gradient(
-            ellipse at center,
-            rgba(34, 197, 94, 0.1) 0%,
-            transparent 70%
-          );
-          filter: blur(15px);
-        }
-
-        .status-indicator {
-          position: relative;
-        }
-
-        .status-indicator::before {
-          content: '';
-          position: absolute;
-          inset: -4px;
-          border-radius: 50%;
-          background: radial-gradient(circle, rgba(34, 197, 94, 0.3) 0%, transparent 70%);
-          opacity: 0;
-          transition: opacity 0.5s ease;
-        }
-
-        .availability-status:hover .status-indicator::before {
-          opacity: 1;
-          animation: statusPulse 2s infinite;
-        }
-
-        @keyframes statusPulse {
-          0%, 100% { transform: scale(1); opacity: 0.3; }
-          50% { transform: scale(1.2); opacity: 0.1; }
-        }
-
-        @keyframes socialIconFloat {
-          0% { 
-            opacity: 0; 
-            transform: translateY(20px) scale(0.8); 
-          }
-          100% { 
-            opacity: 1; 
-            transform: translateY(0px) scale(1); 
-          }
-        }
-
-        @keyframes smoothMorph {
-          0% { transform: scaleX(1) scaleY(1); border-radius: 8px; }
-          50% { transform: scaleX(1.12) scaleY(0.88); border-radius: 20px 2px 20px 2px; }
-          100% { transform: scaleX(1.08) scaleY(0.92); border-radius: 16px 4px 16px 4px; }
+        @keyframes shimmer {
+          0% { transform: skewX(-20deg) translateX(-150%); }
+          100% { transform: skewX(-20deg) translateX(150%); }
         }
 
         @keyframes fadeInUp {
-          0% { 
-            opacity: 0; 
-            transform: translateY(20px) scale(0.95); 
-          }
-          100% { 
-            opacity: 1; 
-            transform: translateY(0px) scale(1); 
-          }
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes smoothMorph {
+          0% { border-radius: 8px; }
+          50% { border-radius: 12px; }
+          100% { border-radius: 8px; }
         }
       `}</style>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

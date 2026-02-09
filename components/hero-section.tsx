@@ -35,7 +35,7 @@ function StaticHello() {
 }
 
 // --- Updated Welcome Banner with Glassy Effect ---
-function WelcomeBanner() {
+function WelcomeBanner({ onThemeToggle }: { onThemeToggle?: () => void }) {
   const glowControls = useAnimation()
 
   useEffect(() => {
@@ -80,9 +80,9 @@ function WelcomeBanner() {
       transition={{ duration: 0.6, delay: 0.2 }}
       className="mb-8"
     >
-      <motion.a
+      <motion.button
         className="group relative inline-flex cursor-pointer items-center justify-center overflow-hidden rounded-full border border-white/20 bg-white/5 py-[6px] px-5 text-xs md:text-sm font-medium opacity-90 backdrop-blur-xl transition-all duration-300 ease-in-out max-w-fit mx-auto"
-        href="/portfolio"
+        onClick={onThemeToggle}
         onMouseEnter={handleHover}
         onMouseLeave={handleHoverEnd}
         animate={glowControls}
@@ -97,7 +97,7 @@ function WelcomeBanner() {
             Welcome to My Creative World
           </span>
         </div>
-      </motion.a>
+      </motion.button>
     </motion.div>
   )
 }
@@ -381,7 +381,7 @@ function LetsConnectButton({ onClick }: LetsConnectButtonProps) {
 }
 
 // --- Main HeroSection Component ---
-export default function HeroSection() {
+export default function HeroSection({ onThemeToggle }: { onThemeToggle?: () => void }) {
   const [allArrivedGlow, setAllArrivedGlow] = useState(false)
   const [showName, setShowName] = useState(false)
   const [showRoles, setShowRoles] = useState(false)
@@ -585,7 +585,7 @@ export default function HeroSection() {
         >
           {showName && (
             <>
-              <WelcomeBanner />
+              <WelcomeBanner onThemeToggle={onThemeToggle} />
 
               <div className="mb-8">
                 <StaticHello />
