@@ -77,12 +77,12 @@ export default function Home() {
 
   return (
     <main className="relative text-white min-h-screen">
-      <Navbar />
+      <Navbar isMonochrome={isMonochrome} />
 
       {/* Content Wrapper for Monochrome Toggle */}
       <div
         style={{
-          filter: isMonochrome ? 'grayscale(85%) contrast(110%)' : 'none',
+          filter: isMonochrome ? 'grayscale(85%) sepia(20%) brightness(120%)' : 'none',
           transition: 'filter 1s ease-in-out'
         }}
       >

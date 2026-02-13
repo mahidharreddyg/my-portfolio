@@ -7,7 +7,7 @@ import Link from "next/link"
 import { Copy, Mail } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-export default function Navbar() {
+export default function Navbar({ isMonochrome = false }: { isMonochrome?: boolean }) {
   const [isVisible, setIsVisible] = useState(false)
   const [emailCopied, setEmailCopied] = useState(false)
   const { scrollY } = useScroll()
@@ -56,10 +56,13 @@ export default function Navbar() {
                 // Liquid Glass Shine Effects
                 position: 'relative',
                 overflow: 'hidden',
+                // Monochrome Filter (Subtle Tint)
+                filter: isMonochrome ? 'grayscale(40%) sepia(10%) brightness(105%)' : 'none',
+                transition: 'all 0.3s ease, filter 1s ease-in-out',
               }}
             >
               {/* Liquid Glass Highlight Layer */}
-              <div 
+              <div
                 className="absolute inset-0 rounded-full pointer-events-none"
                 style={{
                   background: `
@@ -71,7 +74,7 @@ export default function Navbar() {
               />
 
               {/* Specular Reflection */}
-              <div 
+              <div
                 className="absolute top-0 left-0 right-0 h-1/2 rounded-t-full pointer-events-none"
                 style={{
                   background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 100%)',
@@ -152,7 +155,7 @@ export default function Navbar() {
                         className="absolute -inset-2 rounded-lg bg-[radial-gradient(circle_at_center,#4facfe30_0%,transparent_70%)]
                           opacity-0 blur-[12px] transition-opacity duration-300 -z-10
                           group-hover/navitem:opacity-100 
-                          group-hover/navitem:animate-[hologram-pulse_2s_linear_infinite]" 
+                          group-hover/navitem:animate-[hologram-pulse_2s_linear_infinite]"
                       />
                     </div>
                   ))}
@@ -173,14 +176,14 @@ export default function Navbar() {
                       bg-[size:8px_8px] opacity-0 group-hover:opacity-30 transition-opacity duration-300" />
 
                     <div className="flex items-center justify-center gap-2 relative z-10">
-                      <motion.div 
-                        animate={emailCopied ? { 
+                      <motion.div
+                        animate={emailCopied ? {
                           rotate: [0, 180, 360],
                           scale: [1, 1.2, 1]
-                        } : { 
+                        } : {
                           rotate: 0,
                           scale: 1
-                        }} 
+                        }}
                         transition={{ duration: 0.7, times: [0, 0.5, 1] }}
                       >
                         {emailCopied ? (
