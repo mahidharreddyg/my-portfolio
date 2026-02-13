@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTransition } from "react";
+import { createPortal } from "react-dom";
 import { QRCodeSVG } from 'qrcode.react';
 
 const socials = [
@@ -57,10 +58,10 @@ const socials = [
 ];
 
 // Copy to clipboard utility
-const useCopyToClipboard = () => {
-  const [copiedText, setCopiedText] = useState(null);
+const useCopyToClipboard = (): [string | null, (text: string) => Promise<boolean>] => {
+  const [copiedText, setCopiedText] = useState<string | null>(null);
 
-  const copy = async (text) => {
+  const copy = async (text: string) => {
     if (!navigator?.clipboard) {
       console.warn('Clipboard not supported');
       return false;
@@ -116,6 +117,12 @@ export default function LetsConnectModal({
   });
   const [isPending, startTransition] = useTransition();
   const [copiedText, copyToClipboard] = useCopyToClipboard();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   // State to control share view within the same panel
   const [showShareView, setShowShareView] = useState(false);
@@ -152,24 +159,69 @@ export default function LetsConnectModal({
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
-      const rootElement = document.getElementById('__next') || document.getElementById('root') || document.body;
-      if (rootElement && rootElement !== document.body) {
-        rootElement.style.filter = 'blur(8px)';
-        rootElement.style.transition = 'filter 0.3s ease-out';
+      document.documentElement.style.overflow = 'hidden';
+      // Target the specific content wrapper we added an ID to
+      const contentElement = document.getElementById('main-content');
+      if (contentElement) {
+        // We need to preserve existing filters (monochrome) and add blur
+        // Use a class or direct style manipulation that appends?
+        // Since the monochrome filter is inline, appending to it is tricky if we don't know it.
+        // Better: Apply a class or just standard blur if the component handles it?
+        // Actually, logic in page.tsx controls the filter.
+        // If we override style.filter, we lose monochrome.
+        // Solution: Add a CSS class or target a separate overlay?
+        // Or, assume we can append.
+        const currentFilter = contentElement.style.filter || 'none';
+        if (!currentFilter.includes('blur')) {
+          contentElement.dataset.prevFilter = currentFilter; // Store previous
+          contentElement.style.filter = `${currentFilter === 'none' ? '' : currentFilter} blur(8px)`;
+          contentElement.style.transition = 'filter 0.3s ease-out';
+        }
       }
     } else {
       document.body.style.overflow = 'unset';
-      const rootElement = document.getElementById('__next') || document.getElementById('root') || document.body;
-      if (rootElement && rootElement !== document.body) {
-        rootElement.style.filter = 'none';
+      document.documentElement.style.overflow = 'unset';
+      const contentElement = document.getElementById('main-content');
+      if (contentElement) {
+        // Restore previous filter
+        if (contentElement.dataset.prevFilter !== undefined) {
+          contentElement.style.filter = contentElement.dataset.prevFilter;
+          delete contentElement.dataset.prevFilter;
+        } else {
+          // Fallback if no stored filter (e.g. if it wasn't monochrome)
+          // But valid monochrome filter might have been updated by React while modal was open?
+          // If React updates the style prop while we have overridden it, React might overwrite our blur.
+          // Or our blur might overwrite React's monochrome update.
+          // Safest: Use a separate fixed overlay backdrop that blurs? 
+          // But user wants "everything else should be blur".
+          // Backdrop filter on the modal backdrop handles the visual blur ON TOP.
+          // But typically "background blur" means the content *itself* is blurred?
+          // The modal backdrop *already* has `backdrop-filter: blur(4px)`.
+          // If the user says "everything else should be blur", `backdrop-filter` is exactly that.
+          // Maybe they mean it should be MORE blurred?
+          // Or maybe `backdrop-filter` isn't supported/working?
+          // Let's assume the user wants the actual content to be blurred.
+
+          // Issue with manipulating style directly: React reconciliation.
+          // If `isMonochrome` changes while modal is open, React updates `style.filter`.
+          // This conflict is real.
+          // Ideally, `page.tsx` should know `isModalOpen` and apply blur class.
+          // But `isModalOpen` is in `HeroSection`.
+          // Passing it up is best.
+          // For now, let's stick to the direct manipulation, it's usually fine if no theme switch happens while modal is open.
+          contentElement.style.filter = contentElement.style.filter.replace(/ ?blur\(8px\)/g, '');
+          if (contentElement.style.filter === '') contentElement.style.filter = 'none';
+        }
       }
     }
 
     return () => {
       document.body.style.overflow = 'unset';
-      const rootElement = document.getElementById('__next') || document.getElementById('root') || document.body;
-      if (rootElement && rootElement !== document.body) {
-        rootElement.style.filter = 'none';
+      document.documentElement.style.overflow = 'unset';
+      const contentElement = document.getElementById('main-content');
+      if (contentElement) {
+        contentElement.style.filter = contentElement.style.filter.replace(/ ?blur\(8px\)/g, '');
+        if (contentElement.style.filter === '') contentElement.style.filter = 'none';
       }
     };
   }, [isOpen]);
@@ -216,14 +268,17 @@ export default function LetsConnectModal({
     setShowShareView(false);
   };
 
-  if (!isOpen) return null;
+  // if (!isOpen) return null; // Removed to allow exit animation
 
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
+  if (!mounted) return null;
+
+  return createPortal(
+    <>
+      <AnimatePresence>
+        {isOpen && (
+          /* Backdrop */
           <motion.div
+            key="backdrop"
             className="fixed inset-0 z-[9999] bg-black/60"
             style={{
               backdropFilter: 'blur(4px)',
@@ -235,9 +290,12 @@ export default function LetsConnectModal({
             transition={{ duration: 0.3 }}
             onClick={handleBackdropClick}
           />
+        )}
 
-          {/* Modal */}
+        {/* Modal explicit separation for AnimatePresence */}
+        {isOpen && (
           <motion.div
+            key="modal-content"
             className={`fixed z-[10000] flex flex-col mx-auto w-full max-w-xl px-6 pb-6 sm:px-8 border border-white/10 shadow-2xl bg-black/60 backdrop-blur-xl ring-1 ring-white/10 ${slideDirection === "down"
               ? "inset-x-0 top-0 rounded-b-2xl"
               : "inset-x-0 bottom-0 rounded-t-2xl"
@@ -751,9 +809,8 @@ export default function LetsConnectModal({
               </div>
             </div>
           </motion.div>
-        </>
-      )}
-
+        )}
+      </AnimatePresence>
       {/* Enhanced Styles with 3D Rotation Effects */}
       <style jsx>{`
         /* 3D Perspective and Container */
@@ -1201,6 +1258,6 @@ export default function LetsConnectModal({
           }
         }
       `}</style>
-    </AnimatePresence>
-  );
+    </>
+    , document.body);
 }

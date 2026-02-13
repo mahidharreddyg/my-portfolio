@@ -388,6 +388,7 @@ export default function HeroSection({ onThemeToggle }: { onThemeToggle?: () => v
   const [showRoles, setShowRoles] = useState(false)
   const circleContainerRef = useRef<HTMLDivElement>(null)
   const [showConnectModal, setShowConnectModal] = useState(false)
+  const [isIntroComplete, setIsIntroComplete] = useState(false) // New state
 
   const glowControls1 = useAnimation()
   const glowControls2 = useAnimation()
@@ -423,27 +424,28 @@ export default function HeroSection({ onThemeToggle }: { onThemeToggle?: () => v
   const handleHover = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (controls: any) => {
-      if (!allArrivedGlow) {
+      // Only trigger if intro is complete AND not currently in the final glow sequence
+      if (isIntroComplete && !allArrivedGlow) {
         controls.start({
           boxShadow: "0 0 80px rgba(41,141,238,0.9), 0 0 120px rgba(41,141,238,0.6)",
           transition: { duration: 0.2 },
         })
       }
     },
-    [allArrivedGlow],
+    [allArrivedGlow, isIntroComplete],
   )
 
   const handleHoverEnd = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (controls: any) => {
-      if (!allArrivedGlow) {
+      if (isIntroComplete && !allArrivedGlow) {
         controls.start({
           boxShadow: "0 0 40px rgba(41,141,238,0.4), 0 0 60px rgba(41,141,238,0.2)",
           transition: { duration: 0.2 },
         })
       }
     },
-    [allArrivedGlow],
+    [allArrivedGlow, isIntroComplete],
   )
 
   useEffect(() => {
@@ -491,6 +493,7 @@ export default function HeroSection({ onThemeToggle }: { onThemeToggle?: () => v
       ])
 
       setAllArrivedGlow(false)
+      setIsIntroComplete(true) // Enable hover effects
     }, animationDuration * 1000)
 
     return () => {
