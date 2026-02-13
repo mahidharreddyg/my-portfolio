@@ -21,7 +21,7 @@ function StaticHello() {
   return (
     <div className="text-center space-y-2 mb-4">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 0 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
         className="text-xl md:text-3xl font-medium tracking-tight text-white/80"
@@ -298,14 +298,15 @@ function RolesDecryption({ showRoles }: { showRoles: boolean }) {
     return () => clearInterval(interval)
   }, [showRoles, roles.length])
 
-  if (!showRoles) return null
+  // Removed early return to reserve space
+  // if (!showRoles) return null
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 5.0 }}
-      className="text-center mt-2"
+      initial={{ opacity: 0, y: 0 }}
+      animate={{ opacity: showRoles ? 1 : 0, y: 0 }}
+      transition={{ duration: 0.8 }}
+      className="text-center mt-2 h-[32px] md:h-[40px] flex items-center justify-center" // Fixed height container
     >
       <div className="text-lg md:text-2xl font-light tracking-wide text-blue-200/80">
         <HyperText
@@ -454,23 +455,42 @@ export default function HeroSection({ onThemeToggle }: { onThemeToggle?: () => v
       setShowRoles(true)
     }, 4500)
 
-    const glowTimer = setTimeout(() => {
+    const glowTimer = setTimeout(async () => {
       setAllArrivedGlow(true)
       const glowAnimation = {
         boxShadow: [
           "0 0 20px rgba(41,141,238,0.25), 0 0 40px rgba(41,141,238,0.15)",
-          "0 0 35px rgba(41,141,238,0.5), 0 0 60px rgba(41,141,238,0.3)",
+          "0 0 40px rgba(41,141,238,0.7), 0 0 80px rgba(41,141,238,0.5)", // Slightly more intense
           "0 0 20px rgba(41,141,238,0.25), 0 0 40px rgba(41,141,238,0.15)",
         ],
-        transition: { duration: 1.5, times: [0, 0.5, 1] },
+        transition: { duration: 0.75, times: [0, 0.5, 1] }, // Faster pulse
       }
-      Promise.all([
-        glowControls1.start(glowAnimation),
-        glowControls2.start(glowAnimation),
-        glowControls3.start(glowAnimation),
-      ]).then(() => {
-        setAllArrivedGlow(false)
-      })
+
+      // Overlapping "Flow" Sequence (Ripple Effect)
+      glowControls3.start(glowAnimation)
+      await new Promise(r => setTimeout(r, 150)) // Wait for inner to start
+
+      glowControls2.start(glowAnimation)
+      await new Promise(r => setTimeout(r, 150)) // Wait for middle to start
+
+      await glowControls1.start(glowAnimation) // Wait for outer to finish
+
+      // Small pause before final burst
+      await new Promise(r => setTimeout(r, 300))
+
+      // Final Simultaneous Glow (All Together - Slower)
+      const finalGlowAnimation = {
+        ...glowAnimation,
+        transition: { duration: 2.0, times: [0, 0.5, 1] },
+      }
+
+      await Promise.all([
+        glowControls1.start(finalGlowAnimation),
+        glowControls2.start(finalGlowAnimation),
+        glowControls3.start(finalGlowAnimation),
+      ])
+
+      setAllArrivedGlow(false)
     }, animationDuration * 1000)
 
     return () => {
@@ -597,7 +617,7 @@ export default function HeroSection({ onThemeToggle }: { onThemeToggle?: () => v
 
               <motion.div
                 className="mt-8 flex justify-center"
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 0 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 6.5, duration: 0.8 }}
               >
