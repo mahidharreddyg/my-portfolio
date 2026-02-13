@@ -18,6 +18,12 @@ export default function Home() {
   }
 
   useEffect(() => {
+    // Force start at top
+    window.scrollTo(0, 0);
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
     function updateClipPath() {
       if (!sectionRef.current) return;
 
