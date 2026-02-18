@@ -1702,6 +1702,16 @@ eval("// Exports\nmodule.exports = {\n\t\"style\": {\"fontFamily\":\"'Plus Jakar
 
 /***/ }),
 
+/***/ "(rsc)/./node_modules/next/font/local/target.css?{\"path\":\"app/layout.tsx\",\"import\":\"\",\"arguments\":[{\"src\":\"./fonts/Malinton Font/MalintontrialversionExtbd-5y9Wj.otf\",\"variable\":\"--font-malinton\",\"display\":\"swap\"}],\"variableName\":\"malinton\"}":
+/*!*************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/next/font/local/target.css?{"path":"app/layout.tsx","import":"","arguments":[{"src":"./fonts/Malinton Font/MalintontrialversionExtbd-5y9Wj.otf","variable":"--font-malinton","display":"swap"}],"variableName":"malinton"} ***!
+  \*************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module) => {
+
+eval("// Exports\nmodule.exports = {\n\t\"style\": {\"fontFamily\":\"'malinton', 'malinton Fallback'\"},\n\t\"className\": \"__className_16712e\",\n\t\"variable\": \"__variable_16712e\"\n};\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHJzYykvLi9ub2RlX21vZHVsZXMvbmV4dC9mb250L2xvY2FsL3RhcmdldC5jc3M/e1wicGF0aFwiOlwiYXBwL2xheW91dC50c3hcIixcImltcG9ydFwiOlwiXCIsXCJhcmd1bWVudHNcIjpbe1wic3JjXCI6XCIuL2ZvbnRzL01hbGludG9uIEZvbnQvTWFsaW50b250cmlhbHZlcnNpb25FeHRiZC01eTlXai5vdGZcIixcInZhcmlhYmxlXCI6XCItLWZvbnQtbWFsaW50b25cIixcImRpc3BsYXlcIjpcInN3YXBcIn1dLFwidmFyaWFibGVOYW1lXCI6XCJtYWxpbnRvblwifSIsIm1hcHBpbmdzIjoiQUFBQTtBQUNBO0FBQ0EsV0FBVywrQ0FBK0M7QUFDMUQ7QUFDQTtBQUNBIiwic291cmNlcyI6WyIvVXNlcnMvbWFoaWRoYXJyZWRkeWcvTWFoaS9NeSBQcm9qZWN0cy9XZWIgRGV2L215LXBvcnRmb2xpby9ub2RlX21vZHVsZXMvbmV4dC9mb250L2xvY2FsL3RhcmdldC5jc3M/e1wicGF0aFwiOlwiYXBwL2xheW91dC50c3hcIixcImltcG9ydFwiOlwiXCIsXCJhcmd1bWVudHNcIjpbe1wic3JjXCI6XCIuL2ZvbnRzL01hbGludG9uIEZvbnQvTWFsaW50b250cmlhbHZlcnNpb25FeHRiZC01eTlXai5vdGZcIixcInZhcmlhYmxlXCI6XCItLWZvbnQtbWFsaW50b25cIixcImRpc3BsYXlcIjpcInN3YXBcIn1dLFwidmFyaWFibGVOYW1lXCI6XCJtYWxpbnRvblwifSJdLCJzb3VyY2VzQ29udGVudCI6WyIvLyBFeHBvcnRzXG5tb2R1bGUuZXhwb3J0cyA9IHtcblx0XCJzdHlsZVwiOiB7XCJmb250RmFtaWx5XCI6XCInbWFsaW50b24nLCAnbWFsaW50b24gRmFsbGJhY2snXCJ9LFxuXHRcImNsYXNzTmFtZVwiOiBcIl9fY2xhc3NOYW1lXzE2NzEyZVwiLFxuXHRcInZhcmlhYmxlXCI6IFwiX192YXJpYWJsZV8xNjcxMmVcIlxufTtcbiJdLCJuYW1lcyI6W10sImlnbm9yZUxpc3QiOlswXSwic291cmNlUm9vdCI6IiJ9\n//# sourceURL=webpack-internal:///(rsc)/./node_modules/next/font/local/target.css?{\"path\":\"app/layout.tsx\",\"import\":\"\",\"arguments\":[{\"src\":\"./fonts/Malinton Font/MalintontrialversionExtbd-5y9Wj.otf\",\"variable\":\"--font-malinton\",\"display\":\"swap\"}],\"variableName\":\"malinton\"}\n");
+
+/***/ }),
+
 /***/ "(ssr)/./node_modules/next/dist/api/image.js":
 /*!*********************************************!*\
   !*** ./node_modules/next/dist/api/image.js ***!

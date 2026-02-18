@@ -24,6 +24,65 @@ const GlassHighlight = () => (
   </>
 );
 
+const SkillsButton = () => {
+  return (
+    <motion.button
+      whileHover={{
+        y: -2,
+        boxShadow: "0 0 24px rgba(59,130,246,0.5), 0 0 8px rgba(59,130,246,0.3)",
+      }}
+      whileTap={{ scale: 0.96 }}
+      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+      className="relative flex items-center gap-1.5 px-4 py-1.5 overflow-hidden cursor-pointer rounded-md"
+      style={{
+        background: "linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(59,130,246,0.04) 100%)",
+        border: "1px solid rgba(59,130,246,0.3)",
+      }}
+    >
+      <span
+        className="absolute inset-x-0 top-0 h-px"
+        style={{ background: "linear-gradient(90deg, transparent, rgba(59,130,246,0.8), transparent)" }}
+      />
+      <span
+        className="w-1 h-1 rounded-full bg-blue-400"
+        style={{ boxShadow: "0 0 4px rgba(59,130,246,0.9)" }}
+      />
+      <span className="text-[10px] font-semibold tracking-[0.14em] uppercase text-blue-300">
+        Skills
+      </span>
+    </motion.button>
+  );
+};
+
+const ContactButton = () => {
+  return (
+    <motion.button
+      whileHover={{
+        y: -2,
+        boxShadow: "0 0 20px rgba(255,255,255,0.1), 0 0 6px rgba(255,255,255,0.08)",
+      }}
+      whileTap={{ scale: 0.96 }}
+      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+      className="relative flex items-center gap-1.5 px-4 py-1.5 overflow-hidden cursor-pointer rounded-md"
+      style={{
+        background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+        border: "1px solid rgba(255,255,255,0.1)",
+      }}
+    >
+      <span
+        className="absolute inset-x-0 top-0 h-px"
+        style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)" }}
+      />
+      <svg width="8" height="8" viewBox="0 0 10 10" fill="none" className="text-gray-400">
+        <path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      <span className="text-[10px] font-semibold tracking-[0.14em] uppercase text-gray-300">
+        Contact Me
+      </span>
+    </motion.button>
+  );
+};
+
 const PassionateCard = () => {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -36,13 +95,15 @@ const PassionateCard = () => {
       transition={{ duration: 0.5, delay: 0.2 }}
       className="row-span-2 rounded-2xl p-8 pb-0 relative overflow-hidden flex flex-col items-center text-center justify-between cursor-pointer z-30"
       style={glassStyle}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
 
 
       <GlassHighlight />
 
       {/* Background Marquee Layer */}
-      <div className="absolute inset-0 flex flex-col justify-start pt-8 gap-3 z-0 pointer-events-none opacity-20 select-none mask-image-linear-to-b from-transparent via-black to-transparent">
+      <div className="absolute inset-0 flex flex-col justify-start pt-32 gap-3 z-0 pointer-events-none opacity-20 select-none mask-image-linear-to-b from-transparent via-black to-transparent">
         <div className="w-full overflow-hidden">
           <motion.div
             animate={{ x: ["0%", "-50%"] }}
@@ -93,60 +154,190 @@ const PassionateCard = () => {
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[40%] aspect-square border-2 border-white/60 rounded-full bg-[#087CC4]/60 blur-[1px]" />
       </div>
 
-      <div className="relative z-10 mt-4">
-        <h3 className="text-lg font-bold text-white leading-snug">
-          Passionate About Next-Gen,<br />
-          <span className="text-blue-500">Future-Forward Technologies.</span>
+      <div className="relative z-10 -mt-2">
+        <h3 className="text-[1.2rem] font-bold font-malinton text-white leading-snug tracking-wide">
+          Passionate About Next Gen,<br />
+          <span className="text-[1.2rem] text-blue-500 whitespace-nowrap">
+            Future Forward Technologies.
+          </span>
         </h3>
       </div>
 
-      {/* Window Mockup */}
+
+      {/* 
+  NOTE: For the Skills and Contact buttons to have independent hover effects,
+  define these two components OUTSIDE your main component so they don't 
+  inherit variants from the parent motion.div:
+*/}
+
+      {/* ─── Window Mockup (paste inside your JSX) ─── */}
       <motion.div
         variants={{
-          initial: { rotateX: 12, y: 60 },
-          hover: { rotateX: 0, y: 0 }
+          initial: {
+            rotateX: 12,
+            y: 60,
+            boxShadow: "0 25px 60px rgba(0,0,0,0.6)",
+            borderTopLeftRadius: "14px",
+            borderTopRightRadius: "14px",
+            borderBottomLeftRadius: "0px",
+            borderBottomRightRadius: "0px",
+          },
+          hover: {
+            rotateX: 0,
+            y: 0,
+            boxShadow: "0 70px 160px rgba(0,0,0,0.9)",
+            borderTopLeftRadius: "14px",
+            borderTopRightRadius: "14px",
+            borderBottomLeftRadius: "0px",
+            borderBottomRightRadius: "0px",
+          },
         }}
         transition={{
           type: "spring",
-          stiffness: 140,
+          stiffness: 80,
           damping: 20,
         }}
-        className="relative z-10 w-64 bg-[#0a0a0a] rounded-t-xl border border-white/10 shadow-2xl p-4 pointer-events-none"
+        className="relative z-10 w-80 overflow-hidden"
         style={{
           transformPerspective: 1000,
           transformOrigin: "bottom",
+          willChange: "transform",
+          borderTopLeftRadius: "14px",
+          borderTopRightRadius: "14px",
+          borderBottomLeftRadius: "0px",
+          borderBottomRightRadius: "0px",
+          background: "#0a0a0b",
         }}
       >
-        <div className="flex gap-2 mb-4">
-          <div className="w-2.5 h-2.5 rounded-full bg-[#FF5F56]" />
-          <div className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E]" />
-          <div className="w-2.5 h-2.5 rounded-full bg-[#27C93F]" />
+
+        {/* 🔥 Inner Blue Glow — visible only on hover, spreads upward from bottom */}
+        <motion.div
+          variants={{
+            initial: { opacity: 0 },
+            hover: { opacity: 1 },
+          }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="absolute pointer-events-none"
+          style={{
+            bottom: "-20px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "100%",
+            height: "75%",
+            background:
+              "radial-gradient(ellipse 100% 100% at 50% 100%, rgba(59,130,246,0.45) 0%, rgba(59,130,246,0.2) 35%, rgba(59,130,246,0.06) 65%, transparent 85%)",
+            filter: "blur(18px)",
+            zIndex: 0,
+          }}
+        />
+
+        {/* Title Bar */}
+        <div
+          className="flex items-center px-3 h-8 relative select-none"
+          style={{
+            background: "linear-gradient(180deg, #2c2c2e 0%, #1f1f21 100%)",
+            borderBottom: "1px solid rgba(0,0,0,0.6)",
+            zIndex: 10,
+          }}
+        >
+          {/* Traffic Lights */}
+          <div className="flex items-center gap-1.5 z-10">
+            {["#ff5f57", "#febc2e", "#28c840"].map((color, i) => (
+              <div
+                key={i}
+                className="w-2.5 h-2.5 rounded-full"
+                style={{
+                  background: color,
+                  boxShadow:
+                    "0 0 0 0.5px rgba(0,0,0,0.4), inset 0 0.5px 0 rgba(255,255,255,0.3)",
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Safari Pill */}
+          <motion.div
+            variants={{
+              initial: { width: 140 },
+              hover: { width: 170 },
+            }}
+            transition={{ type: "spring", stiffness: 220, damping: 22 }}
+            className="absolute left-1/2 -translate-x-1/2 h-[18px] rounded-full flex items-center justify-center gap-1.5 px-3 overflow-hidden"
+            style={{
+              background: "#000",
+              border: "0.5px solid rgba(255,255,255,0.08)",
+            }}
+          >
+            <motion.div
+              variants={{
+                initial: { opacity: 1 },
+                hover: { opacity: 0 },
+              }}
+              transition={{ duration: 0.25 }}
+              className="absolute inset-0 rounded-full"
+              style={{
+                background: "rgba(255,255,255,0.08)",
+                backdropFilter: "blur(10px)",
+              }}
+            />
+
+            <svg
+              width="10"
+              height="10"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="opacity-80 relative z-10"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" />
+              <path d="M7 11V7a5 5 0 0110 0v4" />
+            </svg>
+
+            <span className="text-[10px] text-white/80 tracking-wide relative z-10">
+              mahidharreddyg.in
+            </span>
+          </motion.div>
         </div>
 
-        <div className="space-y-4 p-2 bg-[#111] rounded-lg border border-white/5">
-          <div className="w-1/2 h-2 bg-white/10 rounded-full" />
-          <div className="space-y-2">
-            <div className="text-[10px] text-gray-400 font-medium leading-relaxed">
+        {/* Content */}
+        <div
+          className="p-6 relative"
+          style={{
+            background: "transparent",
+            zIndex: 2,
+          }}
+        >
+          <div
+            className="space-y-5 p-4 rounded-lg text-center"
+            style={{
+              background: "rgba(255,255,255,0.02)",
+              border: "0.5px solid rgba(255,255,255,0.06)",
+            }}
+          >
+            <div className="flex justify-center">
+              <div className="w-20 h-1 bg-white/20 rounded-full" />
+            </div>
+
+            <div className="text-[11px] text-gray-400 font-medium leading-relaxed">
               Purpose-Driven Design That Speaks<br />
               Performance-First Code That Delivers
             </div>
-          </div>
-          <div className="flex gap-2 pt-2">
-            <div className="px-3 py-1 rounded-full bg-blue-600/20 text-blue-400 text-[10px] border border-blue-500/30">
-              Skills
-            </div>
-            <div className="px-3 py-1 rounded-full bg-white/5 text-gray-400 text-[10px] border border-white/10">
-              Contact Me
+
+            {/* Buttons */}
+            <div className="flex justify-center gap-3 pt-2">
+              <SkillsButton />
+              <ContactButton />
             </div>
           </div>
         </div>
+
       </motion.div>
-      {/* Interaction Hitbox Overlay - Placed last to ensure top z-index */}
-      <div
-        className="absolute inset-0 z-[100] cursor-pointer"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      />
+
+
+
     </motion.div>
   );
 };

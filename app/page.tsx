@@ -98,14 +98,13 @@ export default function Home() {
           </div>
           <div className="relative z-20">
             <div className="relative min-h-screen">
-              <div
-                className="absolute inset-x-0 top-0 flex justify-center pointer-events-none"
-                style={{ height: "160px" }}
-              >
-                <XMarquee
-                  topText="ABOUT EXPERIENCE SKILLS"
-                  bottomText="DEVELOPER CREATOR INNOVATOR"
-                />
+              <div className="absolute -top-[50vh] left-0 w-full h-[200vh] overflow-hidden pointer-events-none">
+                <div className="relative top-[50vh] w-full h-full">
+                  <XMarquee
+                    topText="ABOUT EXPERIENCE SKILLS"
+                    bottomText="DEVELOPER CREATOR INNOVATOR"
+                  />
+                </div>
               </div>
               <div
                 ref={sectionRef}

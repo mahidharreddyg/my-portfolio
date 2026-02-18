@@ -20,6 +20,9 @@ const config: Config = {
       },
     },
     extend: {
+      fontFamily: {
+        malinton: ["var(--font-malinton)", "sans-serif"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
