@@ -4,6 +4,14 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import Image from "next/image";
+import {
+  SiC, SiPython, SiJavascript, SiTypescript, SiGo, SiSpring, SiSpringboot, SiNodedotjs, SiExpress,
+  SiNextdotjs, SiReact, SiAngular, SiTailwindcss, SiPostgresql, SiMysql, SiMongodb,
+  SiDocker, SiKubernetes, SiLinux, SiPandas, SiTensorflow, SiPytorch,
+  SiScikitlearn, SiGit, SiGithub, SiJira, SiFigma, SiPostman, SiVercel,
+  SiSpringsecurity, SiHtml5, SiCss3, SiRedux, SiGraphql, SiPrisma, SiRedis
+} from "react-icons/si";
+import { FaJava } from "react-icons/fa";
 
 const glassStyle = {
   background: 'rgba(255, 255, 255, 0.03)',
@@ -82,7 +90,38 @@ const ContactButton = () => {
     </motion.button>
   );
 };
+// Tech Stack Data
+const techRow1 = [
+  { name: "Java", icon: FaJava, color: "#f89820" },
+  { name: "Python", icon: SiPython, color: "#3776ab" },
+  { name: "Go (Gin)", icon: SiGo, color: "#00add8" },
+  { name: "Spring Boot", icon: SiSpringboot, color: "#6db33f" },
+  { name: "Node.js", icon: SiNodedotjs, color: "#339933" },
+  { name: "Express.js", icon: SiExpress, color: "#000000" },
+  { name: "C", icon: SiC, color: "#a8b9cc" },
+  { name: "TypeScript", icon: SiTypescript, color: "#3178c6" },
+];
 
+const techRow2 = [
+  { name: "React", icon: SiReact, color: "#61dafb" },
+  { name: "Next.js", icon: SiNextdotjs, color: "#000000" },
+  { name: "Angular", icon: SiAngular, color: "#dd0031" },
+  { name: "Tailwind CSS", icon: SiTailwindcss, color: "#06b6d4" },
+  { name: "PostgreSQL", icon: SiPostgresql, color: "#336791" },
+  { name: "MySQL", icon: SiMysql, color: "#4479a1" },
+  { name: "MongoDB", icon: SiMongodb, color: "#47a248" },
+  { name: "Redis", icon: SiRedis, color: "#dc382d" },
+];
+
+const techRow3 = [
+  { name: "Docker", icon: SiDocker, color: "#2496ed" },
+  { name: "Kubernetes", icon: SiKubernetes, color: "#326ce5" },
+  { name: "Linux", icon: SiLinux, color: "#fcc624" },
+  { name: "Pandas", icon: SiPandas, color: "#150458" },
+  { name: "TensorFlow", icon: SiTensorflow, color: "#ff6f00" },
+  { name: "Git", icon: SiGit, color: "#f05032" },
+  { name: "Figma", icon: SiFigma, color: "#f24e1e" },
+];
 const PassionateCard = () => {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -103,41 +142,97 @@ const PassionateCard = () => {
       <GlassHighlight />
 
       {/* Background Marquee Layer */}
-      <div className="absolute inset-0 flex flex-col justify-start pt-32 gap-3 z-0 pointer-events-none opacity-20 select-none mask-image-linear-to-b from-transparent via-black to-transparent">
+      {/* Controls the vertical position of the marquee - Increase/Decrease pt value */}
+      <div className=" absolute inset-0 flex flex-col justify-start pt-[85px] gap-4 z-[5] pointer-events-none select-none mask-image-linear-to-b from-transparent via-black to-transparent " >
+
+        {/* Row 1: Languages & Backend */}
         <div className="w-full overflow-hidden">
-          <motion.div
-            animate={{ x: ["0%", "-50%"] }}
-            transition={{ duration: 15, ease: "linear", repeat: Infinity }}
-            className="flex gap-3 w-max"
+          <div
+            className="flex gap-1.5 w-max animate-marquee"
+            style={{ animationPlayState: isHovered ? 'paused' : 'running' }}
           >
-            {[...Array(15)].map((_, i) => (
-              <div key={`r1-${i}`} className="w-24 h-8 rounded-full border border-white/20 bg-white/5" />
+            {[...techRow1, ...techRow1].map((tech, i) => (
+              <div
+                key={`r1-${i}`}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md shrink-0 transition-all"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  backdropFilter: 'blur(1px) saturate(200%)',
+                  WebkitBackdropFilter: 'blur(1px) saturate(200%)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.05)'
+                }}
+              >
+                <div
+                  className="rounded bg-white/5 p-0.5 flex items-center justify-center shrink-0 border border-white/10"
+                  style={{ width: "20px", height: "20px" }}
+                >
+                  <tech.icon style={{ color: tech.color }} className="w-3 h-3" />
+                </div>
+                <span className="text-[10px] font-semibold text-white/90 whitespace-nowrap">{tech.name}</span>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
 
+        {/* Row 2: Frontend & Database & Cloud */}
         <div className="w-full overflow-hidden">
-          <motion.div
-            animate={{ x: ["-50%", "0%"] }}
-            transition={{ duration: 18, ease: "linear", repeat: Infinity }}
-            className="flex gap-3 w-max"
+          <div
+            className="flex gap-1.5 w-max animate-marquee-reverse"
+            style={{ animationPlayState: isHovered ? 'paused' : 'running' }}
           >
-            {[...Array(15)].map((_, i) => (
-              <div key={`r2-${i}`} className="w-24 h-8 rounded-full border border-white/20 bg-white/5" />
+            {[...techRow2, ...techRow2].map((tech, i) => (
+              <div
+                key={`r2-${i}`}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md shrink-0 transition-all"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  backdropFilter: 'blur(1px) saturate(200%)',
+                  WebkitBackdropFilter: 'blur(1px) saturate(200%)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.05)'
+                }}
+              >
+                <div
+                  className="rounded bg-white/5 p-0.5 flex items-center justify-center shrink-0 border border-white/10"
+                  style={{ width: "20px", height: "20px" }}
+                >
+                  <tech.icon style={{ color: tech.color }} className="w-3 h-3" />
+                </div>
+                <span className="text-[10px] font-semibold text-white/90 whitespace-nowrap">{tech.name}</span>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
 
+        {/* Row 3: AI/ML & Tools */}
         <div className="w-full overflow-hidden">
-          <motion.div
-            animate={{ x: ["0%", "-50%"] }}
-            transition={{ duration: 16, ease: "linear", repeat: Infinity }}
-            className="flex gap-3 w-max"
+          <div
+            className="flex gap-1.5 w-max animate-marquee"
+            style={{ animationPlayState: isHovered ? 'paused' : 'running' }}
           >
-            {[...Array(15)].map((_, i) => (
-              <div key={`r3-${i}`} className="w-24 h-8 rounded-full border border-white/20 bg-white/5" />
+            {[...techRow3, ...techRow3].map((tech, i) => (
+              <div
+                key={`r3-${i}`}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md shrink-0 transition-all"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  backdropFilter: 'blur(1px) saturate(200%)',
+                  WebkitBackdropFilter: 'blur(1px) saturate(200%)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.05)'
+                }}
+              >
+                <div
+                  className="rounded bg-white/5 p-0.5 flex items-center justify-center shrink-0 border border-white/10"
+                  style={{ width: "20px", height: "20px" }}
+                >
+                  <tech.icon style={{ color: tech.color }} className="w-3 h-3" />
+                </div>
+                <span className="text-[10px] font-semibold text-white/90 whitespace-nowrap">{tech.name}</span>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </div>
 
