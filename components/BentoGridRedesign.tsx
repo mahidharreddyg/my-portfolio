@@ -4,12 +4,6 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import Image from "next/image";
-import {
-  SiNextdotjs, SiReact, SiAngular, SiTailwindcss, SiPostgresql, SiMysql, SiMongodb,
-  SiDocker, SiKubernetes, SiLinux, SiPandas, SiTensorflow, SiPytorch,
-  SiScikitlearn, SiGit, SiGithub, SiJira, SiFigma, SiPostman, SiVercel,
-  SiSpringsecurity, SiHtml5, SiCss3, SiRedux, SiGraphql, SiPrisma, SiRedis
-} from "react-icons/si";
 
 const glassStyle = {
   background: 'rgba(255, 255, 255, 0.03)',
@@ -139,6 +133,33 @@ const PassionateCard = () => {
 
 
       <GlassHighlight />
+
+      {/* Default Dark State (Fades out on hover) */}
+      <motion.div
+        className="absolute inset-x-0 bottom-0 h-2/3 pointer-events-none transition-opacity duration-500 rounded-b-2xl z-10"
+        style={{
+          background: "linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent)",
+          opacity: isHovered ? 0 : 1,
+        }}
+      />
+
+      {/* Hover Blue Glow State (Fades in on hover) - Reduced Intensity */}
+      <motion.div
+        className="absolute inset-0 pointer-events-none transition-opacity duration-500 rounded-2xl z-10"
+        style={{
+          background: "radial-gradient(600px circle at center, rgba(41, 141, 238, 0.15), transparent 40%)",
+          opacity: isHovered ? 1 : 0,
+        }}
+      />
+
+      {/* Hover Yellow Left Glow (Fades in on hover) */}
+      <motion.div
+        className="absolute inset-0 pointer-events-none transition-opacity duration-500 rounded-2xl z-10"
+        style={{
+          background: "linear-gradient(90deg, rgba(253, 224, 71, 0.1), transparent 50%)",
+          opacity: isHovered ? 1 : 0,
+        }}
+      />
 
       {/* Background Marquee Layer */}
       {/* Controls the vertical position of the marquee - Increase/Decrease pt value */}
@@ -415,9 +436,9 @@ const PassionateCard = () => {
               <div className="w-20 h-1 bg-white/20 rounded-full" />
             </div>
 
-            <div className="text-[11px] text-gray-400 font-medium leading-relaxed">
-              Purpose-Driven Design That Speaks<br />
-              Performance-First Code That Delivers
+            <div className="text-[12px] text-gray-400 font-malinton leading-relaxed">
+              Purpose Driven Design That Speaks<br />
+              Performance First Code That Delivers
             </div>
 
             {/* Buttons */}
