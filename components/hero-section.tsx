@@ -306,9 +306,9 @@ function RolesDecryption({ showRoles }: { showRoles: boolean }) {
       initial={{ opacity: 0, y: 0 }}
       animate={{ opacity: showRoles ? 1 : 0, y: 0 }}
       transition={{ duration: 0.8 }}
-      className="text-center mt-2 h-[32px] md:h-[40px] flex items-center justify-center" // Fixed height container
+      className="text-center mt-2 h-[40px] md:h-[60px] flex items-center justify-center" // Fixed height container
     >
-      <div className="text-lg md:text-2xl font-light tracking-wide text-blue-200/80">
+      <div className="text-2xl md:text-4xl font-light tracking-wide text-blue-200/80">
         <HyperText
           key={`role-${currentRoleIndex}`}
           triggerAnimation={triggerAnimation}
@@ -326,6 +326,17 @@ function RolesDecryption({ showRoles }: { showRoles: boolean }) {
 }
 
 // --- Glass Effect "Let's Connect" Button ---
+const StarIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 784.11 815.53"
+    className={className}
+    style={{ shapeRendering: 'geometricPrecision', textRendering: 'geometricPrecision', fillRule: 'evenodd', clipRule: 'evenodd' }}
+  >
+    <path className="fill-current" d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z" />
+  </svg>
+)
+
 interface LetsConnectButtonProps {
   onClick: () => void
 }
@@ -333,51 +344,61 @@ interface LetsConnectButtonProps {
 function LetsConnectButton({ onClick }: LetsConnectButtonProps) {
   const [isHovered, setIsHovered] = useState(false)
 
+  // Star Burst Animation Logic
+  // Using Tailwind Arbitrary Values to replicate the exact coordinates from the request
   return (
-    <motion.button
-      onClick={onClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className="
-        group relative inline-flex cursor-pointer items-center justify-between 
-        overflow-hidden rounded-full border border-white/10 bg-white/5 
-        py-[8px] pr-[8px] pl-6 text-base font-medium text-white/90
-        backdrop-blur-xl transition-all duration-500 ease-out
-        hover:bg-white/10 hover:border-white/20 hover:text-white
-        md:py-3 md:pr-3 md:pl-8
-      "
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-    >
-      <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+    <div className="relative group inline-block">
+      <motion.button
+        onClick={onClick}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className="
+          relative z-10 inline-flex items-center justify-center
+          px-8 py-3 text-base font-medium text-white/90
+          bg-white/5 border border-white/10 rounded-full
+          backdrop-blur-xl transition-all duration-300 ease-in-out
+          hover:bg-transparent hover:text-white hover:border-white/20
+          hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]
+          active:scale-95
+          overflow-visible
+        "
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.98 }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full" />
+        <span className="relative z-10 w-full text-center">Let&apos;s Connect</span>
+      </motion.button>
 
-      <span className="z-10 mr-4 tracking-wide text-sm md:text-base">
-        Let&apos;s Connect
-      </span>
+      {/* Star 1 - Top Left Large */}
+      <div className="absolute top-[20%] left-[20%] w-[25px] z-[-1] transition-all duration-1000 ease-[cubic-bezier(0.05,0.83,0.43,0.96)] group-hover:top-[-80%] group-hover:left-[-30%] opacity-0 group-hover:opacity-100 group-hover:z-[20] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] pointer-events-none">
+        <StarIcon className="w-full h-full" />
+      </div>
 
-      <span className="
-        relative z-10 flex h-8 w-8 items-center justify-center overflow-hidden rounded-full 
-        bg-white/10 border border-white/10 transition-all duration-300
-        group-hover:bg-white group-hover:text-black
-        md:h-10 md:w-10
-      ">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="transition-transform duration-300 group-hover:-rotate-45"
-        >
-          <path d="M5 12h14" />
-          <path d="m12 5 7 7-7 7" />
-        </svg>
-      </span>
-    </motion.button>
+      {/* Star 2 - Top Left Medium */}
+      <div className="absolute top-[45%] left-[45%] w-[15px] z-[-1] transition-all duration-1000 ease-[cubic-bezier(0,0.4,0,1.01)] group-hover:top-[-25%] group-hover:left-[10%] opacity-0 group-hover:opacity-100 group-hover:z-[20] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] pointer-events-none">
+        <StarIcon className="w-full h-full" />
+      </div>
+
+      {/* Star 3 - Bottom Left Small */}
+      <div className="absolute top-[40%] left-[40%] w-[5px] z-[-1] transition-all duration-1000 ease-[cubic-bezier(0,0.4,0,1.01)] group-hover:top-[55%] group-hover:left-[25%] opacity-0 group-hover:opacity-100 group-hover:z-[20] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] pointer-events-none">
+        <StarIcon className="w-full h-full" />
+      </div>
+
+      {/* Star 4 - Bottom Right Small */}
+      <div className="absolute top-[20%] left-[40%] w-[8px] z-[-1] transition-all duration-800 ease-[cubic-bezier(0,0.4,0,1.01)] group-hover:top-[30%] group-hover:left-[80%] opacity-0 group-hover:opacity-100 group-hover:z-[20] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] pointer-events-none">
+        <StarIcon className="w-full h-full" />
+      </div>
+
+      {/* Star 5 - Right Large */}
+      <div className="absolute top-[25%] left-[45%] w-[15px] z-[-1] transition-all duration-600 ease-[cubic-bezier(0,0.4,0,1.01)] group-hover:top-[25%] group-hover:left-[115%] opacity-0 group-hover:opacity-100 group-hover:z-[20] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] pointer-events-none">
+        <StarIcon className="w-full h-full" />
+      </div>
+
+      {/* Star 6 - Top Center Small */}
+      <div className="absolute top-[5%] left-[50%] w-[5px] z-[-1] transition-all duration-800 ease-out group-hover:top-[5%] group-hover:left-[60%] opacity-0 group-hover:opacity-100 group-hover:z-[20] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] pointer-events-none">
+        <StarIcon className="w-full h-full" />
+      </div>
+    </div>
   )
 }
 
@@ -451,11 +472,11 @@ export default function HeroSection({ onThemeToggle }: { onThemeToggle?: () => v
   useEffect(() => {
     const nameRevealTimer = setTimeout(() => {
       setShowName(true)
-    }, 2000)
+    }, 2650)
 
     const rolesRevealTimer = setTimeout(() => {
       setShowRoles(true)
-    }, 4500)
+    }, 5000)
 
     const glowTimer = setTimeout(async () => {
       setAllArrivedGlow(true)
@@ -600,7 +621,7 @@ export default function HeroSection({ onThemeToggle }: { onThemeToggle?: () => v
           className="text-center space-y-4 relative z-20"
           initial={{ opacity: 0, y: 0 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.5, delay: 2 }}
+          transition={{ duration: 1.5, delay: 3 }}
           style={{
             textRendering: "optimizeLegibility",
             WebkitFontSmoothing: "antialiased",
@@ -619,10 +640,10 @@ export default function HeroSection({ onThemeToggle }: { onThemeToggle?: () => v
               <RolesDecryption showRoles={showRoles} />
 
               <motion.div
-                className="mt-8 flex justify-center"
+                className="mt-24 flex justify-center"
                 initial={{ opacity: 0, y: 0 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 6.5, duration: 0.8 }}
+                transition={{ delay: 4.0, duration: 0.8 }}
               >
                 <LetsConnectButton onClick={openModal} />
               </motion.div>

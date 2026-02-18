@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import { useState } from "react";
 import Image from "next/image";
 
 const glassStyle = {
@@ -22,6 +23,133 @@ const GlassHighlight = () => (
     }} />
   </>
 );
+
+const PassionateCard = () => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <motion.div
+      initial="initial"
+      animate={isHovered ? "hover" : "initial"}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+      className="row-span-2 rounded-2xl p-8 pb-0 relative overflow-hidden flex flex-col items-center text-center justify-between cursor-pointer z-30"
+      style={glassStyle}
+    >
+
+
+      <GlassHighlight />
+
+      {/* Background Marquee Layer */}
+      <div className="absolute inset-0 flex flex-col justify-start pt-8 gap-3 z-0 pointer-events-none opacity-20 select-none mask-image-linear-to-b from-transparent via-black to-transparent">
+        <div className="w-full overflow-hidden">
+          <motion.div
+            animate={{ x: ["0%", "-50%"] }}
+            transition={{ duration: 15, ease: "linear", repeat: Infinity }}
+            className="flex gap-3 w-max"
+          >
+            {[...Array(15)].map((_, i) => (
+              <div key={`r1-${i}`} className="w-24 h-8 rounded-full border border-white/20 bg-white/5" />
+            ))}
+          </motion.div>
+        </div>
+
+        <div className="w-full overflow-hidden">
+          <motion.div
+            animate={{ x: ["-50%", "0%"] }}
+            transition={{ duration: 18, ease: "linear", repeat: Infinity }}
+            className="flex gap-3 w-max"
+          >
+            {[...Array(15)].map((_, i) => (
+              <div key={`r2-${i}`} className="w-24 h-8 rounded-full border border-white/20 bg-white/5" />
+            ))}
+          </motion.div>
+        </div>
+
+        <div className="w-full overflow-hidden">
+          <motion.div
+            animate={{ x: ["0%", "-50%"] }}
+            transition={{ duration: 16, ease: "linear", repeat: Infinity }}
+            className="flex gap-3 w-max"
+          >
+            {[...Array(15)].map((_, i) => (
+              <div key={`r3-${i}`} className="w-24 h-8 rounded-full border border-white/20 bg-white/5" />
+            ))}
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Concentric Circles Background */}
+      <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[180%] aspect-square rounded-full bg-blue-600 blur-[80px] opacity-20" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[160%] aspect-square border-2 border-white/5 rounded-full" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[140%] aspect-square border-2 border-white/10 rounded-full" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[120%] aspect-square border-2 border-white/20 rounded-full" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[100%] aspect-square border-2 border-white/30 rounded-full" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[80%] aspect-square border-2 border-white/40 rounded-full" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[60%] aspect-square border-2 border-white/50 rounded-full" />
+        {/* Innermost Circle - Most Prominent */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[40%] aspect-square border-2 border-white/60 rounded-full bg-[#087CC4]/60 blur-[1px]" />
+      </div>
+
+      <div className="relative z-10 mt-4">
+        <h3 className="text-lg font-bold text-white leading-snug">
+          Passionate About Next-Gen,<br />
+          <span className="text-blue-500">Future-Forward Technologies.</span>
+        </h3>
+      </div>
+
+      {/* Window Mockup */}
+      <motion.div
+        variants={{
+          initial: { rotateX: 12, y: 60 },
+          hover: { rotateX: 0, y: 0 }
+        }}
+        transition={{
+          type: "spring",
+          stiffness: 140,
+          damping: 20,
+        }}
+        className="relative z-10 w-64 bg-[#0a0a0a] rounded-t-xl border border-white/10 shadow-2xl p-4 pointer-events-none"
+        style={{
+          transformPerspective: 1000,
+          transformOrigin: "bottom",
+        }}
+      >
+        <div className="flex gap-2 mb-4">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#FF5F56]" />
+          <div className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E]" />
+          <div className="w-2.5 h-2.5 rounded-full bg-[#27C93F]" />
+        </div>
+
+        <div className="space-y-4 p-2 bg-[#111] rounded-lg border border-white/5">
+          <div className="w-1/2 h-2 bg-white/10 rounded-full" />
+          <div className="space-y-2">
+            <div className="text-[10px] text-gray-400 font-medium leading-relaxed">
+              Purpose-Driven Design That Speaks<br />
+              Performance-First Code That Delivers
+            </div>
+          </div>
+          <div className="flex gap-2 pt-2">
+            <div className="px-3 py-1 rounded-full bg-blue-600/20 text-blue-400 text-[10px] border border-blue-500/30">
+              Skills
+            </div>
+            <div className="px-3 py-1 rounded-full bg-white/5 text-gray-400 text-[10px] border border-white/10">
+              Contact Me
+            </div>
+          </div>
+        </div>
+      </motion.div>
+      {/* Interaction Hitbox Overlay - Placed last to ensure top z-index */}
+      <div
+        className="absolute inset-0 z-[100] cursor-pointer"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      />
+    </motion.div>
+  );
+};
 
 export function BentoGridRedesign() {
   return (
@@ -94,43 +222,7 @@ export function BentoGridRedesign() {
             {/* Empty as requested */}
           </motion.div>
 
-          {/* 5. Passionate Card (Middle Right) */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="row-span-2 rounded-2xl p-8 relative overflow-hidden flex flex-col items-center text-center"
-            style={glassStyle}
-          >
-            <GlassHighlight />
-            <div className="relative z-10">
-              <h3 className="text-2xl font-bold text-white mb-2">
-                Passionate About Next-Gen,<br />
-                <span className="text-blue-500">Future-Forward Technologies.</span>
-              </h3>
-
-              {/* Decorative Rings */}
-              <div className="absolute bottom-0 left-0 right-0 h-64 pointer-events-none">
-                <div className="absolute bottom-[-20%] left-1/2 -translate-x-1/2 w-[150%] h-[150%] border border-white/5 rounded-full" />
-                <div className="absolute bottom-[-10%] left-1/2 -translate-x-1/2 w-[120%] h-[120%] border border-white/5 rounded-full" />
-                <div className="absolute bottom-[0%] left-1/2 -translate-x-1/2 w-[90%] h-[90%] border border-white/5 rounded-full" />
-              </div>
-
-              {/* Laptop/Window Mockup */}
-              <div className="absolute bottom-[-40px] left-1/2 -translate-x-1/2 w-48 h-32 bg-[#1e1e1e] rounded-t-xl border border-white/20 shadow-2xl p-2 z-10">
-                <div className="flex gap-1 mb-2">
-                  <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                  <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
-                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                </div>
-                <div className="flex justify-center mt-4 space-x-2">
-                  <div className="bg-blue-600/30 text-blue-300 text-[8px] px-2 py-0.5 rounded-full">Skills</div>
-                  <div className="bg-white/10 text-gray-400 text-[8px] px-2 py-0.5 rounded-full">Contact Me</div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
+          <PassionateCard />
 
           {/* 6. Center Bottom (Middle Left) */}
           <motion.div
@@ -160,27 +252,84 @@ export function BentoGridRedesign() {
         </div>
 
 
-        {/* CENTRAL MR BADGE - Adjusted Position for 270px top row */}
-        <div className="absolute left-[33.333%] top-[270px] -translate-x-1/2 -translate-y-1/2 z-20 hidden md:flex">
+        {/* CENTRAL MR BADGE - Revamped with Micro-Interactions */}
+        <div className="absolute left-[33.333%] top-[270px] -translate-x-1/2 -translate-y-1/2 z-20 hidden md:flex items-center justify-center pointer-events-none">
           <motion.div
-            initial={{ scale: 1 }}
-            whileHover={{
-              scale: 1.05,
-              boxShadow: "0 0 80px rgba(41,141,238,0.9), 0 0 120px rgba(41,141,238,0.6)",
-            }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="w-32 h-32 rounded-full flex items-center justify-center relative cursor-pointer backdrop-blur-xl"
-            style={{
-              ...glassStyle,
-              // Keep original MR button gradient as it might be specific
-              background: "linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.05) 100%)",
-            }}
+            className="relative flex items-center justify-center pointer-events-none"
+            initial="initial"
+            whileHover="hover"
           >
-            {/* Restored Inner Rings from Previous Design */}
-            <div className="absolute inset-0 rounded-full border border-white/20" />
-            <div className="absolute -inset-2 rounded-full border border-white/5 scale-110" />
+            {/* Pulsing Outer Glow (Behind) */}
+            <motion.div
+              variants={{
+                initial: { opacity: 0.5, scale: 0.9 },
+                hover: { opacity: 0.8, scale: 1.1 },
+              }}
+              transition={{ duration: 0.3 }}
+              className="absolute inset-0 rounded-full blur-xl bg-blue-500/30 pointer-events-none"
+            />
 
-            <span className="text-4xl font-black text-white tracking-tighter drop-shadow-lg select-none">MR</span>
+            {/* Main Glass Circle */}
+            <motion.div
+              variants={{
+                initial: { scale: 1, rotate: 0 },
+                hover: { scale: 1.1, rotate: 0 },
+              }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="w-32 h-32 rounded-full flex items-center justify-center relative cursor-pointer backdrop-blur-xl z-10 overflow-hidden pointer-events-auto"
+              style={{
+                ...glassStyle,
+                background: "linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)",
+                boxShadow: "0 0 30px rgba(41,141,238,0.3), inset 0 0 20px rgba(255,255,255,0.05)",
+              }}
+            >
+              {/* Rotating Ring 1 (Slow) */}
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, ease: "linear", repeat: Infinity }}
+                className="absolute inset-0 rounded-full border border-white/10 border-t-white/40 border-l-transparent"
+              />
+
+              {/* Rotating Ring 2 (Counter-Rotate, Faster on Hover) */}
+              <motion.div
+                animate={{ rotate: -360 }}
+                transition={{ duration: 15, ease: "linear", repeat: Infinity }}
+                className="absolute inset-2 rounded-full border border-white/5 border-b-white/20 border-r-transparent"
+              />
+
+              {/* Inner Scale Ring */}
+              <motion.div
+                variants={{
+                  initial: { scale: 1 },
+                  hover: { scale: 1.1 },
+                }}
+                className="absolute inset-4 rounded-full border border-white/10"
+              />
+
+              {/* Text Scale & Glow */}
+              <motion.span
+                variants={{
+                  initial: { scale: 1, textShadow: "0 0 0px rgba(255,255,255,0)" },
+                  hover: { scale: 1.15, textShadow: "0 0 10px rgba(255,255,255,0.5)" },
+                }}
+                className="text-4xl font-black text-white tracking-tighter drop-shadow-lg select-none z-20 relative"
+              >
+                MR
+              </motion.span>
+            </motion.div>
+
+            {/* Ripple Effect Ring (Expands on Hover) */}
+            <motion.div
+              variants={{
+                initial: { opacity: 0, scale: 1 },
+                hover: {
+                  opacity: [0, 0.4, 0],
+                  scale: [1, 1.4, 1.5],
+                  transition: { duration: 1.5, repeat: Infinity, ease: "easeOut" }
+                },
+              }}
+              className="absolute inset-0 rounded-full border border-blue-400/50 pointer-events-none"
+            />
           </motion.div>
         </div>
 
