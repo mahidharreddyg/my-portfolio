@@ -5,13 +5,11 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import Image from "next/image";
 import {
-  SiC, SiPython, SiJavascript, SiTypescript, SiGo, SiSpring, SiSpringboot, SiNodedotjs, SiExpress,
   SiNextdotjs, SiReact, SiAngular, SiTailwindcss, SiPostgresql, SiMysql, SiMongodb,
   SiDocker, SiKubernetes, SiLinux, SiPandas, SiTensorflow, SiPytorch,
   SiScikitlearn, SiGit, SiGithub, SiJira, SiFigma, SiPostman, SiVercel,
   SiSpringsecurity, SiHtml5, SiCss3, SiRedux, SiGraphql, SiPrisma, SiRedis
 } from "react-icons/si";
-import { FaJava } from "react-icons/fa";
 
 const glassStyle = {
   background: 'rgba(255, 255, 255, 0.03)',
@@ -92,35 +90,36 @@ const ContactButton = () => {
 };
 // Tech Stack Data
 const techRow1 = [
-  { name: "Java", icon: FaJava, color: "#f89820" },
-  { name: "Python", icon: SiPython, color: "#3776ab" },
-  { name: "Go (Gin)", icon: SiGo, color: "#00add8" },
-  { name: "Spring Boot", icon: SiSpringboot, color: "#6db33f" },
-  { name: "Node.js", icon: SiNodedotjs, color: "#339933" },
-  { name: "Express.js", icon: SiExpress, color: "#000000" },
-  { name: "C", icon: SiC, color: "#a8b9cc" },
-  { name: "TypeScript", icon: SiTypescript, color: "#3178c6" },
+  { name: "Java", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" },
+  { name: "Python", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" },
+  { name: "Go", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg" },
+  { name: "Spring Boot", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg" },
+  { name: "Node.js", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" },
+  { name: "Express.js", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg" }, // Express is strictly text/white usually, checking
+  { name: "C", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-original.svg" },
+  { name: "TypeScript", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" },
 ];
 
 const techRow2 = [
-  { name: "React", icon: SiReact, color: "#61dafb" },
-  { name: "Next.js", icon: SiNextdotjs, color: "#000000" },
-  { name: "Angular", icon: SiAngular, color: "#dd0031" },
-  { name: "Tailwind CSS", icon: SiTailwindcss, color: "#06b6d4" },
-  { name: "PostgreSQL", icon: SiPostgresql, color: "#336791" },
-  { name: "MySQL", icon: SiMysql, color: "#4479a1" },
-  { name: "MongoDB", icon: SiMongodb, color: "#47a248" },
-  { name: "Redis", icon: SiRedis, color: "#dc382d" },
+  { name: "React", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" },
+  { name: "Next.js", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg" }, // Next.js is black/white
+  { name: "Angular", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/angularjs/angularjs-original.svg" },
+  { name: "Tailwind CSS", img: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg" },
+  { name: "PostgreSQL", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" },
+  { name: "MySQL", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" },
+  { name: "MongoDB", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" },
+  { name: "Redis", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg" },
 ];
 
 const techRow3 = [
-  { name: "Docker", icon: SiDocker, color: "#2496ed" },
-  { name: "Kubernetes", icon: SiKubernetes, color: "#326ce5" },
-  { name: "Linux", icon: SiLinux, color: "#fcc624" },
-  { name: "Pandas", icon: SiPandas, color: "#150458" },
-  { name: "TensorFlow", icon: SiTensorflow, color: "#ff6f00" },
-  { name: "Git", icon: SiGit, color: "#f05032" },
-  { name: "Figma", icon: SiFigma, color: "#f24e1e" },
+  { name: "Docker", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" },
+  { name: "Kubernetes", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg" },
+  { name: "Linux", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg" },
+  { name: "Pandas", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pandas/pandas-original.svg" },
+  { name: "TensorFlow", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tensorflow/tensorflow-original.svg" },
+  { name: "AWS", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original-wordmark.svg" },
+  { name: "Git", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" },
+  { name: "Figma", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg" },
 ];
 const PassionateCard = () => {
   const [isHovered, setIsHovered] = useState(false);
@@ -167,7 +166,7 @@ const PassionateCard = () => {
                   className="rounded bg-white/5 p-0.5 flex items-center justify-center shrink-0 border border-white/10"
                   style={{ width: "20px", height: "20px" }}
                 >
-                  <tech.icon style={{ color: tech.color }} className="w-3 h-3" />
+                  <img src={tech.img} alt={tech.name} className="w-3 h-3 object-contain opacity-90" loading="lazy" decoding="async" />
                 </div>
                 <span className="text-[10px] font-semibold text-white/90 whitespace-nowrap">{tech.name}</span>
               </div>
@@ -197,7 +196,7 @@ const PassionateCard = () => {
                   className="rounded bg-white/5 p-0.5 flex items-center justify-center shrink-0 border border-white/10"
                   style={{ width: "20px", height: "20px" }}
                 >
-                  <tech.icon style={{ color: tech.color }} className="w-3 h-3" />
+                  <img src={tech.img} alt={tech.name} className="w-3 h-3 object-contain opacity-90" loading="lazy" decoding="async" />
                 </div>
                 <span className="text-[10px] font-semibold text-white/90 whitespace-nowrap">{tech.name}</span>
               </div>
@@ -227,7 +226,7 @@ const PassionateCard = () => {
                   className="rounded bg-white/5 p-0.5 flex items-center justify-center shrink-0 border border-white/10"
                   style={{ width: "20px", height: "20px" }}
                 >
-                  <tech.icon style={{ color: tech.color }} className="w-3 h-3" />
+                  <img src={tech.img} alt={tech.name} className="w-3 h-3 object-contain opacity-90" loading="lazy" decoding="async" />
                 </div>
                 <span className="text-[10px] font-semibold text-white/90 whitespace-nowrap">{tech.name}</span>
               </div>
