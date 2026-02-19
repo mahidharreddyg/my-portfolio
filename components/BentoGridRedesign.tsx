@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { useState } from "react";
 import Image from "next/image";
+
 
 const glassStyle = {
   background: 'rgba(255, 255, 255, 0.03)',
@@ -279,12 +279,6 @@ const PassionateCard = () => {
       </div>
 
 
-      {/* 
-  NOTE: For the Skills and Contact buttons to have independent hover effects,
-  define these two components OUTSIDE your main component so they don't 
-  inherit variants from the parent motion.div:
-*/}
-
       {/* ─── Window Mockup (paste inside your JSX) ─── */}
       <motion.div
         variants={{
@@ -457,7 +451,254 @@ const PassionateCard = () => {
   );
 };
 
+function FoldedAvatar({
+  hovered,
+  mousePos,
+}: {
+  hovered: boolean;
+  mousePos: { x: number; y: number };
+}) {
+  const W = 104, H = 122, R = 13, FOLD = 28;
+  const ID = "profile-fold-clip";
+  const path = `M ${R} 0 L ${W - FOLD} 0 L ${W} ${FOLD} L ${W} ${H - R} Q ${W} ${H} ${W - R} ${H} L ${R} ${H} Q 0 ${H} 0 ${H - R} L 0 ${R} Q 0 0 ${R} 0 Z`;
+  const sx = mousePos.x * 100;
+  const sy = mousePos.y * 100;
+
+  return (
+    <div style={{ position: "relative", width: W, height: H, flexShrink: 0, zIndex: 2 }}>
+      {/* Clip shape def */}
+      <svg width="0" height="0" style={{ position: "absolute" }}>
+        <defs>
+          <clipPath id={ID} clipPathUnits="userSpaceOnUse">
+            <path d={path} />
+          </clipPath>
+        </defs>
+      </svg>
+
+      {/* Blue halo */}
+      <div style={{
+        position: "absolute", zIndex: 0,
+        inset: hovered ? -12 : 0,
+        borderRadius: R + 12,
+        background: "radial-gradient(circle at 45% 35%, rgba(56,189,248,0.55) 0%, rgba(37,99,235,0.3) 50%, transparent 75%)",
+        filter: "blur(14px)",
+        opacity: hovered ? 1 : 0,
+        transition: "all 0.5s cubic-bezier(0.25,1,0.5,1)",
+        pointerEvents: "none",
+      }} />
+
+      {/* Clipped photo */}
+      <div style={{
+        position: "relative", zIndex: 1,
+        width: W, height: H,
+        clipPath: `url(#${ID})`,
+        WebkitClipPath: `url(#${ID})`,
+        transform: hovered ? "scale(1.07) translateY(-4px)" : "scale(1) translateY(0)",
+        transition: "transform 0.55s cubic-bezier(0.34,1.5,0.64,1)",
+      }}>
+        <Image
+          src="/profile_pic.PNG"
+          alt="Mahidhar Reddy Gaddam"
+          fill
+          className="object-cover object-top"
+          style={{
+            filter: hovered
+              ? "brightness(1.1) contrast(1.05)"
+              : "brightness(0.88) contrast(1.02) grayscale(0.2)",
+            transition: "filter 0.45s ease",
+          }}
+        />
+
+        {/* Mouse spotlight inside photo */}
+        <div style={{
+          position: "absolute", inset: 0, pointerEvents: "none",
+          background: `radial-gradient(circle at ${sx}% ${sy}%, rgba(255,255,255,0.15) 0%, transparent 60%)`,
+          opacity: hovered ? 1 : 0,
+          transition: "opacity 0.25s ease",
+          mixBlendMode: "screen",
+        }} />
+
+        {/* Blue tint */}
+        <div style={{
+          position: "absolute", inset: 0, pointerEvents: "none",
+          background: "linear-gradient(170deg, rgba(56,189,248,0.14) 0%, transparent 55%)",
+          opacity: hovered ? 1 : 0,
+          transition: "opacity 0.4s ease",
+        }} />
+      </div>
+
+      {/* Shape border */}
+      <svg style={{ position: "absolute", top: 0, left: 0, zIndex: 2, pointerEvents: "none", overflow: "visible" }}
+        width={W} height={H} viewBox={`0 0 ${W} ${H}`}>
+        <path d={path} fill="none"
+          stroke={hovered ? "rgba(56,189,248,0.85)" : "rgba(56,189,248,0.2)"}
+          strokeWidth={hovered ? 1.2 : 0.8}
+          style={{
+            transition: "stroke 0.4s ease, stroke-width 0.4s ease",
+            filter: hovered ? "drop-shadow(0 0 5px rgba(56,189,248,0.7))" : "none",
+          }}
+        />
+      </svg>
+
+      {/* Fold ear top-right */}
+      <svg style={{ position: "absolute", top: 0, right: 0, zIndex: 3, pointerEvents: "none" }}
+        width={FOLD} height={FOLD} viewBox={`0 0 ${FOLD} ${FOLD}`}>
+        <polygon points={`0,0 ${FOLD},${FOLD} ${FOLD},0`}
+          fill={hovered ? "rgba(56,189,248,0.22)" : "rgba(56,189,248,0.08)"}
+          style={{ transition: "fill 0.4s ease" }}
+        />
+        <line x1="0.5" y1="0.5" x2={FOLD - 0.5} y2={FOLD - 0.5}
+          stroke={hovered ? "rgba(125,211,252,1)" : "rgba(56,189,248,0.4)"}
+          strokeWidth="0.9"
+          style={{ transition: "stroke 0.4s ease" }}
+        />
+      </svg>
+
+      {/* Shadow pool */}
+      <div style={{
+        position: "absolute", bottom: -12, left: "12%", right: "12%", height: 16,
+        background: "rgba(37,99,235,0.4)",
+        filter: "blur(12px)", borderRadius: "50%",
+        opacity: hovered ? 0.85 : 0,
+        transform: `scaleX(${hovered ? 1 : 0.3})`,
+        transition: "opacity 0.5s ease, transform 0.5s cubic-bezier(0.34,1.3,0.64,1)",
+      }} />
+    </div>
+  );
+}
+
+function GlitchName({ hovered }: { hovered: boolean }) {
+  const [glitch, setGlitch] = useState(false);
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      setGlitch(true);
+      setTimeout(() => setGlitch(false), 320);
+    }, 5000);
+    return () => clearInterval(t);
+  }, []);
+
+  const css = `
+    .pgn {
+      background: linear-gradient(125deg, #f1f5f9 0%, #93c5fd 40%, #3b82f6 80%, #1d4ed8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 22px;
+      letter-spacing: 0.02em;
+      line-height: 1.05;
+      white-space: nowrap;
+    }
+    .pgn-last {
+      background: linear-gradient(125deg, #3b82f6 0%, #60a5fa 40%, #38bdf8 80%, #0ea5e9 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 22px;
+      letter-spacing: 0.02em;
+      line-height: 1.05;
+      white-space: nowrap;
+    }
+    .pgn.hov, .pgn-last.hov {
+      background: linear-gradient(125deg, #ffffff 0%, #bae6fd 30%, #38bdf8 65%, #0ea5e9 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  `;
+  const clsFirst = `pgn font-malinton${hovered ? " hov" : ""}`;
+  const clsLast = `pgn-last font-malinton${hovered ? " hov" : ""}`;
+
+  return (
+    <div className="relative select-none text-left">
+      <style>{css}</style>
+
+      <div className="relative">
+        <div style={{ lineHeight: 1.05 }} className="whitespace-nowrap">
+          <span className={clsFirst}>Mahidhar</span>
+        </div>
+        <div style={{ lineHeight: 1.05 }} className="flex items-baseline whitespace-nowrap">
+          <span className={clsLast}>Reddy Gaddam</span>
+          <span className="font-malinton text-white" style={{ fontSize: "22px", letterSpacing: "0.02em" }}>.</span>
+        </div>
+
+        {/* Glitch layers */}
+        {glitch && (
+          <>
+            <div className="font-malinton flex flex-col whitespace-nowrap" aria-hidden style={{
+              position: "absolute", inset: 0,
+              fontSize: "22px", letterSpacing: "0.02em", lineHeight: 1.05,
+              background: "linear-gradient(125deg, #22d3ee, #38bdf8)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+              opacity: 0.75,
+              clipPath: "polygon(0 10%, 100% 10%, 100% 38%, 0 38%)",
+              transform: "translateX(-3px)", pointerEvents: "none",
+            }}>
+              <div>Mahidhar</div>
+              <div>Reddy Gaddam.</div>
+            </div>
+            <div className="font-malinton flex flex-col whitespace-nowrap" aria-hidden style={{
+              position: "absolute", inset: 0,
+              fontSize: "22px", letterSpacing: "0.02em", lineHeight: 1.05,
+              background: "linear-gradient(125deg, #0ea5e9, #0284c7)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+              opacity: 0.6,
+              clipPath: "polygon(0 62%, 100% 62%, 100% 82%, 0 82%)",
+              transform: "translateX(3px)", pointerEvents: "none",
+            }}>
+              <div>Mahidhar</div>
+              <div>Reddy Gaddam.</div>
+            </div>
+          </>
+        )}
+      </div>
+
+      <div className="flex items-center gap-2 mt-2 text-[13px] font-medium text-white/90 tracking-wide">
+        <span className="text-base leading-none mt-[-2px]">🇮🇳</span>
+        <span>Bengaluru, India.</span>
+      </div>
+    </div>
+  );
+}
+
+function useProfileCard() {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [hovered, setHovered] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.35 });
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => t + 1), 50);
+    return () => clearInterval(id);
+  }, []);
+
+  const pulse = 0.55 + 0.45 * Math.sin(tick * 0.055);
+
+  const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const r = cardRef.current?.getBoundingClientRect();
+    if (!r) return;
+    const nx = (e.clientX - r.left) / r.width;
+    const ny = (e.clientY - r.top) / r.height;
+    setMousePos({ x: nx, y: ny });
+    if (cardRef.current)
+      cardRef.current.style.transform =
+        `perspective(900px) rotateY(${(nx - 0.5) * 14}deg) rotateX(${(ny - 0.5) * -14}deg) scale(1.025)`;
+  };
+
+  const onMouseLeave = () => {
+    if (cardRef.current)
+      cardRef.current.style.transform =
+        "perspective(900px) rotateY(0deg) rotateX(0deg) scale(1)";
+    setHovered(false);
+  };
+
+  const onMouseEnter = () => setHovered(true);
+
+  return { cardRef, hovered, mousePos, tick, pulse, onMouseMove, onMouseLeave, onMouseEnter };
+}
+
 export function BentoGridRedesign() {
+  const { cardRef, hovered, mousePos, tick, pulse, onMouseMove, onMouseLeave, onMouseEnter } = useProfileCard();
   return (
     <div className="w-full max-w-6xl mx-auto px-4 pb-12 pt-24 md:pt-48">
       <div className="relative grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -470,17 +711,100 @@ export function BentoGridRedesign() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="h-[270px] rounded-2xl p-6 relative overflow-hidden group flex flex-row items-center gap-4"
-            style={glassStyle}
+            className="h-[270px] rounded-2xl relative"
+            style={{ perspective: "1000px" }}
           >
-            <GlassHighlight />
-            <div className="w-20 h-20 shrink-0 rounded-2xl overflow-hidden border-2 border-white/20 shadow-lg relative z-10">
-              <Image src="/profile_pic.PNG" alt="Profile" fill className="object-cover" />
-            </div>
-            <div className="flex flex-col justify-center relative z-10">
-              <h3 className="text-white text-lg font-bold leading-tight">Mahidhar<br />Reddy Gaddam.</h3>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-xs text-gray-400">🇮🇳 Bengaluru, India.</span>
+            <div
+              ref={cardRef}
+              onMouseMove={onMouseMove}
+              onMouseLeave={onMouseLeave}
+              onMouseEnter={onMouseEnter}
+              className="w-full h-full rounded-2xl relative overflow-hidden flex flex-row items-center gap-4 px-5 py-6 cursor-default"
+              style={{
+                ...glassStyle,
+                border: hovered
+                  ? "1px solid rgba(56,189,248,0.3)"
+                  : "1px solid rgba(255,255,255,0.07)",
+                boxShadow: hovered
+                  ? "0 0 0 1px rgba(56,189,248,0.08), 0 20px 60px rgba(0,0,0,0.55), inset 0 0 80px rgba(37,99,235,0.04)"
+                  : undefined,
+                transition: "border 0.4s ease, box-shadow 0.4s ease, transform 0.16s cubic-bezier(0.23,1,0.32,1)",
+              }}
+            >
+              <GlassHighlight />
+
+              {/* Mouse spotlight over whole card */}
+              <div
+                className="absolute inset-0 rounded-2xl pointer-events-none"
+                style={{
+                  background: `radial-gradient(circle at ${mousePos.x * 100}% ${mousePos.y * 100}%, rgba(56,189,248,0.07) 0%, transparent 60%)`,
+                  opacity: hovered ? 1 : 0,
+                  transition: "opacity 0.3s ease",
+                  zIndex: 0,
+                }}
+              />
+
+              {/* Ambient glow — top left */}
+              <div className="absolute pointer-events-none rounded-full" style={{
+                top: -44, left: -44, width: 190, height: 190,
+                background: "radial-gradient(circle, rgba(37,99,235,0.18) 0%, transparent 70%)",
+                filter: "blur(28px)", opacity: pulse,
+              }} />
+
+              {/* Ambient glow — bottom right */}
+              <div className="absolute pointer-events-none rounded-full" style={{
+                bottom: -30, right: -30, width: 130, height: 130,
+                background: "radial-gradient(circle, rgba(14,165,233,0.1) 0%, transparent 70%)",
+                filter: "blur(20px)", opacity: pulse * 0.7,
+              }} />
+
+              {/* HUD bracket — top left */}
+              <svg className="absolute pointer-events-none" style={{ top: 12, left: 12, zIndex: 5 }}
+                width="15" height="15" viewBox="0 0 15 15" fill="none">
+                <path d="M1 7.5 L1 1 L7.5 1"
+                  stroke={hovered ? "rgba(56,189,248,0.85)" : "rgba(56,189,248,0.3)"}
+                  strokeWidth="1.6" strokeLinecap="round"
+                  style={{ transition: "stroke 0.35s ease" }}
+                />
+              </svg>
+
+              {/* HUD bracket — bottom right */}
+              <svg className="absolute pointer-events-none" style={{ bottom: 12, right: 12, zIndex: 5 }}
+                width="15" height="15" viewBox="0 0 15 15" fill="none">
+                <path d="M7.5 14 L14 14 L14 7.5"
+                  stroke={hovered ? "rgba(56,189,248,0.85)" : "rgba(56,189,248,0.3)"}
+                  strokeWidth="1.6" strokeLinecap="round"
+                  style={{ transition: "stroke 0.35s ease" }}
+                />
+              </svg>
+
+              {/* Bottom shimmer */}
+              <div className="absolute pointer-events-none" style={{
+                bottom: 0, left: 36, right: 36, height: 1, zIndex: 5,
+                background: "linear-gradient(90deg, transparent, rgba(56,189,248,0.7), rgba(14,165,233,0.5), transparent)",
+                opacity: hovered ? 1 : 0.25 + 0.25 * Math.abs(Math.sin(tick * 0.04)),
+                transform: `scaleX(${hovered ? 1 : 0.5 + 0.35 * Math.abs(Math.sin(tick * 0.04))})`,
+                transition: "opacity 0.4s ease, transform 0.4s ease",
+              }} />
+
+              {/* Hover Yellow Left Glow (Fades in on hover) */}
+              <div
+                className="absolute inset-0 pointer-events-none transition-opacity duration-500 rounded-2xl z-0"
+                style={{
+                  background: "linear-gradient(90deg, rgba(253, 224, 71, 0.15), transparent 60%)",
+                  opacity: hovered ? 1 : 0,
+                }}
+              />
+
+              {/* Avatar with folded corner */}
+              <FoldedAvatar hovered={hovered} mousePos={mousePos} />
+
+              {/* Name + location */}
+              <div className="flex flex-col justify-center relative z-10 flex-1 text-left pl-2">
+                <div className="text-[9px] text-white/80 tracking-wide font-medium mb-1 drop-shadow-sm leading-tight w-max">
+                  Software Engineer With A Design Eye
+                </div>
+                <GlitchName hovered={hovered} />
               </div>
             </div>
           </motion.div>

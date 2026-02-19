@@ -163,14 +163,6 @@ export default function LetsConnectModal({
       // Target the specific content wrapper we added an ID to
       const contentElement = document.getElementById('main-content');
       if (contentElement) {
-        // We need to preserve existing filters (monochrome) and add blur
-        // Use a class or direct style manipulation that appends?
-        // Since the monochrome filter is inline, appending to it is tricky if we don't know it.
-        // Better: Apply a class or just standard blur if the component handles it?
-        // Actually, logic in page.tsx controls the filter.
-        // If we override style.filter, we lose monochrome.
-        // Solution: Add a CSS class or target a separate overlay?
-        // Or, assume we can append.
         const currentFilter = contentElement.style.filter || 'none';
         if (!currentFilter.includes('blur')) {
           contentElement.dataset.prevFilter = currentFilter; // Store previous
