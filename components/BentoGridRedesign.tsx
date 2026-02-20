@@ -458,115 +458,115 @@ function FoldedAvatar({
   hovered: boolean;
   mousePos: { x: number; y: number };
 }) {
-  const W = 104, H = 122, R = 13, FOLD = 28;
-  const ID = "profile-fold-clip";
-  const path = `M ${R} 0 L ${W - FOLD} 0 L ${W} ${FOLD} L ${W} ${H - R} Q ${W} ${H} ${W - R} ${H} L ${R} ${H} Q 0 ${H} 0 ${H - R} L 0 ${R} Q 0 0 ${R} 0 Z`;
-  const sx = mousePos.x * 100;
-  const sy = mousePos.y * 100;
+  const W = 100, H = 140; // Shrunk further to give name plenty of space
 
   return (
-    <div style={{ position: "relative", width: W, height: H, flexShrink: 0, zIndex: 2 }}>
-      {/* Clip shape def */}
-      <svg width="0" height="0" style={{ position: "absolute" }}>
-        <defs>
-          <clipPath id={ID} clipPathUnits="userSpaceOnUse">
-            <path d={path} />
-          </clipPath>
-        </defs>
-      </svg>
+    <div style={{ position: "relative", width: W, height: H, flexShrink: 0, zIndex: 2, perspective: 1200 }} className="flex items-center justify-center">
 
-      {/* Blue halo */}
-      <div style={{
-        position: "absolute", zIndex: 0,
-        inset: hovered ? -12 : 0,
-        borderRadius: R + 12,
-        background: "radial-gradient(circle at 45% 35%, rgba(56,189,248,0.55) 0%, rgba(37,99,235,0.3) 50%, transparent 75%)",
-        filter: "blur(14px)",
-        opacity: hovered ? 1 : 0,
-        transition: "all 0.5s cubic-bezier(0.25,1,0.5,1)",
-        pointerEvents: "none",
-      }} />
+      {/* 1. Base Playing Card (Navbar Glassmorphism Texture) */}
+      <motion.div
+        className="absolute inset-0 rounded-lg overflow-hidden shadow-2xl transition-shadow"
+        initial={{ rotateZ: 0, x: 0, y: 0 }}
+        animate={{
+          rotateZ: hovered ? -8 : 0,
+          x: hovered ? -20 : 0,
+          y: hovered ? 8 : 0,
+        }}
+        transition={{ type: "spring", stiffness: 220, damping: 20 }}
+        style={{
+          background: 'rgba(10, 15, 30, 0.4)', // Darker tech blue base
+          backdropFilter: 'blur(8px) saturate(150%)',
+          WebkitBackdropFilter: 'blur(8px) saturate(150%)',
+          border: '1px solid rgba(56, 189, 248, 0.3)', // Cyan tinted border
+          boxShadow: `
+            0 8px 32px rgba(0, 0, 0, 0.2),
+            inset 0 1px 0 rgba(56, 189, 248, 0.2),
+            inset 0 -1px 0 rgba(56, 189, 248, 0.05)
+          `,
+        }}
+      >
+        {/* Glass specular shine highlight */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `
+              linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.12) 0%, transparent 60%)
+            `,
+            opacity: 0.8,
+          }}
+        />
+        <div
+          className="absolute top-0 left-0 right-0 h-1/2 pointer-events-none bg-gradient-to-b from-white/5 to-transparent"
+        />
+        {/* Subtle grid pattern inside base card for tech feel */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(56,189,248,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(56,189,248,0.08)_1px,transparent_1px)] bg-[size:10px_10px]" />
 
-      {/* Clipped photo */}
-      <div style={{
-        position: "relative", zIndex: 1,
-        width: W, height: H,
-        clipPath: `url(#${ID})`,
-        WebkitClipPath: `url(#${ID})`,
-        transform: hovered ? "scale(1.07) translateY(-4px)" : "scale(1) translateY(0)",
-        transition: "transform 0.55s cubic-bezier(0.34,1.5,0.64,1)",
-      }}>
+        {/* Tech Corner Accents on Base Card */}
+        <div className="absolute top-2 left-2 w-2 h-2 border-t-2 border-l-2 border-cyan-400" />
+        <div className="absolute top-2 right-2 w-2 h-2 border-t-2 border-r-2 border-cyan-400" />
+        <div className="absolute bottom-2 left-2 w-2 h-2 border-b-2 border-l-2 border-cyan-400" />
+        <div className="absolute bottom-2 right-2 w-2 h-2 border-b-2 border-r-2 border-cyan-400" />
+
+        {/* Card Suit / Emblem for base card */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-30">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-white z-0">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M14.25 9.75L16.5 12l-2.25 2.25m-4.5 0L7.5 12l2.25-2.25M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" />
+          </svg>
+        </div>
+      </motion.div>
+
+      {/* 2. Top Playing Card (Profile Image) */}
+      <motion.div
+        className="absolute inset-0 rounded-lg overflow-hidden"
+        initial={{ rotateZ: 0, x: 0, y: 0 }}
+        animate={{
+          rotateZ: hovered ? 4 : 0,
+          x: hovered ? 10 : 0,
+          y: hovered ? -6 : 0,
+        }}
+        transition={{ type: "spring", stiffness: 220, damping: 20 }}
+        style={{ border: '1px solid rgba(255, 255, 255, 0.15)', boxShadow: '0 15px 35px rgba(0,0,0,0.5)' }}
+      >
         <Image
-          src="/profile_pic.PNG"
+          src="/Mahidhar_Reddy_G_Card_Pic.png"
           alt="Mahidhar Reddy Gaddam"
           fill
-          className="object-cover object-top"
+          className="object-cover"
           style={{
-            filter: hovered
-              ? "brightness(1.1) contrast(1.05)"
-              : "brightness(0.88) contrast(1.02) grayscale(0.2)",
-            transition: "filter 0.45s ease",
+            objectPosition: "50% 10%",
+            filter: hovered ? "contrast(1.08) saturate(1.1) brightness(1.05)" : "contrast(1.02) saturate(1.02) brightness(0.95)",
+            transition: "filter 0.4s ease"
           }}
         />
 
-        {/* Mouse spotlight inside photo */}
+        {/* Glossy gradient overlay to reinforce 'card' material feel */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-transparent pointer-events-none opacity-40 mix-blend-overlay" />
+
+        {/* Interactive hover glow */}
         <div style={{
           position: "absolute", inset: 0, pointerEvents: "none",
-          background: `radial-gradient(circle at ${sx}% ${sy}%, rgba(255,255,255,0.15) 0%, transparent 60%)`,
+          background: `radial-gradient(circle at ${mousePos.x * 100}% ${mousePos.y * 100}%, rgba(255,255,255,0.15) 0%, transparent 60%)`,
           opacity: hovered ? 1 : 0,
           transition: "opacity 0.25s ease",
-          mixBlendMode: "screen",
+          mixBlendMode: "overlay",
         }} />
+      </motion.div>
 
-        {/* Blue tint */}
-        <div style={{
-          position: "absolute", inset: 0, pointerEvents: "none",
-          background: "linear-gradient(170deg, rgba(56,189,248,0.14) 0%, transparent 55%)",
-          opacity: hovered ? 1 : 0,
-          transition: "opacity 0.4s ease",
-        }} />
-      </div>
-
-      {/* Shape border */}
-      <svg style={{ position: "absolute", top: 0, left: 0, zIndex: 2, pointerEvents: "none", overflow: "visible" }}
-        width={W} height={H} viewBox={`0 0 ${W} ${H}`}>
-        <path d={path} fill="none"
-          stroke={hovered ? "rgba(56,189,248,0.85)" : "rgba(56,189,248,0.2)"}
-          strokeWidth={hovered ? 1.2 : 0.8}
-          style={{
-            transition: "stroke 0.4s ease, stroke-width 0.4s ease",
-            filter: hovered ? "drop-shadow(0 0 5px rgba(56,189,248,0.7))" : "none",
-          }}
-        />
-      </svg>
-
-      {/* Fold ear top-right */}
-      <svg style={{ position: "absolute", top: 0, right: 0, zIndex: 3, pointerEvents: "none" }}
-        width={FOLD} height={FOLD} viewBox={`0 0 ${FOLD} ${FOLD}`}>
-        <polygon points={`0,0 ${FOLD},${FOLD} ${FOLD},0`}
-          fill={hovered ? "rgba(56,189,248,0.22)" : "rgba(56,189,248,0.08)"}
-          style={{ transition: "fill 0.4s ease" }}
-        />
-        <line x1="0.5" y1="0.5" x2={FOLD - 0.5} y2={FOLD - 0.5}
-          stroke={hovered ? "rgba(125,211,252,1)" : "rgba(56,189,248,0.4)"}
-          strokeWidth="0.9"
-          style={{ transition: "stroke 0.4s ease" }}
-        />
-      </svg>
-
-      {/* Shadow pool */}
+      {/* Floating Shadow Pool (adapts width based on card split) */}
       <div style={{
-        position: "absolute", bottom: -12, left: "12%", right: "12%", height: 16,
+        position: "absolute", bottom: -24, left: "15%", right: "15%", height: 16,
         background: "rgba(37,99,235,0.4)",
-        filter: "blur(12px)", borderRadius: "50%",
-        opacity: hovered ? 0.85 : 0,
-        transform: `scaleX(${hovered ? 1 : 0.3})`,
-        transition: "opacity 0.5s ease, transform 0.5s cubic-bezier(0.34,1.3,0.64,1)",
+        filter: "blur(14px)", borderRadius: "50%",
+        opacity: hovered ? 0.9 : 0.4,
+        transform: `scaleX(${hovered ? 1.3 : 0.8})`,
+        transition: "all 0.5s cubic-bezier(0.34,1.3,0.64,1)",
+        zIndex: 0,
       }} />
+
     </div>
   );
 }
-
 function GlitchName({ hovered }: { hovered: boolean }) {
   const [glitch, setGlitch] = useState(false);
 
@@ -613,6 +613,16 @@ function GlitchName({ hovered }: { hovered: boolean }) {
     <div className="relative select-none text-left">
       <style>{css}</style>
 
+      {/* Top Tech Accent Line */}
+      <div className="flex items-center gap-1.5 mb-2.5 w-max opacity-80">
+        <div className="flex gap-[2px]">
+          <div className="h-[2px] w-[2px] bg-blue-400 rounded-sm shadow-[0_0_8px_rgba(59,130,246,0.9)]" />
+          <div className="h-[2px] w-[2px] bg-blue-400/80 rounded-sm" />
+          <div className="h-[2px] w-[2px] bg-blue-400/60 rounded-sm" />
+        </div>
+        <div className="h-[1px] w-12 bg-gradient-to-r from-blue-500/90 via-blue-400/40 to-transparent" />
+      </div>
+
       <div className="relative">
         <div style={{ lineHeight: 1.05 }} className="whitespace-nowrap">
           <span className={clsFirst}>Mahidhar</span>
@@ -653,9 +663,21 @@ function GlitchName({ hovered }: { hovered: boolean }) {
         )}
       </div>
 
-      <div className="flex items-center gap-2 mt-2 text-[13px] font-medium text-white/90 tracking-wide">
-        <span className="text-base leading-none mt-[-2px]">🇮🇳</span>
-        <span>Bengaluru, India.</span>
+      {/* Bottom Tech Accent Line */}
+      <div className="flex items-center gap-1.5 mt-2 w-max opacity-80">
+        <div className="h-[1px] w-24 bg-gradient-to-l from-blue-500/90 via-blue-400/40 to-transparent" />
+        <div className="flex gap-[2px]">
+          <div className="h-[2px] w-[2px] bg-blue-400/60 rounded-sm" />
+          <div className="h-[2px] w-[2px] bg-blue-400/80 rounded-sm" />
+          <div className="h-[2px] w-[2px] bg-blue-400 rounded-sm shadow-[0_0_8px_rgba(59,130,246,0.9)]" />
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2.5 mt-4 text-[13px] font-mono tracking-widest uppercase">
+        <span className="text-[20px] drop-shadow-md leading-none flex items-center justify-center">🇮🇳</span>
+        <span className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-white via-white/90 to-white/60 drop-shadow-sm flex items-center h-full">
+          Bengaluru, India
+        </span>
       </div>
     </div>
   );
@@ -698,7 +720,7 @@ function useProfileCard() {
 }
 
 export function BentoGridRedesign() {
-  const { cardRef, hovered, mousePos, tick, pulse, onMouseMove, onMouseLeave, onMouseEnter } = useProfileCard();
+  const { cardRef, hovered, mousePos, pulse, onMouseMove, onMouseLeave, onMouseEnter } = useProfileCard();
   return (
     <div className="w-full max-w-6xl mx-auto px-4 pb-12 pt-24 md:pt-48">
       <div className="relative grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -723,11 +745,11 @@ export function BentoGridRedesign() {
               style={{
                 ...glassStyle,
                 border: hovered
-                  ? "1px solid rgba(56,189,248,0.3)"
-                  : "1px solid rgba(255,255,255,0.07)",
+                  ? "1px solid rgba(255, 255, 255, 0.15)"
+                  : "1px solid rgba(255, 255, 255, 0.07)",
                 boxShadow: hovered
-                  ? "0 0 0 1px rgba(56,189,248,0.08), 0 20px 60px rgba(0,0,0,0.55), inset 0 0 80px rgba(37,99,235,0.04)"
-                  : undefined,
+                  ? "0 25px 50px -12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.1)"
+                  : glassStyle.boxShadow,
                 transition: "border 0.4s ease, box-shadow 0.4s ease, transform 0.16s cubic-bezier(0.23,1,0.32,1)",
               }}
             >
@@ -744,25 +766,64 @@ export function BentoGridRedesign() {
                 }}
               />
 
+              {/* Tech-savvy grid background */}
+              <div
+                className="absolute inset-0 pointer-events-none transition-opacity duration-500 z-0"
+                style={{
+                  backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)`,
+                  backgroundSize: '20px 20px',
+                  opacity: hovered ? 0.8 : 0.2,
+                  maskImage: 'radial-gradient(ellipse at center, black 20%, transparent 80%)',
+                  WebkitMaskImage: 'radial-gradient(ellipse at center, black 20%, transparent 80%)'
+                }}
+              />
+
+              {/* Default Dark State (Fades out on hover) matching Box 5 */}
+              <div
+                className="absolute inset-x-0 bottom-0 h-full pointer-events-none transition-opacity duration-500 rounded-2xl z-0"
+                style={{
+                  background: "linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent 80%)",
+                  opacity: hovered ? 0 : 1,
+                }}
+              />
+
+              {/* Hover Blue Glow State (Fades in on hover) matching Box 5 */}
+              <div
+                className="absolute inset-0 pointer-events-none transition-opacity duration-500 rounded-2xl z-0"
+                style={{
+                  background: "radial-gradient(ellipse at center, rgba(41, 141, 238, 0.15), transparent 70%)",
+                  opacity: hovered ? 1 : 0,
+                }}
+              />
+
+              {/* Hover Yellow Left Glow (Fades in on hover) */}
+              <div
+                className="absolute inset-0 pointer-events-none transition-opacity duration-500 rounded-2xl z-0"
+                style={{
+                  background: "linear-gradient(90deg, rgba(253, 224, 71, 0.1) 0%, transparent 60%)",
+                  opacity: hovered ? 1 : 0,
+                }}
+              />
+
               {/* Ambient glow — top left */}
-              <div className="absolute pointer-events-none rounded-full" style={{
+              <div className="absolute pointer-events-none rounded-full transition-opacity duration-500" style={{
                 top: -44, left: -44, width: 190, height: 190,
                 background: "radial-gradient(circle, rgba(37,99,235,0.18) 0%, transparent 70%)",
-                filter: "blur(28px)", opacity: pulse,
+                filter: "blur(28px)", opacity: hovered ? pulse : 0,
               }} />
 
               {/* Ambient glow — bottom right */}
-              <div className="absolute pointer-events-none rounded-full" style={{
+              <div className="absolute pointer-events-none rounded-full transition-opacity duration-500" style={{
                 bottom: -30, right: -30, width: 130, height: 130,
                 background: "radial-gradient(circle, rgba(14,165,233,0.1) 0%, transparent 70%)",
-                filter: "blur(20px)", opacity: pulse * 0.7,
+                filter: "blur(20px)", opacity: hovered ? pulse * 0.7 : 0,
               }} />
 
               {/* HUD bracket — top left */}
               <svg className="absolute pointer-events-none" style={{ top: 12, left: 12, zIndex: 5 }}
                 width="15" height="15" viewBox="0 0 15 15" fill="none">
                 <path d="M1 7.5 L1 1 L7.5 1"
-                  stroke={hovered ? "rgba(56,189,248,0.85)" : "rgba(56,189,248,0.3)"}
+                  stroke={hovered ? "rgba(56,189,248,0.85)" : "rgba(255,255,255,0.15)"}
                   strokeWidth="1.6" strokeLinecap="round"
                   style={{ transition: "stroke 0.35s ease" }}
                 />
@@ -772,37 +833,37 @@ export function BentoGridRedesign() {
               <svg className="absolute pointer-events-none" style={{ bottom: 12, right: 12, zIndex: 5 }}
                 width="15" height="15" viewBox="0 0 15 15" fill="none">
                 <path d="M7.5 14 L14 14 L14 7.5"
-                  stroke={hovered ? "rgba(56,189,248,0.85)" : "rgba(56,189,248,0.3)"}
+                  stroke={hovered ? "rgba(56,189,248,0.85)" : "rgba(255,255,255,0.15)"}
                   strokeWidth="1.6" strokeLinecap="round"
                   style={{ transition: "stroke 0.35s ease" }}
                 />
               </svg>
 
               {/* Bottom shimmer */}
-              <div className="absolute pointer-events-none" style={{
-                bottom: 0, left: 36, right: 36, height: 1, zIndex: 5,
-                background: "linear-gradient(90deg, transparent, rgba(56,189,248,0.7), rgba(14,165,233,0.5), transparent)",
-                opacity: hovered ? 1 : 0.25 + 0.25 * Math.abs(Math.sin(tick * 0.04)),
-                transform: `scaleX(${hovered ? 1 : 0.5 + 0.35 * Math.abs(Math.sin(tick * 0.04))})`,
-                transition: "opacity 0.4s ease, transform 0.4s ease",
+              <div className="absolute pointer-events-none rounded-full" style={{
+                bottom: 0, left: "15%", right: "15%", height: "1px", zIndex: 5,
+                background: "linear-gradient(90deg, transparent, rgba(56,189,248,0.8), rgba(14,165,233,0.6), transparent)",
+                opacity: hovered ? 1 : 0.1,
+                transform: `scaleX(${hovered ? 1 : 0.4})`,
+                transition: "opacity 0.5s ease, transform 0.5s cubic-bezier(0.23,1,0.32,1)",
+                boxShadow: hovered ? "0 -2px 10px rgba(56,189,248,0.5)" : "none"
               }} />
-
-              {/* Hover Yellow Left Glow (Fades in on hover) */}
-              <div
-                className="absolute inset-0 pointer-events-none transition-opacity duration-500 rounded-2xl z-0"
-                style={{
-                  background: "linear-gradient(90deg, rgba(253, 224, 71, 0.15), transparent 60%)",
-                  opacity: hovered ? 1 : 0,
-                }}
-              />
 
               {/* Avatar with folded corner */}
               <FoldedAvatar hovered={hovered} mousePos={mousePos} />
 
               {/* Name + location */}
               <div className="flex flex-col justify-center relative z-10 flex-1 text-left pl-2">
-                <div className="text-[9px] text-white/80 tracking-wide font-medium mb-1 drop-shadow-sm leading-tight w-max">
-                  Software Engineer With A Design Eye
+                <div className="font-mono text-[9px] tracking-wider uppercase font-semibold mb-2 flex flex-wrap items-center gap-1.5 w-max">
+                  <span className="text-blue-500 font-bold">{'>'}</span>
+                  <span className="text-blue-300 drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]">Software Engineer</span>
+                  <span className="text-gray-500">{"//"}</span>
+                  <span className="text-gray-400">Design Eye</span>
+                  <motion.span
+                    animate={{ opacity: [1, 0] }}
+                    transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}
+                    className="w-[1.5px] h-2.5 bg-blue-400 inline-block shadow-[0_0_5px_rgba(59,130,246,0.8)] ml-0.5"
+                  />
                 </div>
                 <GlitchName hovered={hovered} />
               </div>
