@@ -7,19 +7,20 @@ import Image from "next/image";
 
 const glassStyle = {
   background: 'rgba(255, 255, 255, 0.03)',
-  backdropFilter: 'blur(16px) saturate(180%)',
-  WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+  backdropFilter: 'blur(3px) saturate(200%)',
+  WebkitBackdropFilter: 'blur(3px) saturate(200%)',
   border: '1px solid rgba(255, 255, 255, 0.15)',
-  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.05)'
+  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.05)'
 };
 
 const GlassHighlight = () => (
   <>
     <div className="absolute inset-0 pointer-events-none rounded-2xl" style={{
-      background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 50%), radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 60%)'
+      background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, transparent 50%), radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.12) 0%, transparent 60%)',
+      opacity: 0.8,
     }} />
     <div className="absolute top-0 left-0 right-0 h-1/2 pointer-events-none rounded-t-2xl" style={{
-      background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%)'
+      background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 100%)'
     }} />
   </>
 );
@@ -967,13 +968,39 @@ export function BentoGridRedesign() {
                 hover: { scale: 1.1, rotate: 0 },
               }}
               transition={{ duration: 0.4, ease: "easeOut" }}
-              className="w-32 h-32 rounded-full flex items-center justify-center relative cursor-pointer backdrop-blur-xl z-10 overflow-hidden pointer-events-auto"
+              className="w-32 h-32 rounded-full flex items-center justify-center relative cursor-pointer z-10 overflow-hidden pointer-events-auto shadow-2xl transition-all duration-300"
               style={{
-                ...glassStyle,
-                background: "linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)",
-                boxShadow: "0 0 30px rgba(41,141,238,0.3), inset 0 0 20px rgba(255,255,255,0.05)",
+                // True Liquid Glass Background - High Transparency, Minimal Blur
+                background: 'rgba(255, 255, 255, 0.03)',
+                backdropFilter: 'blur(3px) saturate(200%)',
+                WebkitBackdropFilter: 'blur(3px) saturate(200%)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                boxShadow: `
+                  0 8px 32px rgba(0, 0, 0, 0.08),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                  inset 0 -1px 0 rgba(255, 255, 255, 0.05)
+                `,
               }}
             >
+              {/* Liquid Glass Highlight Layer */}
+              <div
+                className="absolute inset-0 rounded-full pointer-events-none"
+                style={{
+                  background: `
+                    linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+                    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.12) 0%, transparent 60%)
+                  `,
+                  opacity: 0.8,
+                }}
+              />
+
+              {/* Specular Reflection */}
+              <div
+                className="absolute top-0 left-0 right-0 h-1/2 rounded-t-full pointer-events-none"
+                style={{
+                  background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 100%)',
+                }}
+              />
               {/* Rotating Ring 1 (Slow) */}
               <motion.div
                 animate={{ rotate: 360 }}
