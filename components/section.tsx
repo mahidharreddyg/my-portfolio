@@ -21,7 +21,7 @@ export default function Section({ id, title, children, className = "" }: Section
     <motion.section
       ref={ref}
       id={id}
-      className={`min-h-screen flex items-center justify-center relative overflow-hidden ${className}`}
+      className={`min-h-screen flex items-center justify-center relative overflow-hidden transform-gpu backface-hidden will-change-transform ${className}`}
       initial={{ opacity: 0 }}
       animate={isInView ? { opacity: 1 } : { opacity: 0 }}
       transition={{ duration: 0.4 }}
@@ -30,10 +30,10 @@ export default function Section({ id, title, children, className = "" }: Section
       {!className.includes('bg-transparent') && (
         <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-black to-zinc-800">
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-cyan-500/5"
-            animate={{
+            className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-cyan-500/5 will-change-transform"
+            animate={isInView ? {
               backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-            }}
+            } : { backgroundPosition: "0% 50%" }}
             transition={{
               duration: 10,
               repeat: Number.POSITIVE_INFINITY,
@@ -53,10 +53,10 @@ export default function Section({ id, title, children, className = "" }: Section
             ease: [0.25, 0.46, 0.45, 0.94],
             delay: 0,
           }}
-          className="text-center"
+          className="text-center will-change-transform transform-gpu"
         >
           <motion.h2
-            className="text-4xl md:text-6xl font-bold mb-8 bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent"
+            className="text-4xl md:text-6xl font-bold mb-8 bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent transform-gpu"
             whileHover={{
               backgroundImage: "linear-gradient(to right, #3b82f6, #8b5cf6, #06b6d4)",
               scale: 1.05,
@@ -75,6 +75,7 @@ export default function Section({ id, title, children, className = "" }: Section
                 ease: [0.25, 0.46, 0.45, 0.94],
                 delay: 0.05,
               }}
+              className="will-change-transform transform-gpu"
             >
               {children}
             </motion.div>
@@ -82,18 +83,20 @@ export default function Section({ id, title, children, className = "" }: Section
         </motion.div>
 
         {/* Decorative elements */}
-        <motion.div
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 180, 360],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Number.POSITIVE_INFINITY,
-            ease: "linear",
-          }}
-        />
+        {isInView && (
+          <motion.div
+            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full blur-3xl will-change-transform"
+            animate={{
+              scale: [1, 1.2, 1],
+              rotate: [0, 180, 360],
+            }}
+            transition={{
+              duration: 20,
+              repeat: Number.POSITIVE_INFINITY,
+              ease: "linear",
+            }}
+          />
+        )}
       </div>
     </motion.section>
   )

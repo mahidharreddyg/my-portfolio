@@ -176,13 +176,7 @@ const PassionateCard = () => {
               <div
                 key={`r1-${i}`}
                 className="flex items-center gap-1.5 px-2.5 py-1 rounded-md shrink-0 transition-all"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  backdropFilter: 'blur(1px) saturate(200%)',
-                  WebkitBackdropFilter: 'blur(1px) saturate(200%)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.05)'
-                }}
+                style={glassStyle}
               >
                 <div
                   className="rounded bg-white/5 p-0.5 flex items-center justify-center shrink-0 border border-white/10"
@@ -206,13 +200,7 @@ const PassionateCard = () => {
               <div
                 key={`r2-${i}`}
                 className="flex items-center gap-1.5 px-2.5 py-1 rounded-md shrink-0 transition-all"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  backdropFilter: 'blur(1px) saturate(200%)',
-                  WebkitBackdropFilter: 'blur(1px) saturate(200%)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.05)'
-                }}
+                style={glassStyle}
               >
                 <div
                   className="rounded bg-white/5 p-0.5 flex items-center justify-center shrink-0 border border-white/10"
@@ -236,13 +224,7 @@ const PassionateCard = () => {
               <div
                 key={`r3-${i}`}
                 className="flex items-center gap-1.5 px-2.5 py-1 rounded-md shrink-0 transition-all"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  backdropFilter: 'blur(1px) saturate(200%)',
-                  WebkitBackdropFilter: 'blur(1px) saturate(200%)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.05)'
-                }}
+                style={glassStyle}
               >
                 <div
                   className="rounded bg-white/5 p-0.5 flex items-center justify-center shrink-0 border border-white/10"
