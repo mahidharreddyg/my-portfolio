@@ -102,7 +102,7 @@ function WelcomeBanner({ onThemeToggle }: { onThemeToggle?: () => void }) {
   )
 }
 
-// --- 2025 Interactive Spotlight Void (Option D) ---
+// --- 2025 Interactive Tech Void Background ---
 function EnhancedBackground() {
   const spotlightRef = useRef<HTMLDivElement>(null)
 
@@ -118,27 +118,82 @@ function EnhancedBackground() {
       className="absolute inset-0 overflow-hidden bg-[#020617]"
       onMouseMove={handleMouseMove}
     >
-      {/* 1. Base Dark Background (clean) */}
+      {/* 1. Base Dark Background */}
       <div className="absolute inset-0 bg-[#020617]" />
 
-      {/* 2. Ambient Glows (Static, very subtle) */}
-      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-900/10 blur-[120px]" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-900/10 blur-[120px]" />
+      {/* 2. Tech Circuit Lines (SVG Base) */}
+      <svg className="absolute inset-0 w-full h-full opacity-40 z-0 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
 
-      {/* 3. Interactive Spotlight (The "Flashlight") */}
+        {/* Definition for the glowing light effect moving along paths */}
+        <defs>
+          <linearGradient id="glow-line-1" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="transparent" />
+            <stop offset="50%" stopColor="#3b82f6" /> {/* Blue-500 */}
+            <stop offset="100%" stopColor="transparent" />
+          </linearGradient>
+
+          <linearGradient id="glow-line-2" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="transparent" />
+            <stop offset="50%" stopColor="#10b981" /> {/* Emerald-500 */}
+            <stop offset="100%" stopColor="transparent" />
+          </linearGradient>
+        </defs>
+
+        {/* Faint Base Paths */}
+        <path d="M 0 200 L 300 200 L 400 300 L 800 300" stroke="rgba(255,255,255,0.03)" strokeWidth="1" fill="none" />
+        <path d="M 1200 800 L 900 800 L 700 600 L 400 600" stroke="rgba(255,255,255,0.03)" strokeWidth="1" fill="none" />
+        <path d="M 200 1000 L 200 700 L 400 500 L 500 500" stroke="rgba(255,255,255,0.03)" strokeWidth="1" fill="none" />
+        <path d="M 1400 100 L 1200 100 L 1000 300 L 900 300" stroke="rgba(255,255,255,0.03)" strokeWidth="1" fill="none" />
+
+        {/* Animated Light Beams mapping the exact same paths */}
+        <path d="M 0 200 L 300 200 L 400 300 L 800 300" stroke="url(#glow-line-1)" strokeWidth="2" fill="none"
+          strokeDasharray="100 1000" strokeDashoffset="1000" className="animate-[dash_6s_linear_infinite]" />
+
+        <path d="M 1200 800 L 900 800 L 700 600 L 400 600" stroke="url(#glow-line-2)" strokeWidth="2" fill="none"
+          strokeDasharray="150 1200" strokeDashoffset="1200" className="animate-[dash_8s_linear_infinite_2s]" />
+
+        <path d="M 200 1000 L 200 700 L 400 500 L 500 500" stroke="url(#glow-line-1)" strokeWidth="1.5" fill="none"
+          strokeDasharray="80 800" strokeDashoffset="800" className="animate-[dash_5s_linear_infinite_1s]" />
+
+        <path d="M 1400 100 L 1200 100 L 1000 300 L 900 300" stroke="url(#glow-line-2)" strokeWidth="1.5" fill="none"
+          strokeDasharray="80 700" strokeDashoffset="700" className="animate-[dash_7s_linear_infinite_3s]" />
+
+      </svg>
+
+      {/* Moving Tech Dots/Data Nodes (CSS Animation) */}
+      <div className="absolute inset-0 z-0 opacity-30 overflow-hidden">
+        {/* Top Left Float */}
+        <div className="absolute top-[10%] left-[15%] w-1.5 h-1.5 bg-blue-400 rounded-full animate-[ping_3s_ease-in-out_infinite]" />
+        <div className="absolute top-[20%] left-[10%] w-0.5 h-12 bg-blue-500/20 rotate-45" />
+
+        {/* Bottom Right Float */}
+        <div className="absolute bottom-[20%] right-[15%] w-2 h-2 bg-emerald-400 rounded-full animate-[ping_4s_ease-in-out_infinite_1s]" />
+        <div className="absolute bottom-[25%] right-[20%] w-12 h-0.5 bg-emerald-500/20 -rotate-12" />
+
+        {/* Center Right Float */}
+        <div className="absolute top-[40%] right-[10%] w-1 h-1 bg-white/50 rounded-full animate-pulse shadow-[0_0_10px_white]" />
+      </div>
+
+      {/* 3. Ambient Glows (Deepened for tech contrast) */}
+      <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-blue-600/10 blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-600/10 blur-[140px] pointer-events-none" />
+      {/* Subtle core accent */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[30%] h-[30%] rounded-full bg-emerald-500/5 blur-[120px] pointer-events-none" />
+
+      {/* 4. Interactive Spotlight (The "Flashlight") */}
       <div
         ref={spotlightRef}
-        className="pointer-events-none absolute w-[800px] h-[800px] rounded-full mix-blend-screen transition-opacity duration-200"
+        className="pointer-events-none absolute w-[800px] h-[800px] rounded-full mix-blend-screen transition-opacity duration-200 z-10"
         style={{
           left: '-100%', // Start off-screen
           top: '-100%',
-          background: 'radial-gradient(circle, rgba(29, 78, 216, 0.15) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(41, 141, 238, 0.12) 0%, transparent 60%)',
         }}
       />
 
-      {/* 4. Noise Texture (The "Film" Look) */}
+      {/* 5. Noise Texture (The "Film" Look) */}
       <div
-        className="absolute inset-0 opacity-[0.05] pointer-events-none mix-blend-overlay"
+        className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay z-20"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
         }}

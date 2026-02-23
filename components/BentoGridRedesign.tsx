@@ -13,6 +13,19 @@ const glassStyle = {
   boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.05)'
 };
 
+const SpotlightBorder = () => (
+  <div
+    className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition duration-300 group-hover/bento:opacity-100 z-[100]"
+    style={{
+      background: 'radial-gradient(800px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(0, 195, 255, 1) 0%, rgba(14, 165, 233, 0.9) 10%, rgba(30, 58, 138, 0.8) 25%, rgba(0, 0, 0, 1) 50%, transparent 60%)',
+      WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+      WebkitMaskComposite: 'xor',
+      maskComposite: 'exclude',
+      padding: '2px',
+    }}
+  />
+);
+
 const GlassHighlight = () => (
   <>
     <div className="absolute inset-0 pointer-events-none rounded-2xl" style={{
@@ -126,14 +139,15 @@ const PassionateCard = () => {
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: 0.2 }}
-      className="row-span-2 rounded-2xl p-8 pb-0 relative overflow-hidden flex flex-col items-center text-center justify-between cursor-pointer z-30"
-      style={glassStyle}
+      className="bento-card row-span-2 rounded-2xl p-8 pb-0 relative overflow-hidden flex flex-col items-center text-center justify-between cursor-pointer z-30"
+      style={{ ...glassStyle }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
 
 
       <GlassHighlight />
+      <SpotlightBorder />
 
       {/* Default Dark State (Fades out on hover) */}
       <motion.div
@@ -155,7 +169,7 @@ const PassionateCard = () => {
 
       {/* Hover Yellow Left Glow (Fades in on hover) */}
       <motion.div
-        className="absolute inset-0 pointer-events-none transition-opacity duration-500 rounded-2xl z-10"
+        className="absolute inset-0 pointer-events-none transition-opacity duration-500 rounded-2xl z-10 overflow-hidden"
         style={{
           background: "linear-gradient(90deg, rgba(253, 224, 71, 0.1), transparent 50%)",
           opacity: isHovered ? 1 : 0,
@@ -441,7 +455,7 @@ function FoldedAvatar({
   hovered: boolean;
   mousePos: { x: number; y: number };
 }) {
-  const W = 100, H = 140; // Shrunk further to give name plenty of space
+  const W = 95, H = 140; // Shrunk slightly to give name plenty of space inside constraints
 
   return (
     <div style={{ position: "relative", width: W, height: H, flexShrink: 0, zIndex: 2, perspective: 1200 }} className="flex items-center justify-center">
@@ -703,9 +717,27 @@ function useProfileCard() {
 }
 
 export function BentoGridRedesign() {
-  const { cardRef, hovered, mousePos, pulse, onMouseMove, onMouseLeave, onMouseEnter } = useProfileCard();
+  const { cardRef, hovered, mousePos, pulse, onMouseMove: profileMouseMove, onMouseLeave: profileMouseLeave, onMouseEnter: profileMouseEnter } = useProfileCard();
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!gridRef.current) return;
+    const cards = gridRef.current.querySelectorAll('.bento-card');
+
+    // Calculate global mouse position relative to the grid wrapper
+    for (const card of cards) {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      // Update each card's local mouse coordinates for its own spotlight border
+      (card as HTMLElement).style.setProperty('--mouse-x', `${x}px`);
+      (card as HTMLElement).style.setProperty('--mouse-y', `${y}px`);
+    }
+  };
+
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 pb-12 pt-24 md:pt-48">
+    <div className="w-full max-w-6xl mx-auto px-4 pb-12 pt-24 md:pt-48 group/bento" onMouseMove={handleMouseMove} ref={gridRef}>
       <div className="relative grid grid-cols-1 md:grid-cols-3 gap-4">
 
         {/* LEFT COLUMN - Fixed Independent Heights */}
@@ -721,10 +753,10 @@ export function BentoGridRedesign() {
           >
             <div
               ref={cardRef}
-              onMouseMove={onMouseMove}
-              onMouseLeave={onMouseLeave}
-              onMouseEnter={onMouseEnter}
-              className="w-full h-full rounded-2xl relative overflow-hidden flex flex-row items-center gap-4 px-5 py-6 cursor-default"
+              onMouseMove={profileMouseMove}
+              onMouseLeave={profileMouseLeave}
+              onMouseEnter={profileMouseEnter}
+              className="bento-card w-full h-full rounded-2xl relative overflow-hidden flex flex-row items-center gap-3 px-4 py-6 cursor-default"
               style={{
                 ...glassStyle,
                 border: hovered
@@ -737,6 +769,7 @@ export function BentoGridRedesign() {
               }}
             >
               <GlassHighlight />
+              <SpotlightBorder />
 
               {/* Mouse spotlight over whole card */}
               <div
@@ -836,11 +869,11 @@ export function BentoGridRedesign() {
               <FoldedAvatar hovered={hovered} mousePos={mousePos} />
 
               {/* Name + location */}
-              <div className="flex flex-col justify-center relative z-10 flex-1 text-left pl-2">
-                <div className="font-mono text-[9px] tracking-wider uppercase font-semibold mb-2 flex flex-wrap items-center gap-1.5 w-max">
+              <div className="flex flex-col justify-center relative z-10 flex-1 text-left pl-1">
+                <div className="font-mono text-[8px] tracking-wider uppercase font-semibold mb-2 flex flex-wrap items-center gap-1 w-max">
                   <span className="text-blue-500 font-bold">{'>'}</span>
                   <span className="text-blue-300 drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]">Software Engineer</span>
-                  <span className="text-gray-500">{"//"}</span>
+                  <span className="text-gray-500">{"W/"}</span>
                   <span className="text-gray-400">Design Eye</span>
                   <motion.span
                     animate={{ opacity: [1, 0] }}
@@ -859,10 +892,11 @@ export function BentoGridRedesign() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="h-[502px] rounded-2xl relative overflow-hidden"
+            className="bento-card h-[502px] rounded-2xl relative overflow-hidden"
             style={glassStyle}
           >
             <GlassHighlight />
+            <SpotlightBorder />
             {/* Empty as requested */}
           </motion.div>
         </div>
@@ -876,10 +910,11 @@ export function BentoGridRedesign() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="col-span-2 rounded-2xl relative overflow-hidden"
+            className="bento-card col-span-2 rounded-2xl relative overflow-hidden"
             style={glassStyle}
           >
             <GlassHighlight />
+            <SpotlightBorder />
             {/* Empty as requested */}
           </motion.div>
 
@@ -889,10 +924,11 @@ export function BentoGridRedesign() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="rounded-2xl relative overflow-hidden"
+            className="bento-card rounded-2xl relative overflow-hidden"
             style={glassStyle}
           >
             <GlassHighlight />
+            <SpotlightBorder />
             {/* Empty as requested */}
           </motion.div>
 
@@ -904,10 +940,11 @@ export function BentoGridRedesign() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="rounded-2xl relative overflow-hidden"
+            className="bento-card rounded-2xl relative overflow-hidden"
             style={glassStyle}
           >
             <GlassHighlight />
+            <SpotlightBorder />
             {/* Empty as requested */}
           </motion.div>
 
@@ -917,10 +954,11 @@ export function BentoGridRedesign() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="col-span-2 rounded-2xl relative overflow-hidden"
+            className="bento-card col-span-2 rounded-2xl relative overflow-hidden"
             style={glassStyle}
           >
             <GlassHighlight />
+            <SpotlightBorder />
             {/* Empty as requested */}
           </motion.div>
         </div>
