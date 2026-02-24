@@ -125,54 +125,43 @@ export default function Home() {
               </div>
 
               {/* =========================================
-                  MATHEMATICALLY PERFECT INTERLEAVED SCROLL PARALLAX 
-                  (INVERTED SEQUENCE: EXPERIENCE -> CERTIFICATIONS, THEN PEEL TO FOOTER)
+                  NATIVE CSS STICKY PARALLAX STACKING 
+                  (Hardware-accelerated and buttery smooth, no scroll trapping)
                   ========================================= */}
-              {/* Total Absolute Bounds = 900vh perfectly sequenced scroll track */}
-              <div className="relative z-30 w-full h-[900vh] bg-black">
+              <div className="relative z-30 w-full bg-black">
 
-                {/* 1. EXPERIENCE (Z-30): Pinned 0-200vh. Visible 0-100vh. Covered by Skills 100-200vh. */}
-                <div id="experience" className="absolute top-0 left-0 w-full h-[200vh] z-30 pointer-events-none">
-                  <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-[3rem] bg-black transform-gpu will-change-transform backface-hidden shadow-[0_20px_60px_rgba(0,0,0,0.8)] border border-white/5 overflow-hidden pointer-events-auto">
-                    <div className="w-full h-full">
-                      <Experience />
-                    </div>
+                {/* 1. EXPERIENCE */}
+                <div id="experience" className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-t-[3rem] md:rounded-t-[4rem] bg-black shadow-[0_20px_60px_rgba(0,0,0,0.8)] border-t border-white/5 overflow-hidden">
+                  <div className="w-full h-full overflow-y-auto hide-scrollbar">
+                    <Experience />
                   </div>
                 </div>
 
-                {/* 2. SKILLS (Z-40): Pinned 100-400vh. Covers Exp 100-200vh. Visible 200-300vh. Peels away to reveal Proj 300-400vh. */}
-                <div id="skills" className="absolute top-[100vh] left-0 w-full h-[300vh] z-40 pointer-events-none">
-                  <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-[3rem] bg-zinc-950 transform-gpu will-change-transform backface-hidden shadow-[0_-20px_60px_rgba(0,0,0,0.8),0_20px_60px_rgba(0,0,0,0.8)] border border-white/5 overflow-hidden pointer-events-auto">
-                    <div className="w-full h-full">
-                      <Skills />
-                    </div>
+                {/* 2. SKILLS */}
+                <div id="skills" className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-t-[3rem] md:rounded-t-[4rem] bg-zinc-950 shadow-[0_-20px_60px_rgba(0,0,0,0.8)] border-t border-white/5 overflow-hidden">
+                  <div className="w-full h-full overflow-y-auto hide-scrollbar">
+                    <Skills />
                   </div>
                 </div>
 
-                {/* 3. PROJECTS (Z-30): Pinned 300-600vh. Revealed beneath Skills 300-400vh. Visible 400-500vh. Covered by Certs 500-600vh. */}
-                <div id="projects" className="absolute top-[300vh] left-0 w-full h-[300vh] z-30 pointer-events-none">
-                  <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-[3rem] bg-black transform-gpu will-change-transform backface-hidden shadow-[0_20px_60px_rgba(0,0,0,0.8)] border border-white/5 overflow-hidden pointer-events-auto">
-                    <div className="w-full h-full">
-                      <Projects />
-                    </div>
+                {/* 3. PROJECTS */}
+                <div id="projects" className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-t-[3rem] md:rounded-t-[4rem] bg-black shadow-[0_-20px_60px_rgba(0,0,0,0.8)] border-t border-white/5 overflow-hidden">
+                  <div className="w-full h-full overflow-y-auto hide-scrollbar">
+                    <Projects />
                   </div>
                 </div>
 
-                {/* 4. CERTIFICATIONS (Z-40): Pinned 500-800vh. Covers Proj 500-600vh. Visible 600-700vh. Peels away to reveal Footer 700-800vh. */}
-                <div id="certifications" className="absolute top-[500vh] left-0 w-full h-[300vh] z-40 pointer-events-none">
-                  <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-t-[3rem] bg-zinc-950 transform-gpu will-change-transform backface-hidden shadow-[0_-20px_60px_rgba(0,0,0,0.8),0_20px_60px_rgba(0,0,0,0.8)] border border-white/5 overflow-hidden pointer-events-auto">
-                    <div className="w-full h-full">
-                      <Certifications />
-                    </div>
+                {/* 4. CERTIFICATIONS */}
+                <div id="certifications" className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-t-[3rem] md:rounded-t-[4rem] bg-zinc-950 shadow-[0_-20px_60px_rgba(0,0,0,0.8)] border-t border-white/5 overflow-hidden">
+                  <div className="w-full h-full overflow-y-auto hide-scrollbar">
+                    <Certifications />
                   </div>
                 </div>
 
-                {/* 5. FOOTER (Z-30): Revealed perfectly pinned beneath Certs peeling away 700-800vh. Stays visible 800-900vh */}
-                <div id="footer" className="absolute top-[700vh] left-0 w-full h-[200vh] z-30 pointer-events-none">
-                  <div className="sticky top-0 h-screen w-full flex flex-col justify-end bg-black transform-gpu will-change-transform backface-hidden shadow-[0_-20px_60px_rgba(0,0,0,0.8)] border-t border-white/10 pointer-events-auto">
-                    <div className="w-full h-full">
-                      <Footer />
-                    </div>
+                {/* 5. FOOTER */}
+                <div id="footer" className="relative h-screen sm:h-[60vh] md:h-[50vh] w-full flex flex-col justify-end bg-black shadow-[0_-20px_60px_rgba(0,0,0,0.8)] border-t border-white/10 z-50">
+                  <div className="w-full h-full">
+                    <Footer />
                   </div>
                 </div>
 
