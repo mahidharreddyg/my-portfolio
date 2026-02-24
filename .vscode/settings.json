@@ -3,5 +3,6 @@
     "Figma": {
       "url": "https://mcp.figma.com/mcp"
     }
-  }
+  },
+  "css.lint.unknownAtRules": "ignore"
 }

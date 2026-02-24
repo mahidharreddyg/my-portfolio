@@ -102,7 +102,7 @@ function WelcomeBanner({ onThemeToggle }: { onThemeToggle?: () => void }) {
   )
 }
 
-// --- 2025 Interactive Spotlight Void (Option D) ---
+// --- 2025 Interactive Tech Void Background ---
 function EnhancedBackground() {
   const spotlightRef = useRef<HTMLDivElement>(null)
 
@@ -118,27 +118,82 @@ function EnhancedBackground() {
       className="absolute inset-0 overflow-hidden bg-[#020617]"
       onMouseMove={handleMouseMove}
     >
-      {/* 1. Base Dark Background (clean) */}
+      {/* 1. Base Dark Background */}
       <div className="absolute inset-0 bg-[#020617]" />
 
-      {/* 2. Ambient Glows (Static, very subtle) */}
-      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-900/10 blur-[120px]" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-900/10 blur-[120px]" />
+      {/* 2. Tech Circuit Lines (SVG Base) */}
+      <svg className="absolute inset-0 w-full h-full opacity-40 z-0 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
 
-      {/* 3. Interactive Spotlight (The "Flashlight") */}
+        {/* Definition for the glowing light effect moving along paths */}
+        <defs>
+          <linearGradient id="glow-line-1" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="transparent" />
+            <stop offset="50%" stopColor="#3b82f6" /> {/* Blue-500 */}
+            <stop offset="100%" stopColor="transparent" />
+          </linearGradient>
+
+          <linearGradient id="glow-line-2" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="transparent" />
+            <stop offset="50%" stopColor="#10b981" /> {/* Emerald-500 */}
+            <stop offset="100%" stopColor="transparent" />
+          </linearGradient>
+        </defs>
+
+        {/* Faint Base Paths */}
+        <path d="M 0 200 L 300 200 L 400 300 L 800 300" stroke="rgba(255,255,255,0.03)" strokeWidth="1" fill="none" />
+        <path d="M 1200 800 L 900 800 L 700 600 L 400 600" stroke="rgba(255,255,255,0.03)" strokeWidth="1" fill="none" />
+        <path d="M 200 1000 L 200 700 L 400 500 L 500 500" stroke="rgba(255,255,255,0.03)" strokeWidth="1" fill="none" />
+        <path d="M 1400 100 L 1200 100 L 1000 300 L 900 300" stroke="rgba(255,255,255,0.03)" strokeWidth="1" fill="none" />
+
+        {/* Animated Light Beams mapping the exact same paths */}
+        <path d="M 0 200 L 300 200 L 400 300 L 800 300" stroke="url(#glow-line-1)" strokeWidth="2" fill="none"
+          strokeDasharray="100 1000" strokeDashoffset="1000" className="animate-[dash_6s_linear_infinite]" />
+
+        <path d="M 1200 800 L 900 800 L 700 600 L 400 600" stroke="url(#glow-line-2)" strokeWidth="2" fill="none"
+          strokeDasharray="150 1200" strokeDashoffset="1200" className="animate-[dash_8s_linear_infinite_2s]" />
+
+        <path d="M 200 1000 L 200 700 L 400 500 L 500 500" stroke="url(#glow-line-1)" strokeWidth="1.5" fill="none"
+          strokeDasharray="80 800" strokeDashoffset="800" className="animate-[dash_5s_linear_infinite_1s]" />
+
+        <path d="M 1400 100 L 1200 100 L 1000 300 L 900 300" stroke="url(#glow-line-2)" strokeWidth="1.5" fill="none"
+          strokeDasharray="80 700" strokeDashoffset="700" className="animate-[dash_7s_linear_infinite_3s]" />
+
+      </svg>
+
+      {/* Moving Tech Dots/Data Nodes (CSS Animation) */}
+      <div className="absolute inset-0 z-0 opacity-30 overflow-hidden">
+        {/* Top Left Float */}
+        <div className="absolute top-[10%] left-[15%] w-1.5 h-1.5 bg-blue-400 rounded-full animate-[ping_3s_ease-in-out_infinite]" />
+        <div className="absolute top-[20%] left-[10%] w-0.5 h-12 bg-blue-500/20 rotate-45" />
+
+        {/* Bottom Right Float */}
+        <div className="absolute bottom-[20%] right-[15%] w-2 h-2 bg-emerald-400 rounded-full animate-[ping_4s_ease-in-out_infinite_1s]" />
+        <div className="absolute bottom-[25%] right-[20%] w-12 h-0.5 bg-emerald-500/20 -rotate-12" />
+
+        {/* Center Right Float */}
+        <div className="absolute top-[40%] right-[10%] w-1 h-1 bg-white/50 rounded-full animate-pulse shadow-[0_0_10px_white]" />
+      </div>
+
+      {/* 3. Ambient Glows (Deepened for tech contrast) */}
+      <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-blue-600/10 blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-600/10 blur-[140px] pointer-events-none" />
+      {/* Subtle core accent */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[30%] h-[30%] rounded-full bg-emerald-500/5 blur-[120px] pointer-events-none" />
+
+      {/* 4. Interactive Spotlight (The "Flashlight") */}
       <div
         ref={spotlightRef}
-        className="pointer-events-none absolute w-[800px] h-[800px] rounded-full mix-blend-screen transition-opacity duration-200"
+        className="pointer-events-none absolute w-[800px] h-[800px] rounded-full mix-blend-screen transition-opacity duration-200 z-10"
         style={{
           left: '-100%', // Start off-screen
           top: '-100%',
-          background: 'radial-gradient(circle, rgba(29, 78, 216, 0.15) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(41, 141, 238, 0.12) 0%, transparent 60%)',
         }}
       />
 
-      {/* 4. Noise Texture (The "Film" Look) */}
+      {/* 5. Noise Texture (The "Film" Look) */}
       <div
-        className="absolute inset-0 opacity-[0.05] pointer-events-none mix-blend-overlay"
+        className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay z-20"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
         }}
@@ -306,9 +361,9 @@ function RolesDecryption({ showRoles }: { showRoles: boolean }) {
       initial={{ opacity: 0, y: 0 }}
       animate={{ opacity: showRoles ? 1 : 0, y: 0 }}
       transition={{ duration: 0.8 }}
-      className="text-center mt-2 h-[32px] md:h-[40px] flex items-center justify-center" // Fixed height container
+      className="text-center mt-2 h-[40px] md:h-[60px] flex items-center justify-center" // Fixed height container
     >
-      <div className="text-lg md:text-2xl font-light tracking-wide text-blue-200/80">
+      <div className="text-2xl md:text-4xl font-light tracking-wide text-blue-200/80">
         <HyperText
           key={`role-${currentRoleIndex}`}
           triggerAnimation={triggerAnimation}
@@ -326,6 +381,17 @@ function RolesDecryption({ showRoles }: { showRoles: boolean }) {
 }
 
 // --- Glass Effect "Let's Connect" Button ---
+const StarIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 784.11 815.53"
+    className={className}
+    style={{ shapeRendering: 'geometricPrecision', textRendering: 'geometricPrecision', fillRule: 'evenodd', clipRule: 'evenodd' }}
+  >
+    <path className="fill-current" d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z" />
+  </svg>
+)
+
 interface LetsConnectButtonProps {
   onClick: () => void
 }
@@ -333,51 +399,61 @@ interface LetsConnectButtonProps {
 function LetsConnectButton({ onClick }: LetsConnectButtonProps) {
   const [isHovered, setIsHovered] = useState(false)
 
+  // Star Burst Animation Logic
+  // Using Tailwind Arbitrary Values to replicate the exact coordinates from the request
   return (
-    <motion.button
-      onClick={onClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className="
-        group relative inline-flex cursor-pointer items-center justify-between 
-        overflow-hidden rounded-full border border-white/10 bg-white/5 
-        py-[8px] pr-[8px] pl-6 text-base font-medium text-white/90
-        backdrop-blur-xl transition-all duration-500 ease-out
-        hover:bg-white/10 hover:border-white/20 hover:text-white
-        md:py-3 md:pr-3 md:pl-8
-      "
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-    >
-      <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+    <div className="relative group inline-block">
+      <motion.button
+        onClick={onClick}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className="
+          relative z-10 inline-flex items-center justify-center
+          px-8 py-3 text-base font-medium text-white/90
+          bg-white/5 border border-white/10 rounded-full
+          backdrop-blur-xl transition-all duration-300 ease-in-out
+          hover:bg-transparent hover:text-white hover:border-white/20
+          hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]
+          active:scale-95
+          overflow-visible
+        "
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.98 }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full" />
+        <span className="relative z-10 w-full text-center">Let&apos;s Connect</span>
+      </motion.button>
 
-      <span className="z-10 mr-4 tracking-wide text-sm md:text-base">
-        Let&apos;s Connect
-      </span>
+      {/* Star 1 - Top Left Large */}
+      <div className="absolute top-[20%] left-[20%] w-[25px] z-[-1] transition-all duration-1000 ease-[cubic-bezier(0.05,0.83,0.43,0.96)] group-hover:top-[-80%] group-hover:left-[-30%] opacity-0 group-hover:opacity-100 group-hover:z-[20] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] pointer-events-none">
+        <StarIcon className="w-full h-full" />
+      </div>
 
-      <span className="
-        relative z-10 flex h-8 w-8 items-center justify-center overflow-hidden rounded-full 
-        bg-white/10 border border-white/10 transition-all duration-300
-        group-hover:bg-white group-hover:text-black
-        md:h-10 md:w-10
-      ">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="transition-transform duration-300 group-hover:-rotate-45"
-        >
-          <path d="M5 12h14" />
-          <path d="m12 5 7 7-7 7" />
-        </svg>
-      </span>
-    </motion.button>
+      {/* Star 2 - Top Left Medium */}
+      <div className="absolute top-[45%] left-[45%] w-[15px] z-[-1] transition-all duration-1000 ease-[cubic-bezier(0,0.4,0,1.01)] group-hover:top-[-25%] group-hover:left-[10%] opacity-0 group-hover:opacity-100 group-hover:z-[20] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] pointer-events-none">
+        <StarIcon className="w-full h-full" />
+      </div>
+
+      {/* Star 3 - Bottom Left Small */}
+      <div className="absolute top-[40%] left-[40%] w-[5px] z-[-1] transition-all duration-1000 ease-[cubic-bezier(0,0.4,0,1.01)] group-hover:top-[55%] group-hover:left-[25%] opacity-0 group-hover:opacity-100 group-hover:z-[20] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] pointer-events-none">
+        <StarIcon className="w-full h-full" />
+      </div>
+
+      {/* Star 4 - Bottom Right Small */}
+      <div className="absolute top-[20%] left-[40%] w-[8px] z-[-1] transition-all duration-800 ease-[cubic-bezier(0,0.4,0,1.01)] group-hover:top-[30%] group-hover:left-[80%] opacity-0 group-hover:opacity-100 group-hover:z-[20] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] pointer-events-none">
+        <StarIcon className="w-full h-full" />
+      </div>
+
+      {/* Star 5 - Right Large */}
+      <div className="absolute top-[25%] left-[45%] w-[15px] z-[-1] transition-all duration-600 ease-[cubic-bezier(0,0.4,0,1.01)] group-hover:top-[25%] group-hover:left-[115%] opacity-0 group-hover:opacity-100 group-hover:z-[20] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] pointer-events-none">
+        <StarIcon className="w-full h-full" />
+      </div>
+
+      {/* Star 6 - Top Center Small */}
+      <div className="absolute top-[5%] left-[50%] w-[5px] z-[-1] transition-all duration-800 ease-out group-hover:top-[5%] group-hover:left-[60%] opacity-0 group-hover:opacity-100 group-hover:z-[20] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] pointer-events-none">
+        <StarIcon className="w-full h-full" />
+      </div>
+    </div>
   )
 }
 
@@ -388,6 +464,7 @@ export default function HeroSection({ onThemeToggle }: { onThemeToggle?: () => v
   const [showRoles, setShowRoles] = useState(false)
   const circleContainerRef = useRef<HTMLDivElement>(null)
   const [showConnectModal, setShowConnectModal] = useState(false)
+  const [isIntroComplete, setIsIntroComplete] = useState(false) // New state
 
   const glowControls1 = useAnimation()
   const glowControls2 = useAnimation()
@@ -423,37 +500,38 @@ export default function HeroSection({ onThemeToggle }: { onThemeToggle?: () => v
   const handleHover = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (controls: any) => {
-      if (!allArrivedGlow) {
+      // Only trigger if intro is complete AND not currently in the final glow sequence
+      if (isIntroComplete && !allArrivedGlow) {
         controls.start({
           boxShadow: "0 0 80px rgba(41,141,238,0.9), 0 0 120px rgba(41,141,238,0.6)",
           transition: { duration: 0.2 },
         })
       }
     },
-    [allArrivedGlow],
+    [allArrivedGlow, isIntroComplete],
   )
 
   const handleHoverEnd = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (controls: any) => {
-      if (!allArrivedGlow) {
+      if (isIntroComplete && !allArrivedGlow) {
         controls.start({
           boxShadow: "0 0 40px rgba(41,141,238,0.4), 0 0 60px rgba(41,141,238,0.2)",
           transition: { duration: 0.2 },
         })
       }
     },
-    [allArrivedGlow],
+    [allArrivedGlow, isIntroComplete],
   )
 
   useEffect(() => {
     const nameRevealTimer = setTimeout(() => {
       setShowName(true)
-    }, 2000)
+    }, 2650)
 
     const rolesRevealTimer = setTimeout(() => {
       setShowRoles(true)
-    }, 4500)
+    }, 5000)
 
     const glowTimer = setTimeout(async () => {
       setAllArrivedGlow(true)
@@ -491,6 +569,7 @@ export default function HeroSection({ onThemeToggle }: { onThemeToggle?: () => v
       ])
 
       setAllArrivedGlow(false)
+      setIsIntroComplete(true) // Enable hover effects
     }, animationDuration * 1000)
 
     return () => {
@@ -597,7 +676,7 @@ export default function HeroSection({ onThemeToggle }: { onThemeToggle?: () => v
           className="text-center space-y-4 relative z-20"
           initial={{ opacity: 0, y: 0 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.5, delay: 2 }}
+          transition={{ duration: 1.5, delay: 3 }}
           style={{
             textRendering: "optimizeLegibility",
             WebkitFontSmoothing: "antialiased",
@@ -616,10 +695,10 @@ export default function HeroSection({ onThemeToggle }: { onThemeToggle?: () => v
               <RolesDecryption showRoles={showRoles} />
 
               <motion.div
-                className="mt-8 flex justify-center"
+                className="mt-24 flex justify-center"
                 initial={{ opacity: 0, y: 0 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 6.5, duration: 0.8 }}
+                transition={{ delay: 4.0, duration: 0.8 }}
               >
                 <LetsConnectButton onClick={openModal} />
               </motion.div>

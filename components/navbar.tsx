@@ -129,15 +129,15 @@ export default function Navbar({ isMonochrome = false }: { isMonochrome?: boolea
               {/* Navigation + Copy Button - UNCHANGED */}
               <div className="hidden md:flex items-center gap-4 ml-32 relative z-10">
                 <nav className="flex items-center gap-8">
-                  {["About", "Skills", "Experience", "Projects", "Certifications"].map((item) => (
+                  {["About", "Experience", "Skills", "Projects", "Certifications"].map((item) => (
                     <div key={item} className="relative group/navitem">
                       <Link
                         href={`#${item.toLowerCase()}`}
                         className="text-gray-300 font-medium relative z-10 px-1
-                          transition-all duration-500 hover:text-transparent
-                          hover:bg-clip-text hover:bg-[linear-gradient(90deg,#00f2fe_0%,#4facfe_50%,#00f2fe_100%)]
-                          hover:drop-shadow-[0_0_15px_rgba(79,172,254,0.6)]
-                          group-hover/navitem:animate-[text-glitch_0.3s_linear_infinite]"
+                           transition-all duration-500 hover:text-transparent
+                           hover:bg-clip-text hover:bg-[linear-gradient(90deg,#00f2fe_0%,#4facfe_50%,#00f2fe_100%)]
+                           hover:drop-shadow-[0_0_15px_rgba(79,172,254,0.6)]
+                           group-hover/navitem:animate-[text-glitch_0.3s_linear_infinite]"
                       >
                         {item}
                       </Link>

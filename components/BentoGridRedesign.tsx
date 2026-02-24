@@ -1,31 +1,743 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 
+
 const glassStyle = {
   background: 'rgba(255, 255, 255, 0.03)',
-  backdropFilter: 'blur(16px) saturate(180%)',
-  WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+  backdropFilter: 'blur(3px) saturate(200%)',
+  WebkitBackdropFilter: 'blur(3px) saturate(200%)',
   border: '1px solid rgba(255, 255, 255, 0.15)',
-  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.05)'
+  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.05)'
 };
+
+const SpotlightBorder = () => (
+  <div
+    className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition duration-300 group-hover/bento:opacity-100 z-[100]"
+    style={{
+      background: 'radial-gradient(800px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(0, 195, 255, 1) 0%, rgba(14, 165, 233, 0.9) 10%, rgba(30, 58, 138, 0.8) 25%, rgba(0, 0, 0, 1) 50%, transparent 60%)',
+      WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+      WebkitMaskComposite: 'xor',
+      maskComposite: 'exclude',
+      padding: '2px',
+    }}
+  />
+);
 
 const GlassHighlight = () => (
   <>
     <div className="absolute inset-0 pointer-events-none rounded-2xl" style={{
-      background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 50%), radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 60%)'
+      background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, transparent 50%), radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.12) 0%, transparent 60%)',
+      opacity: 0.8,
     }} />
     <div className="absolute top-0 left-0 right-0 h-1/2 pointer-events-none rounded-t-2xl" style={{
-      background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%)'
+      background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 100%)'
     }} />
   </>
 );
 
-export function BentoGridRedesign() {
+const SkillsButton = () => {
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 pb-12 pt-24 md:pt-48">
+    <motion.button
+      whileHover={{
+        y: -2,
+        boxShadow: "0 0 24px rgba(59,130,246,0.5), 0 0 8px rgba(59,130,246,0.3)",
+      }}
+      whileTap={{ scale: 0.96 }}
+      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+      className="relative flex items-center gap-1.5 px-4 py-1.5 overflow-hidden cursor-pointer rounded-md"
+      style={{
+        background: "linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(59,130,246,0.04) 100%)",
+        border: "1px solid rgba(59,130,246,0.3)",
+      }}
+    >
+      <span
+        className="absolute inset-x-0 top-0 h-px"
+        style={{ background: "linear-gradient(90deg, transparent, rgba(59,130,246,0.8), transparent)" }}
+      />
+      <span
+        className="w-1 h-1 rounded-full bg-blue-400"
+        style={{ boxShadow: "0 0 4px rgba(59,130,246,0.9)" }}
+      />
+      <span className="text-[10px] font-semibold tracking-[0.14em] uppercase text-blue-300">
+        Skills
+      </span>
+    </motion.button>
+  );
+};
+
+const ContactButton = () => {
+  return (
+    <motion.button
+      whileHover={{
+        y: -2,
+        boxShadow: "0 0 20px rgba(255,255,255,0.1), 0 0 6px rgba(255,255,255,0.08)",
+      }}
+      whileTap={{ scale: 0.96 }}
+      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+      className="relative flex items-center gap-1.5 px-4 py-1.5 overflow-hidden cursor-pointer rounded-md"
+      style={{
+        background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+        border: "1px solid rgba(255,255,255,0.1)",
+      }}
+    >
+      <span
+        className="absolute inset-x-0 top-0 h-px"
+        style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)" }}
+      />
+      <svg width="8" height="8" viewBox="0 0 10 10" fill="none" className="text-gray-400">
+        <path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      <span className="text-[10px] font-semibold tracking-[0.14em] uppercase text-gray-300">
+        Contact Me
+      </span>
+    </motion.button>
+  );
+};
+// Tech Stack Data
+const techRow1 = [
+  { name: "Java", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" },
+  { name: "Python", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" },
+  { name: "Go", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg" },
+  { name: "Spring Boot", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg" },
+  { name: "Node.js", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" },
+  { name: "Express.js", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg" }, // Express is strictly text/white usually, checking
+  { name: "C", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-original.svg" },
+  { name: "TypeScript", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" },
+];
+
+const techRow2 = [
+  { name: "React", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" },
+  { name: "Next.js", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg" }, // Next.js is black/white
+  { name: "Angular", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/angularjs/angularjs-original.svg" },
+  { name: "Tailwind CSS", img: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg" },
+  { name: "PostgreSQL", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" },
+  { name: "MySQL", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" },
+  { name: "MongoDB", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" },
+  { name: "Redis", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg" },
+];
+
+const techRow3 = [
+  { name: "Docker", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" },
+  { name: "Kubernetes", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg" },
+  { name: "Linux", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg" },
+  { name: "Pandas", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pandas/pandas-original.svg" },
+  { name: "TensorFlow", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tensorflow/tensorflow-original.svg" },
+  { name: "AWS", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original-wordmark.svg" },
+  { name: "Git", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" },
+  { name: "Figma", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg" },
+];
+const PassionateCard = () => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <motion.div
+      initial="initial"
+      animate={isHovered ? "hover" : "initial"}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+      className="bento-card row-span-2 rounded-2xl p-8 pb-0 relative overflow-hidden flex flex-col items-center text-center justify-between cursor-pointer z-30"
+      style={{ ...glassStyle }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+
+
+      <GlassHighlight />
+      <SpotlightBorder />
+
+      {/* Default Dark State (Fades out on hover) */}
+      <motion.div
+        className="absolute inset-x-0 bottom-0 h-2/3 pointer-events-none transition-opacity duration-500 rounded-b-2xl z-10"
+        style={{
+          background: "linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent)",
+          opacity: isHovered ? 0 : 1,
+        }}
+      />
+
+      {/* Hover Blue Glow State (Fades in on hover) - Reduced Intensity */}
+      <motion.div
+        className="absolute inset-0 pointer-events-none transition-opacity duration-500 rounded-2xl z-10"
+        style={{
+          background: "radial-gradient(600px circle at center, rgba(41, 141, 238, 0.15), transparent 40%)",
+          opacity: isHovered ? 1 : 0,
+        }}
+      />
+
+      {/* Hover Yellow Left Glow (Fades in on hover) */}
+      <motion.div
+        className="absolute inset-0 pointer-events-none transition-opacity duration-500 rounded-2xl z-10 overflow-hidden"
+        style={{
+          background: "linear-gradient(90deg, rgba(253, 224, 71, 0.1), transparent 50%)",
+          opacity: isHovered ? 1 : 0,
+        }}
+      />
+
+      {/* Background Marquee Layer */}
+      {/* Controls the vertical position of the marquee - Increase/Decrease pt value */}
+      <div className=" absolute inset-0 flex flex-col justify-start pt-[85px] gap-4 z-[5] pointer-events-none select-none mask-image-linear-to-b from-transparent via-black to-transparent " >
+
+        {/* Row 1: Languages & Backend */}
+        <div className="w-full overflow-hidden">
+          <div
+            className="flex gap-1.5 w-max animate-marquee"
+            style={{ animationPlayState: isHovered ? 'paused' : 'running' }}
+          >
+            {[...techRow1, ...techRow1].map((tech, i) => (
+              <div
+                key={`r1-${i}`}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md shrink-0 transition-all"
+                style={glassStyle}
+              >
+                <div
+                  className="rounded bg-white/5 p-0.5 flex items-center justify-center shrink-0 border border-white/10"
+                  style={{ width: "20px", height: "20px" }}
+                >
+                  <img src={tech.img} alt={tech.name} className="w-3 h-3 object-contain opacity-90" loading="lazy" decoding="async" />
+                </div>
+                <span className="text-[10px] font-semibold text-white/90 whitespace-nowrap">{tech.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Row 2: Frontend & Database & Cloud */}
+        <div className="w-full overflow-hidden">
+          <div
+            className="flex gap-1.5 w-max animate-marquee-reverse"
+            style={{ animationPlayState: isHovered ? 'paused' : 'running' }}
+          >
+            {[...techRow2, ...techRow2].map((tech, i) => (
+              <div
+                key={`r2-${i}`}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md shrink-0 transition-all"
+                style={glassStyle}
+              >
+                <div
+                  className="rounded bg-white/5 p-0.5 flex items-center justify-center shrink-0 border border-white/10"
+                  style={{ width: "20px", height: "20px" }}
+                >
+                  <img src={tech.img} alt={tech.name} className="w-3 h-3 object-contain opacity-90" loading="lazy" decoding="async" />
+                </div>
+                <span className="text-[10px] font-semibold text-white/90 whitespace-nowrap">{tech.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Row 3: AI/ML & Tools */}
+        <div className="w-full overflow-hidden">
+          <div
+            className="flex gap-1.5 w-max animate-marquee"
+            style={{ animationPlayState: isHovered ? 'paused' : 'running' }}
+          >
+            {[...techRow3, ...techRow3].map((tech, i) => (
+              <div
+                key={`r3-${i}`}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md shrink-0 transition-all"
+                style={glassStyle}
+              >
+                <div
+                  className="rounded bg-white/5 p-0.5 flex items-center justify-center shrink-0 border border-white/10"
+                  style={{ width: "20px", height: "20px" }}
+                >
+                  <img src={tech.img} alt={tech.name} className="w-3 h-3 object-contain opacity-90" loading="lazy" decoding="async" />
+                </div>
+                <span className="text-[10px] font-semibold text-white/90 whitespace-nowrap">{tech.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Concentric Circles Background */}
+      <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[180%] aspect-square rounded-full bg-blue-600 blur-[80px] opacity-20" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[160%] aspect-square border-2 border-white/5 rounded-full" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[140%] aspect-square border-2 border-white/10 rounded-full" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[120%] aspect-square border-2 border-white/20 rounded-full" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[100%] aspect-square border-2 border-white/30 rounded-full" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[80%] aspect-square border-2 border-white/40 rounded-full" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[60%] aspect-square border-2 border-white/50 rounded-full" />
+        {/* Innermost Circle - Most Prominent */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[40%] aspect-square border-2 border-white/60 rounded-full bg-[#087CC4]/60 blur-[1px]" />
+      </div>
+
+      <div className="relative z-10 -mt-2">
+        <h3 className="text-[1.2rem] font-bold font-malinton text-white leading-snug tracking-wide">
+          Passionate About Next Gen,<br />
+          <span className="text-[1.2rem] text-blue-500 whitespace-nowrap">
+            Future Forward Technologies.
+          </span>
+        </h3>
+      </div>
+
+
+      {/* ─── Window Mockup (paste inside your JSX) ─── */}
+      <motion.div
+        variants={{
+          initial: {
+            rotateX: 12,
+            y: 60,
+            boxShadow: "0 25px 60px rgba(0,0,0,0.6)",
+            borderTopLeftRadius: "14px",
+            borderTopRightRadius: "14px",
+            borderBottomLeftRadius: "0px",
+            borderBottomRightRadius: "0px",
+          },
+          hover: {
+            rotateX: 0,
+            y: 0,
+            boxShadow: "0 70px 160px rgba(0,0,0,0.9)",
+            borderTopLeftRadius: "14px",
+            borderTopRightRadius: "14px",
+            borderBottomLeftRadius: "0px",
+            borderBottomRightRadius: "0px",
+          },
+        }}
+        transition={{
+          type: "spring",
+          stiffness: 80,
+          damping: 20,
+        }}
+        className="relative z-10 w-80 overflow-hidden"
+        style={{
+          transformPerspective: 1000,
+          transformOrigin: "bottom",
+          willChange: "transform",
+          borderTopLeftRadius: "14px",
+          borderTopRightRadius: "14px",
+          borderBottomLeftRadius: "0px",
+          borderBottomRightRadius: "0px",
+          background: "#0a0a0b",
+        }}
+      >
+
+        {/* 🔥 Inner Blue Glow — visible only on hover, spreads upward from bottom */}
+        <motion.div
+          variants={{
+            initial: { opacity: 0 },
+            hover: { opacity: 1 },
+          }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="absolute pointer-events-none"
+          style={{
+            bottom: "-20px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "100%",
+            height: "75%",
+            background:
+              "radial-gradient(ellipse 100% 100% at 50% 100%, rgba(59,130,246,0.45) 0%, rgba(59,130,246,0.2) 35%, rgba(59,130,246,0.06) 65%, transparent 85%)",
+            filter: "blur(18px)",
+            zIndex: 0,
+          }}
+        />
+
+        {/* Title Bar */}
+        <div
+          className="flex items-center px-3 h-8 relative select-none"
+          style={{
+            background: "linear-gradient(180deg, #2c2c2e 0%, #1f1f21 100%)",
+            borderBottom: "1px solid rgba(0,0,0,0.6)",
+            zIndex: 10,
+          }}
+        >
+          {/* Traffic Lights */}
+          <div className="flex items-center gap-1.5 z-10">
+            {["#ff5f57", "#febc2e", "#28c840"].map((color, i) => (
+              <div
+                key={i}
+                className="w-2.5 h-2.5 rounded-full"
+                style={{
+                  background: color,
+                  boxShadow:
+                    "0 0 0 0.5px rgba(0,0,0,0.4), inset 0 0.5px 0 rgba(255,255,255,0.3)",
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Safari Pill */}
+          <motion.div
+            variants={{
+              initial: { width: 140 },
+              hover: { width: 170 },
+            }}
+            transition={{ type: "spring", stiffness: 220, damping: 22 }}
+            className="absolute left-1/2 -translate-x-1/2 h-[18px] rounded-full flex items-center justify-center gap-1.5 px-3 overflow-hidden"
+            style={{
+              background: "#000",
+              border: "0.5px solid rgba(255,255,255,0.08)",
+            }}
+          >
+            <motion.div
+              variants={{
+                initial: { opacity: 1 },
+                hover: { opacity: 0 },
+              }}
+              transition={{ duration: 0.25 }}
+              className="absolute inset-0 rounded-full"
+              style={{
+                background: "rgba(255,255,255,0.08)",
+                backdropFilter: "blur(10px)",
+              }}
+            />
+
+            <svg
+              width="10"
+              height="10"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="opacity-80 relative z-10"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" />
+              <path d="M7 11V7a5 5 0 0110 0v4" />
+            </svg>
+
+            <span className="text-[10px] text-white/80 tracking-wide relative z-10">
+              mahidharreddyg.in
+            </span>
+          </motion.div>
+        </div>
+
+        {/* Content */}
+        <div
+          className="p-6 relative"
+          style={{
+            background: "transparent",
+            zIndex: 2,
+          }}
+        >
+          <div
+            className="space-y-5 p-4 rounded-lg text-center"
+            style={{
+              background: "rgba(255,255,255,0.02)",
+              border: "0.5px solid rgba(255,255,255,0.06)",
+            }}
+          >
+            <div className="flex justify-center">
+              <div className="w-20 h-1 bg-white/20 rounded-full" />
+            </div>
+
+            <div className="text-[12px] text-gray-400 font-malinton leading-relaxed">
+              Purpose Driven Design That Speaks<br />
+              Performance First Code That Delivers
+            </div>
+
+            {/* Buttons */}
+            <div className="flex justify-center gap-3 pt-2">
+              <SkillsButton />
+              <ContactButton />
+            </div>
+          </div>
+        </div>
+
+      </motion.div>
+
+
+
+    </motion.div>
+  );
+};
+
+function FoldedAvatar({
+  hovered,
+  mousePos,
+}: {
+  hovered: boolean;
+  mousePos: { x: number; y: number };
+}) {
+  const W = 95, H = 140; // Shrunk slightly to give name plenty of space inside constraints
+
+  return (
+    <div style={{ position: "relative", width: W, height: H, flexShrink: 0, zIndex: 2, perspective: 1200 }} className="flex items-center justify-center">
+
+      {/* 1. Base Playing Card (Navbar Glassmorphism Texture) */}
+      <motion.div
+        className="absolute inset-0 rounded-lg overflow-hidden shadow-2xl transition-shadow"
+        initial={{ rotateZ: 0, x: 0, y: 0 }}
+        animate={{
+          rotateZ: hovered ? -8 : 0,
+          x: hovered ? -20 : 0,
+          y: hovered ? 8 : 0,
+        }}
+        transition={{ type: "spring", stiffness: 220, damping: 20 }}
+        style={{
+          background: 'rgba(10, 15, 30, 0.4)', // Darker tech blue base
+          backdropFilter: 'blur(8px) saturate(150%)',
+          WebkitBackdropFilter: 'blur(8px) saturate(150%)',
+          border: '1px solid rgba(56, 189, 248, 0.3)', // Cyan tinted border
+          boxShadow: `
+            0 8px 32px rgba(0, 0, 0, 0.2),
+            inset 0 1px 0 rgba(56, 189, 248, 0.2),
+            inset 0 -1px 0 rgba(56, 189, 248, 0.05)
+          `,
+        }}
+      >
+        {/* Glass specular shine highlight */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `
+              linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.12) 0%, transparent 60%)
+            `,
+            opacity: 0.8,
+          }}
+        />
+        <div
+          className="absolute top-0 left-0 right-0 h-1/2 pointer-events-none bg-gradient-to-b from-white/5 to-transparent"
+        />
+        {/* Subtle grid pattern inside base card for tech feel */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(56,189,248,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(56,189,248,0.08)_1px,transparent_1px)] bg-[size:10px_10px]" />
+
+        {/* Tech Corner Accents on Base Card */}
+        <div className="absolute top-2 left-2 w-2 h-2 border-t-2 border-l-2 border-cyan-400" />
+        <div className="absolute top-2 right-2 w-2 h-2 border-t-2 border-r-2 border-cyan-400" />
+        <div className="absolute bottom-2 left-2 w-2 h-2 border-b-2 border-l-2 border-cyan-400" />
+        <div className="absolute bottom-2 right-2 w-2 h-2 border-b-2 border-r-2 border-cyan-400" />
+
+        {/* Card Suit / Emblem for base card */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-30">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-white z-0">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M14.25 9.75L16.5 12l-2.25 2.25m-4.5 0L7.5 12l2.25-2.25M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" />
+          </svg>
+        </div>
+      </motion.div>
+
+      {/* 2. Top Playing Card (Profile Image) */}
+      <motion.div
+        className="absolute inset-0 rounded-lg overflow-hidden"
+        initial={{ rotateZ: 0, x: 0, y: 0 }}
+        animate={{
+          rotateZ: hovered ? 4 : 0,
+          x: hovered ? 10 : 0,
+          y: hovered ? -6 : 0,
+        }}
+        transition={{ type: "spring", stiffness: 220, damping: 20 }}
+        style={{ border: '1px solid rgba(255, 255, 255, 0.15)', boxShadow: '0 15px 35px rgba(0,0,0,0.5)' }}
+      >
+        <Image
+          src="/Mahidhar_Reddy_G_Card_Pic.png"
+          alt="Mahidhar Reddy Gaddam"
+          fill
+          className="object-cover"
+          style={{
+            objectPosition: "50% 10%",
+            filter: hovered ? "contrast(1.08) saturate(1.1) brightness(1.05)" : "contrast(1.02) saturate(1.02) brightness(0.95)",
+            transition: "filter 0.4s ease"
+          }}
+        />
+
+        {/* Glossy gradient overlay to reinforce 'card' material feel */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-transparent pointer-events-none opacity-40 mix-blend-overlay" />
+
+        {/* Interactive hover glow */}
+        <div style={{
+          position: "absolute", inset: 0, pointerEvents: "none",
+          background: `radial-gradient(circle at ${mousePos.x * 100}% ${mousePos.y * 100}%, rgba(255,255,255,0.15) 0%, transparent 60%)`,
+          opacity: hovered ? 1 : 0,
+          transition: "opacity 0.25s ease",
+          mixBlendMode: "overlay",
+        }} />
+      </motion.div>
+
+      {/* Floating Shadow Pool (adapts width based on card split) */}
+      <div style={{
+        position: "absolute", bottom: -24, left: "15%", right: "15%", height: 16,
+        background: "rgba(37,99,235,0.4)",
+        filter: "blur(14px)", borderRadius: "50%",
+        opacity: hovered ? 0.9 : 0.4,
+        transform: `scaleX(${hovered ? 1.3 : 0.8})`,
+        transition: "all 0.5s cubic-bezier(0.34,1.3,0.64,1)",
+        zIndex: 0,
+      }} />
+
+    </div>
+  );
+}
+function GlitchName({ hovered }: { hovered: boolean }) {
+  const [glitch, setGlitch] = useState(false);
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      setGlitch(true);
+      setTimeout(() => setGlitch(false), 320);
+    }, 5000);
+    return () => clearInterval(t);
+  }, []);
+
+  const css = `
+    .pgn {
+      background: linear-gradient(125deg, #f1f5f9 0%, #93c5fd 40%, #3b82f6 80%, #1d4ed8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 22px;
+      letter-spacing: 0.02em;
+      line-height: 1.05;
+      white-space: nowrap;
+    }
+    .pgn-last {
+      background: linear-gradient(125deg, #3b82f6 0%, #60a5fa 40%, #38bdf8 80%, #0ea5e9 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 22px;
+      letter-spacing: 0.02em;
+      line-height: 1.05;
+      white-space: nowrap;
+    }
+    .pgn.hov, .pgn-last.hov {
+      background: linear-gradient(125deg, #ffffff 0%, #bae6fd 30%, #38bdf8 65%, #0ea5e9 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  `;
+  const clsFirst = `pgn font-malinton${hovered ? " hov" : ""}`;
+  const clsLast = `pgn-last font-malinton${hovered ? " hov" : ""}`;
+
+  return (
+    <div className="relative select-none text-left">
+      <style>{css}</style>
+
+      {/* Top Tech Accent Line */}
+      <div className="flex items-center gap-1.5 mb-2.5 w-max opacity-80">
+        <div className="flex gap-[2px]">
+          <div className="h-[2px] w-[2px] bg-blue-400 rounded-sm shadow-[0_0_8px_rgba(59,130,246,0.9)]" />
+          <div className="h-[2px] w-[2px] bg-blue-400/80 rounded-sm" />
+          <div className="h-[2px] w-[2px] bg-blue-400/60 rounded-sm" />
+        </div>
+        <div className="h-[1px] w-12 bg-gradient-to-r from-blue-500/90 via-blue-400/40 to-transparent" />
+      </div>
+
+      <div className="relative">
+        <div style={{ lineHeight: 1.05 }} className="whitespace-nowrap">
+          <span className={clsFirst}>Mahidhar</span>
+        </div>
+        <div style={{ lineHeight: 1.05 }} className="flex items-baseline whitespace-nowrap">
+          <span className={clsLast}>Reddy Gaddam</span>
+          <span className="font-malinton text-white" style={{ fontSize: "22px", letterSpacing: "0.02em" }}>.</span>
+        </div>
+
+        {/* Glitch layers */}
+        {glitch && (
+          <>
+            <div className="font-malinton flex flex-col whitespace-nowrap" aria-hidden style={{
+              position: "absolute", inset: 0,
+              fontSize: "22px", letterSpacing: "0.02em", lineHeight: 1.05,
+              background: "linear-gradient(125deg, #22d3ee, #38bdf8)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+              opacity: 0.75,
+              clipPath: "polygon(0 10%, 100% 10%, 100% 38%, 0 38%)",
+              transform: "translateX(-3px)", pointerEvents: "none",
+            }}>
+              <div>Mahidhar</div>
+              <div>Reddy Gaddam.</div>
+            </div>
+            <div className="font-malinton flex flex-col whitespace-nowrap" aria-hidden style={{
+              position: "absolute", inset: 0,
+              fontSize: "22px", letterSpacing: "0.02em", lineHeight: 1.05,
+              background: "linear-gradient(125deg, #0ea5e9, #0284c7)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+              opacity: 0.6,
+              clipPath: "polygon(0 62%, 100% 62%, 100% 82%, 0 82%)",
+              transform: "translateX(3px)", pointerEvents: "none",
+            }}>
+              <div>Mahidhar</div>
+              <div>Reddy Gaddam.</div>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Bottom Tech Accent Line */}
+      <div className="flex items-center gap-1.5 mt-2 w-max opacity-80">
+        <div className="h-[1px] w-24 bg-gradient-to-l from-blue-500/90 via-blue-400/40 to-transparent" />
+        <div className="flex gap-[2px]">
+          <div className="h-[2px] w-[2px] bg-blue-400/60 rounded-sm" />
+          <div className="h-[2px] w-[2px] bg-blue-400/80 rounded-sm" />
+          <div className="h-[2px] w-[2px] bg-blue-400 rounded-sm shadow-[0_0_8px_rgba(59,130,246,0.9)]" />
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2.5 mt-4 text-[13px] font-mono tracking-widest uppercase">
+        <span className="text-[20px] drop-shadow-md leading-none flex items-center justify-center">🇮🇳</span>
+        <span className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-white via-white/90 to-white/60 drop-shadow-sm flex items-center h-full">
+          Bengaluru, India
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function useProfileCard() {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [hovered, setHovered] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.35 });
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => t + 1), 50);
+    return () => clearInterval(id);
+  }, []);
+
+  const pulse = 0.55 + 0.45 * Math.sin(tick * 0.055);
+
+  const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const r = cardRef.current?.getBoundingClientRect();
+    if (!r) return;
+    const nx = (e.clientX - r.left) / r.width;
+    const ny = (e.clientY - r.top) / r.height;
+    setMousePos({ x: nx, y: ny });
+    if (cardRef.current)
+      cardRef.current.style.transform =
+        `perspective(900px) rotateY(${(nx - 0.5) * 14}deg) rotateX(${(ny - 0.5) * -14}deg) scale(1.025)`;
+  };
+
+  const onMouseLeave = () => {
+    if (cardRef.current)
+      cardRef.current.style.transform =
+        "perspective(900px) rotateY(0deg) rotateX(0deg) scale(1)";
+    setHovered(false);
+  };
+
+  const onMouseEnter = () => setHovered(true);
+
+  return { cardRef, hovered, mousePos, tick, pulse, onMouseMove, onMouseLeave, onMouseEnter };
+}
+
+export function BentoGridRedesign() {
+  const { cardRef, hovered, mousePos, pulse, onMouseMove: profileMouseMove, onMouseLeave: profileMouseLeave, onMouseEnter: profileMouseEnter } = useProfileCard();
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!gridRef.current) return;
+    const cards = gridRef.current.querySelectorAll('.bento-card');
+
+    // Calculate global mouse position relative to the grid wrapper
+    for (const card of cards) {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      // Update each card's local mouse coordinates for its own spotlight border
+      (card as HTMLElement).style.setProperty('--mouse-x', `${x}px`);
+      (card as HTMLElement).style.setProperty('--mouse-y', `${y}px`);
+    }
+  };
+
+  return (
+    <div className="w-full max-w-6xl mx-auto px-4 pb-12 pt-24 md:pt-48 group/bento" onMouseMove={handleMouseMove} ref={gridRef}>
       <div className="relative grid grid-cols-1 md:grid-cols-3 gap-4">
 
         {/* LEFT COLUMN - Fixed Independent Heights */}
@@ -36,17 +748,140 @@ export function BentoGridRedesign() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="h-[270px] rounded-2xl p-6 relative overflow-hidden group flex flex-row items-center gap-4"
-            style={glassStyle}
+            className="h-[270px] rounded-2xl relative"
+            style={{ perspective: "1000px" }}
           >
-            <GlassHighlight />
-            <div className="w-20 h-20 shrink-0 rounded-2xl overflow-hidden border-2 border-white/20 shadow-lg relative z-10">
-              <Image src="/profile_pic.PNG" alt="Profile" fill className="object-cover" />
-            </div>
-            <div className="flex flex-col justify-center relative z-10">
-              <h3 className="text-white text-lg font-bold leading-tight">Mahidhar<br />Reddy Gaddam.</h3>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-xs text-gray-400">🇮🇳 Bengaluru, India.</span>
+            <div
+              ref={cardRef}
+              onMouseMove={profileMouseMove}
+              onMouseLeave={profileMouseLeave}
+              onMouseEnter={profileMouseEnter}
+              className="bento-card w-full h-full rounded-2xl relative overflow-hidden flex flex-row items-center gap-3 px-4 py-6 cursor-default"
+              style={{
+                ...glassStyle,
+                border: hovered
+                  ? "1px solid rgba(255, 255, 255, 0.15)"
+                  : "1px solid rgba(255, 255, 255, 0.07)",
+                boxShadow: hovered
+                  ? "0 25px 50px -12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.1)"
+                  : glassStyle.boxShadow,
+                transition: "border 0.4s ease, box-shadow 0.4s ease, transform 0.16s cubic-bezier(0.23,1,0.32,1)",
+              }}
+            >
+              <GlassHighlight />
+              <SpotlightBorder />
+
+              {/* Mouse spotlight over whole card */}
+              <div
+                className="absolute inset-0 rounded-2xl pointer-events-none"
+                style={{
+                  background: `radial-gradient(circle at ${mousePos.x * 100}% ${mousePos.y * 100}%, rgba(56,189,248,0.07) 0%, transparent 60%)`,
+                  opacity: hovered ? 1 : 0,
+                  transition: "opacity 0.3s ease",
+                  zIndex: 0,
+                }}
+              />
+
+              {/* Tech-savvy grid background */}
+              <div
+                className="absolute inset-0 pointer-events-none transition-opacity duration-500 z-0"
+                style={{
+                  backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)`,
+                  backgroundSize: '20px 20px',
+                  opacity: hovered ? 0.8 : 0.2,
+                  maskImage: 'radial-gradient(ellipse at center, black 20%, transparent 80%)',
+                  WebkitMaskImage: 'radial-gradient(ellipse at center, black 20%, transparent 80%)'
+                }}
+              />
+
+              {/* Default Dark State (Fades out on hover) matching Box 5 */}
+              <div
+                className="absolute inset-x-0 bottom-0 h-full pointer-events-none transition-opacity duration-500 rounded-2xl z-0"
+                style={{
+                  background: "linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent 80%)",
+                  opacity: hovered ? 0 : 1,
+                }}
+              />
+
+              {/* Hover Blue Glow State (Fades in on hover) matching Box 5 */}
+              <div
+                className="absolute inset-0 pointer-events-none transition-opacity duration-500 rounded-2xl z-0"
+                style={{
+                  background: "radial-gradient(ellipse at center, rgba(41, 141, 238, 0.15), transparent 70%)",
+                  opacity: hovered ? 1 : 0,
+                }}
+              />
+
+              {/* Hover Yellow Left Glow (Fades in on hover) */}
+              <div
+                className="absolute inset-0 pointer-events-none transition-opacity duration-500 rounded-2xl z-0"
+                style={{
+                  background: "linear-gradient(90deg, rgba(253, 224, 71, 0.1) 0%, transparent 60%)",
+                  opacity: hovered ? 1 : 0,
+                }}
+              />
+
+              {/* Ambient glow — top left */}
+              <div className="absolute pointer-events-none rounded-full transition-opacity duration-500" style={{
+                top: -44, left: -44, width: 190, height: 190,
+                background: "radial-gradient(circle, rgba(37,99,235,0.18) 0%, transparent 70%)",
+                filter: "blur(28px)", opacity: hovered ? pulse : 0,
+              }} />
+
+              {/* Ambient glow — bottom right */}
+              <div className="absolute pointer-events-none rounded-full transition-opacity duration-500" style={{
+                bottom: -30, right: -30, width: 130, height: 130,
+                background: "radial-gradient(circle, rgba(14,165,233,0.1) 0%, transparent 70%)",
+                filter: "blur(20px)", opacity: hovered ? pulse * 0.7 : 0,
+              }} />
+
+              {/* HUD bracket — top left */}
+              <svg className="absolute pointer-events-none" style={{ top: 12, left: 12, zIndex: 5 }}
+                width="15" height="15" viewBox="0 0 15 15" fill="none">
+                <path d="M1 7.5 L1 1 L7.5 1"
+                  stroke={hovered ? "rgba(56,189,248,0.85)" : "rgba(255,255,255,0.15)"}
+                  strokeWidth="1.6" strokeLinecap="round"
+                  style={{ transition: "stroke 0.35s ease" }}
+                />
+              </svg>
+
+              {/* HUD bracket — bottom right */}
+              <svg className="absolute pointer-events-none" style={{ bottom: 12, right: 12, zIndex: 5 }}
+                width="15" height="15" viewBox="0 0 15 15" fill="none">
+                <path d="M7.5 14 L14 14 L14 7.5"
+                  stroke={hovered ? "rgba(56,189,248,0.85)" : "rgba(255,255,255,0.15)"}
+                  strokeWidth="1.6" strokeLinecap="round"
+                  style={{ transition: "stroke 0.35s ease" }}
+                />
+              </svg>
+
+              {/* Bottom shimmer */}
+              <div className="absolute pointer-events-none rounded-full" style={{
+                bottom: 0, left: "15%", right: "15%", height: "1px", zIndex: 5,
+                background: "linear-gradient(90deg, transparent, rgba(56,189,248,0.8), rgba(14,165,233,0.6), transparent)",
+                opacity: hovered ? 1 : 0.1,
+                transform: `scaleX(${hovered ? 1 : 0.4})`,
+                transition: "opacity 0.5s ease, transform 0.5s cubic-bezier(0.23,1,0.32,1)",
+                boxShadow: hovered ? "0 -2px 10px rgba(56,189,248,0.5)" : "none"
+              }} />
+
+              {/* Avatar with folded corner */}
+              <FoldedAvatar hovered={hovered} mousePos={mousePos} />
+
+              {/* Name + location */}
+              <div className="flex flex-col justify-center relative z-10 flex-1 text-left pl-1">
+                <div className="font-mono text-[8px] tracking-wider uppercase font-semibold mb-2 flex flex-wrap items-center gap-1 w-max">
+                  <span className="text-blue-500 font-bold">{'>'}</span>
+                  <span className="text-blue-300 drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]">Software Engineer</span>
+                  <span className="text-gray-500">{"W/"}</span>
+                  <span className="text-gray-400">Design Eye</span>
+                  <motion.span
+                    animate={{ opacity: [1, 0] }}
+                    transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}
+                    className="w-[1.5px] h-2.5 bg-blue-400 inline-block shadow-[0_0_5px_rgba(59,130,246,0.8)] ml-0.5"
+                  />
+                </div>
+                <GlitchName hovered={hovered} />
               </div>
             </div>
           </motion.div>
@@ -57,10 +892,11 @@ export function BentoGridRedesign() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="h-[502px] rounded-2xl relative overflow-hidden"
+            className="bento-card h-[502px] rounded-2xl relative overflow-hidden"
             style={glassStyle}
           >
             <GlassHighlight />
+            <SpotlightBorder />
             {/* Empty as requested */}
           </motion.div>
         </div>
@@ -74,10 +910,11 @@ export function BentoGridRedesign() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="col-span-2 rounded-2xl relative overflow-hidden"
+            className="bento-card col-span-2 rounded-2xl relative overflow-hidden"
             style={glassStyle}
           >
             <GlassHighlight />
+            <SpotlightBorder />
             {/* Empty as requested */}
           </motion.div>
 
@@ -87,50 +924,15 @@ export function BentoGridRedesign() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="rounded-2xl relative overflow-hidden"
+            className="bento-card rounded-2xl relative overflow-hidden"
             style={glassStyle}
           >
             <GlassHighlight />
+            <SpotlightBorder />
             {/* Empty as requested */}
           </motion.div>
 
-          {/* 5. Passionate Card (Middle Right) */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="row-span-2 rounded-2xl p-8 relative overflow-hidden flex flex-col items-center text-center"
-            style={glassStyle}
-          >
-            <GlassHighlight />
-            <div className="relative z-10">
-              <h3 className="text-2xl font-bold text-white mb-2">
-                Passionate About Next-Gen,<br />
-                <span className="text-blue-500">Future-Forward Technologies.</span>
-              </h3>
-
-              {/* Decorative Rings */}
-              <div className="absolute bottom-0 left-0 right-0 h-64 pointer-events-none">
-                <div className="absolute bottom-[-20%] left-1/2 -translate-x-1/2 w-[150%] h-[150%] border border-white/5 rounded-full" />
-                <div className="absolute bottom-[-10%] left-1/2 -translate-x-1/2 w-[120%] h-[120%] border border-white/5 rounded-full" />
-                <div className="absolute bottom-[0%] left-1/2 -translate-x-1/2 w-[90%] h-[90%] border border-white/5 rounded-full" />
-              </div>
-
-              {/* Laptop/Window Mockup */}
-              <div className="absolute bottom-[-40px] left-1/2 -translate-x-1/2 w-48 h-32 bg-[#1e1e1e] rounded-t-xl border border-white/20 shadow-2xl p-2 z-10">
-                <div className="flex gap-1 mb-2">
-                  <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                  <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
-                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                </div>
-                <div className="flex justify-center mt-4 space-x-2">
-                  <div className="bg-blue-600/30 text-blue-300 text-[8px] px-2 py-0.5 rounded-full">Skills</div>
-                  <div className="bg-white/10 text-gray-400 text-[8px] px-2 py-0.5 rounded-full">Contact Me</div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
+          <PassionateCard />
 
           {/* 6. Center Bottom (Middle Left) */}
           <motion.div
@@ -138,10 +940,11 @@ export function BentoGridRedesign() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="rounded-2xl relative overflow-hidden"
+            className="bento-card rounded-2xl relative overflow-hidden"
             style={glassStyle}
           >
             <GlassHighlight />
+            <SpotlightBorder />
             {/* Empty as requested */}
           </motion.div>
 
@@ -151,36 +954,120 @@ export function BentoGridRedesign() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="col-span-2 rounded-2xl relative overflow-hidden"
+            className="bento-card col-span-2 rounded-2xl relative overflow-hidden"
             style={glassStyle}
           >
             <GlassHighlight />
+            <SpotlightBorder />
             {/* Empty as requested */}
           </motion.div>
         </div>
 
 
-        {/* CENTRAL MR BADGE - Adjusted Position for 270px top row */}
-        <div className="absolute left-[33.333%] top-[270px] -translate-x-1/2 -translate-y-1/2 z-20 hidden md:flex">
+        {/* CENTRAL MR BADGE - Revamped with Micro-Interactions */}
+        <div className="absolute left-[33.333%] top-[270px] -translate-x-1/2 -translate-y-1/2 z-20 hidden md:flex items-center justify-center pointer-events-none">
           <motion.div
-            initial={{ scale: 1 }}
-            whileHover={{
-              scale: 1.05,
-              boxShadow: "0 0 80px rgba(41,141,238,0.9), 0 0 120px rgba(41,141,238,0.6)",
-            }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="w-32 h-32 rounded-full flex items-center justify-center relative cursor-pointer backdrop-blur-xl"
-            style={{
-              ...glassStyle,
-              // Keep original MR button gradient as it might be specific
-              background: "linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.05) 100%)",
-            }}
+            className="relative flex items-center justify-center pointer-events-none"
+            initial="initial"
+            whileHover="hover"
           >
-            {/* Restored Inner Rings from Previous Design */}
-            <div className="absolute inset-0 rounded-full border border-white/20" />
-            <div className="absolute -inset-2 rounded-full border border-white/5 scale-110" />
+            {/* Pulsing Outer Glow (Behind) */}
+            <motion.div
+              variants={{
+                initial: { opacity: 0.5, scale: 0.9 },
+                hover: { opacity: 0.8, scale: 1.1 },
+              }}
+              transition={{ duration: 0.3 }}
+              className="absolute inset-0 rounded-full blur-xl bg-blue-500/30 pointer-events-none"
+            />
 
-            <span className="text-4xl font-black text-white tracking-tighter drop-shadow-lg select-none">MR</span>
+            {/* Main Glass Circle */}
+            <motion.div
+              variants={{
+                initial: { scale: 1, rotate: 0 },
+                hover: { scale: 1.1, rotate: 0 },
+              }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="w-32 h-32 rounded-full flex items-center justify-center relative cursor-pointer z-10 overflow-hidden pointer-events-auto shadow-2xl transition-all duration-300"
+              style={{
+                // True Liquid Glass Background - High Transparency, Minimal Blur
+                background: 'rgba(255, 255, 255, 0.03)',
+                backdropFilter: 'blur(3px) saturate(200%)',
+                WebkitBackdropFilter: 'blur(3px) saturate(200%)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                boxShadow: `
+                  0 8px 32px rgba(0, 0, 0, 0.08),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                  inset 0 -1px 0 rgba(255, 255, 255, 0.05)
+                `,
+              }}
+            >
+              {/* Liquid Glass Highlight Layer */}
+              <div
+                className="absolute inset-0 rounded-full pointer-events-none"
+                style={{
+                  background: `
+                    linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+                    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.12) 0%, transparent 60%)
+                  `,
+                  opacity: 0.8,
+                }}
+              />
+
+              {/* Specular Reflection */}
+              <div
+                className="absolute top-0 left-0 right-0 h-1/2 rounded-t-full pointer-events-none"
+                style={{
+                  background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 100%)',
+                }}
+              />
+              {/* Rotating Ring 1 (Slow) */}
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, ease: "linear", repeat: Infinity }}
+                className="absolute inset-0 rounded-full border border-white/10 border-t-white/40 border-l-transparent"
+              />
+
+              {/* Rotating Ring 2 (Counter-Rotate, Faster on Hover) */}
+              <motion.div
+                animate={{ rotate: -360 }}
+                transition={{ duration: 15, ease: "linear", repeat: Infinity }}
+                className="absolute inset-2 rounded-full border border-white/5 border-b-white/20 border-r-transparent"
+              />
+
+              {/* Inner Scale Ring */}
+              <motion.div
+                variants={{
+                  initial: { scale: 1 },
+                  hover: { scale: 1.1 },
+                }}
+                className="absolute inset-4 rounded-full border border-white/10"
+              />
+
+              {/* Text Scale & Glow */}
+              <motion.span
+                variants={{
+                  initial: { scale: 1, textShadow: "0 0 0px rgba(255,255,255,0)" },
+                  hover: { scale: 1.15, textShadow: "0 0 10px rgba(255,255,255,0.5)" },
+                }}
+                className="text-4xl font-black text-white tracking-tighter drop-shadow-lg select-none z-20 relative"
+              >
+                MR
+              </motion.span>
+            </motion.div>
+
+            {/* Ripple Effect Ring (Expands on Hover) */}
+            <motion.div
+              variants={{
+                initial: { opacity: 0, scale: 1 },
+                hover: {
+                  opacity: [0, 0.4, 0],
+                  scale: [1, 1.4, 1.5],
+                  transition: { duration: 1.5, repeat: Infinity, ease: "easeOut" }
+                },
+              }}
+              className="absolute inset-0 rounded-full border border-blue-400/50 pointer-events-none"
+            />
           </motion.div>
         </div>
 
