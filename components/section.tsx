@@ -11,9 +11,10 @@ interface SectionProps {
   title: string
   children?: React.ReactNode
   className?: string
+  style?: React.CSSProperties
 }
 
-export default function Section({ id, title, children, className = "" }: SectionProps) {
+export default function Section({ id, title, children, className = "", style }: SectionProps) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-10px" })
 
@@ -22,6 +23,7 @@ export default function Section({ id, title, children, className = "" }: Section
       ref={ref}
       id={id}
       className={`min-h-screen flex items-center justify-center relative overflow-hidden transform-gpu backface-hidden will-change-transform ${className}`}
+      style={style}
       initial={{ opacity: 0 }}
       animate={isInView ? { opacity: 1 } : { opacity: 0 }}
       transition={{ duration: 0.4 }}

@@ -1,7 +1,7 @@
 "use client";
 
 import Section from "@/components/section";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
 import Image from "next/image";
 
@@ -62,8 +62,7 @@ const technologies = [
   { name: "Android", img: "https://cdn.simpleicons.org/android/3DDC84" },
 ];
 
-// Helper to chunk the tech array into the diamond layout
-const layoutPattern = [12, 10, 8, 6, 4, 2]; // 42 items total, perfect inverted pyramid
+const layoutPattern = [12, 10, 8, 6, 4, 2];
 let currentIdx = 0;
 const diamondRows = layoutPattern.map(count => {
   const row = technologies.slice(currentIdx, currentIdx + count);
@@ -71,22 +70,57 @@ const diamondRows = layoutPattern.map(count => {
   return row;
 });
 
-// A single glassmorphic tech stack card
-const TechCard = ({ tech }: { tech: { name: string, img: string } }) => {
+// Compute parallax offset per tile — how far it starts from its final position
+function getTileParallaxOffset(rowIndex: number, colIndex: number, totalCols: number) {
+  const center = (totalCols - 1) / 2;
+  const distFromCenter = colIndex - center;
+  const normalizedDist = center === 0 ? 0 : distFromCenter / center; // -1 to 1
+
+  // Horizontal: tiles fan out from center (left goes left, right goes right)
+  const xOffset = normalizedDist * 300;
+
+  // Vertical: rows spread out vertically — top rows go up, bottom rows go down
+  const yOffset = (rowIndex - 2.5) * 80 - Math.abs(normalizedDist) * 50;
+
+  // Rotation proportional to horizontal position
+  const rotation = normalizedDist * 20;
+
+  return { xOffset, yOffset, rotation };
+}
+
+// Single tech card with scroll-driven parallax
+const TechCard = ({
+  tech,
+  rowIndex,
+  colIndex,
+  totalCols,
+  scrollProgress,
+}: {
+  tech: { name: string; img: string };
+  rowIndex: number;
+  colIndex: number;
+  totalCols: number;
+  scrollProgress: import("framer-motion").MotionValue<number>;
+}) => {
   const [isHovered, setIsHovered] = useState(false);
+  const { xOffset, yOffset, rotation } = getTileParallaxOffset(rowIndex, colIndex, totalCols);
+
+  // Map scroll progress (0→1) to tile transform values
+  // Tiles start at their offset positions and converge to 0 as scroll progresses
+  const x = useTransform(scrollProgress, [0, 0.5], [xOffset, 0]);
+  const y = useTransform(scrollProgress, [0, 0.5], [yOffset, 0]);
+  const rotate = useTransform(scrollProgress, [0, 0.5], [rotation, 0]);
+  const scale = useTransform(scrollProgress, [0, 0.4], [0.5, 1]);
+  const opacity = useTransform(scrollProgress, [0, 0.35], [0, 1]);
 
   return (
     <motion.div
-      whileHover={{ y: -5 }}
+      style={{ x, y, rotate, scale, opacity }}
+      whileHover={{ y: -6, scale: 1.08 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       className="relative group cursor-pointer"
     >
-      {/* 
-        Container with light frosted glass matching the reference.
-        Thin border, visible text by default. 
-        On hover, a sharp bottom-heavy "neon underglow" appears.
-      */}
       <div
         className={`
           flex flex-col items-center justify-center 
@@ -95,29 +129,28 @@ const TechCard = ({ tech }: { tech: { name: string, img: string } }) => {
           transition-all duration-300 ease-out
           border
           backdrop-blur-xl
-          bg-white/[0.04]
+          bg-white/[0.06]
           ${isHovered
             ? 'border-white/10 border-b-cyan-400 shadow-[0_25px_30px_-10px_rgba(34,211,238,0.5),_0_10px_10px_-5px_rgba(59,130,246,0.6)] z-10'
             : 'border-white/10 shadow-lg z-0'}
         `}
       >
-        {/* The Icon */}
         <div className="relative z-10 w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 flex-shrink-0 mb-[2px] sm:mb-1">
           <Image
             src={tech.img}
             alt={tech.name}
             fill
             sizes="(max-width: 768px) 24px, 32px"
-            className={`
-              object-contain transition-all duration-500 ease-out
-              ${isHovered
-                ? 'opacity-100 scale-110 drop-shadow-[0_0_12px_rgba(255,255,255,0.6)]'
-                : 'opacity-75 scale-100 hover:opacity-100'}
-            `}
+            className="object-contain transition-all duration-500 ease-out"
+            style={{
+              filter: isHovered
+                ? 'drop-shadow(0 0 12px rgba(255,255,255,0.6))'
+                : 'brightness(0) invert(1)',
+              opacity: isHovered ? 1 : 0.7,
+              transform: isHovered ? 'scale(1.1)' : 'scale(1)',
+            }}
           />
         </div>
-
-        {/* Text always visible, brightens on hover */}
         <span
           className={`
             text-[5px] sm:text-[6px] md:text-[8px] lg:text-[9px] font-medium tracking-wider
@@ -132,77 +165,75 @@ const TechCard = ({ tech }: { tech: { name: string, img: string } }) => {
   );
 };
 
-// Animated Orbital Background Entity
-const OrbBackground = () => {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {/* 3D Perspective Grid / Wormhole lines - Layer 1 */}
-      <div
-        className="absolute inset-0 animate-wormhole"
-        style={{
-          // Using ellipse for flattened top, mimicking the reference shape
-          backgroundImage: 'radial-gradient(ellipse at center, transparent 30%, #000 80%), linear-gradient(0deg, transparent 49%, rgba(255, 255, 255, .15) 50%, transparent 51%), linear-gradient(90deg, transparent 49%, rgba(255, 255, 255, .15) 50%, transparent 51%)',
-          backgroundSize: '100px 100px',
-          transformOrigin: '50% 50%',
-        }}
-      />
-      {/* 3D Perspective Grid / Wormhole lines - Layer 2 (Delayed) */}
-      <div
-        className="absolute inset-0 animate-wormhole"
-        style={{
-          backgroundImage: 'radial-gradient(ellipse at center, transparent 30%, #000 80%), linear-gradient(0deg, transparent 49%, rgba(139, 92, 246, .2) 50%, transparent 51%), linear-gradient(90deg, transparent 49%, rgba(139, 92, 246, .2) 50%, transparent 51%)',
-          backgroundSize: '100px 100px',
-          transformOrigin: '50% 50%',
-          animationDelay: '-4s'
-        }}
-      />
-
-      {/* Floating Glowing Orb mimicking the reference */}
-      <motion.div
-        animate={{
-          x: ["-20%", "20%", "-10%", "-20%"],
-          y: ["-20%", "10%", "20%", "-20%"],
-          scale: [1, 1.2, 0.9, 1],
-        }}
-        transition={{
-          duration: 15,
-          ease: "linear",
-          repeat: Infinity,
-        }}
-        className="absolute top-[20%] left-[20%] w-64 h-64 md:w-96 md:h-96 rounded-full blur-[100px] opacity-40 mix-blend-screen"
-        style={{
-          background: "radial-gradient(circle, rgba(168,85,247,0.8) 0%, rgba(59,130,246,0.4) 50%, transparent 80%)",
-        }}
-      />
-
-      {/* Dimmed purple ambient lighting */}
-      <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-purple-900/20 to-transparent blur-3xl" />
-    </div>
-  );
-};
-
 
 export default function Skills() {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  // Track scroll progress through this section
+  // offset: start = when top of section hits bottom of viewport
+  //         end   = when top of section hits top of viewport
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "center center"],
+  });
 
   return (
-    <Section id="skills-inner" title="Tech Stack" className="bg-transparent relative w-full overflow-hidden flex flex-col items-center justify-center py-20 min-h-screen z-10">
-      <OrbBackground />
+    <Section
+      id="skills-inner"
+      title="Tech Stack"
+      className="bg-transparent relative w-full overflow-hidden flex flex-col items-center justify-center py-20 min-h-screen z-10"
+      style={{ background: 'radial-gradient(ellipse at center, #001a66 0%, #000d33 40%, #000000 75%)' }}
+    >
+      {/* Electric blue ambient glow */}
+      {/* Main Electric Glow */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
+  w-[950px] h-[650px] rounded-full blur-[160px] pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(0,150,255,0.35) 0%, rgba(0,80,255,0.25) 30%, rgba(0,30,120,0.15) 55%, rgba(0,0,0,0.9) 80%)",
+        }}
+      />
 
-      {/* Content Container */}
-      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-2 sm:px-4 flex flex-col items-center justify-center">
+      {/* Top Neon Spread */}
+      <div
+        className="absolute top-[-100px] left-1/2 -translate-x-1/2 
+  w-[700px] h-[350px] rounded-full blur-[120px] pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(0,170,255,0.25) 0%, rgba(0,70,255,0.18) 40%, transparent 75%)",
+        }}
+      />
 
-        {/* Diamond Layout Flex Container */}
-        <div ref={containerRef} className="flex flex-col items-center justify-center gap-2 sm:gap-3 lg:gap-4 w-full">
+      {/* Bottom Electric Glow */}
+      <div
+        className="absolute bottom-[-120px] left-1/2 -translate-x-1/2 
+  w-[800px] h-[400px] rounded-full blur-[140px] pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(0,120,255,0.25) 0%, rgba(0,60,200,0.15) 40%, transparent 80%)",
+        }}
+      />
+
+      {/* Scroll-tracked container */}
+      <div
+        ref={sectionRef}
+        className="relative z-10 w-full max-w-[1400px] mx-auto px-2 sm:px-4 flex flex-col items-center justify-center"
+      >
+        <div className="flex flex-col items-center justify-center gap-2 sm:gap-3 lg:gap-4 w-full">
           {diamondRows.map((row, rowIndex) => (
             <div
               key={`row-${rowIndex}`}
               className="flex flex-row justify-center items-center gap-2 sm:gap-3 lg:gap-4 w-full"
             >
-              {row.map((tech) => (
+              {row.map((tech, colIndex) => (
                 <TechCard
                   key={tech.name}
                   tech={tech}
+                  rowIndex={rowIndex}
+                  colIndex={colIndex}
+                  totalCols={row.length}
+                  scrollProgress={scrollYProgress}
                 />
               ))}
             </div>
