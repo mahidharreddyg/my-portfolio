@@ -38,23 +38,23 @@ const technologies = [
   { name: "MongoDB", img: "https://cdn.simpleicons.org/mongodb/47A248", color: "#47A248" },
   { name: "Redis", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg", color: "#DD0031" },
   { name: "AWS", img: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg", color: "#FF9900" },
-  { name: "Docker", img: "https://cdn.simpleicons.org/docker/2496ED", color: "#2496ED" },
-  { name: "Kubernetes", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg", color: "#326CE5" },
+  { name: "Docker", img: "https://cdn.simpleicons.org/docker/2496ED?v=bust", color: "#2496ED" },
+  { name: "Kubernetes", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg?v=bust", color: "#326CE5" },
   { name: "Linux", img: "https://cdn.simpleicons.org/linux/FCC624", color: "#FCC624" },
 
   // Row 4 — DevOps + AI/ML (6)
   { name: "Git", img: "https://cdn.simpleicons.org/git/F05032", color: "#F05032" },
   { name: "TensorFlow", img: "https://cdn.simpleicons.org/tensorflow/FF6F00", color: "#FF6F00" },
   { name: "PyTorch", img: "https://cdn.simpleicons.org/pytorch/EE4C2C", color: "#EE4C2C" },
-  { name: "Scikit-learn", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/scikitlearn/scikitlearn-original.svg", color: "#F7931E" },
+  { name: "Scikit-learn", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/scikitlearn/scikitlearn-original.svg?v=bust", color: "#F7931E" },
   { name: "Pandas", img: "https://cdn.simpleicons.org/pandas/776DD3", color: "#776DD3" },
-  { name: "Selenium", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/selenium/selenium-original.svg", color: "#43B02A" },
+  { name: "Selenium", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/selenium/selenium-original.svg?v=bust", color: "#43B02A" },
 
   // Row 5 — Tools (4)
   { name: "Postman", img: "https://cdn.simpleicons.org/postman/FF6C37", color: "#FF6C37" },
   { name: "Figma", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg", color: "#F24E1E" },
-  { name: "Jira", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jira/jira-original.svg", color: "#2684FF" },
-  { name: "Power BI", img: "https://upload.wikimedia.org/wikipedia/commons/c/cf/New_Power_BI_Logo.svg", color: "#F2C811" },
+  { name: "Jira", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jira/jira-original.svg?v=bust", color: "#2684FF" },
+  { name: "Power BI", img: "https://upload.wikimedia.org/wikipedia/commons/c/cf/New_Power_BI_Logo.svg?v=bust", color: "#F2C811" },
 
   // Row 6 — Tools (2)
   { name: "Vercel", img: "https://cdn.simpleicons.org/vercel/white", color: "#000000" },
@@ -216,7 +216,7 @@ export default function Skills() {
     <Section
       id="skills-inner"
       title=""
-      className="bg-transparent relative w-full overflow-hidden flex flex-col items-center justify-center py-20 min-h-screen z-10"
+      className="bg-transparent relative w-full overflow-visible flex flex-col items-center justify-center py-20 min-h-screen z-10"
       style={{ background: 'radial-gradient(ellipse at center, #001a66 0%, #000d33 40%, #000000 75%)' }}
     >
       {/* Custom styled title */}
