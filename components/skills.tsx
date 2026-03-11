@@ -2,7 +2,7 @@
 
 import Section from "@/components/section";
 import { motion, useScroll, useTransform, useSpring, MotionValue } from "framer-motion";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 
 // Technology Data — 42 Skills with fallback colored SVGs
 const technologies = [
@@ -95,7 +95,6 @@ const TechCard = ({
   totalCols: number;
   scrollProgress: MotionValue<number>;
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
   const { xOffset, yOffset, rotation } = getTileParallaxOffset(rowIndex, colIndex, totalCols);
 
   const x = useTransform(scrollProgress, [0, 0.75], [xOffset, 0], { ease: (t: number) => 1 - Math.pow(1 - t, 3) });
@@ -159,7 +158,9 @@ export default function Skills() {
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["start end", "start 0.60"],
+    // Start expanding later (when section start crosses 70% line) 
+    // Finish expanding later (when section start crosses 20% line)
+    offset: ["start 77%", "start 8%"],
   });
 
   // Smooth the raw scroll progress with a spring for fluid, non-jittery motion
