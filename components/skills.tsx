@@ -4,9 +4,7 @@ import Section from "@/components/section";
 import { motion, useScroll, useTransform, useSpring, MotionValue } from "framer-motion";
 import { useRef } from "react";
 
-// Technology Data — 42 Skills with fallback colored SVGs
 const technologies = [
-  // Row 1 — Programming Languages (12)
   { name: "Python", img: "/icons/blackandwhite/python.svg", hoverImg: "/icons/coloured/python.svg", color: "#3776AB" },
   { name: "JavaScript", img: "/icons/blackandwhite/js.svg", hoverImg: "/icons/coloured/js.svg", color: "#F7DF1E" },
   { name: "TypeScript", img: "/icons/blackandwhite/typescript.svg", hoverImg: "/icons/coloured/typescript.svg", color: "#3178C6" },
@@ -19,8 +17,6 @@ const technologies = [
   { name: "CSS3", img: "/icons/blackandwhite/css3.svg", hoverImg: "/icons/coloured/css3.svg", color: "#1572B6" },
   { name: "React", img: "/icons/blackandwhite/react.svg", hoverImg: "/icons/coloured/react.svg", color: "#61DAFB" },
   { name: "Next.js", img: "/icons/blackandwhite/nextjs2.svg", hoverImg: "/icons/coloured/nextjs2.svg", color: "#FFFFFF" },
-
-  // Row 2 — Frontend + Backend (10)
   { name: "Angular", img: "/icons/blackandwhite/angular17.svg", hoverImg: "/icons/coloured/angular17.svg", color: "#DD0031" },
   { name: "Node.js", img: "/icons/blackandwhite/nodejs.svg", hoverImg: "/icons/coloured/nodejs.svg", color: "#339933" },
   { name: "Express.js", img: "/icons/blackandwhite/expressjs.svg", hoverImg: "/icons/coloured/expressjs.svg", color: "#FFFFFF" },
@@ -31,8 +27,6 @@ const technologies = [
   { name: "Three.js", img: "/icons/blackandwhite/threejs.svg", hoverImg: "/icons/coloured/threejs.svg", color: "#FFFFFF" },
   { name: "Firebase", img: "/icons/blackandwhite/firebase.svg", hoverImg: "/icons/coloured/firebase.svg", color: "#FFCA28" },
   { name: "Vercel", img: "/icons/blackandwhite/vercel.svg", hoverImg: "/icons/coloured/vercel.svg", color: "#FFFFFF" },
-
-  // Row 3 — Databases + Cloud + DevOps (8)
   { name: "PostgreSQL", img: "/icons/blackandwhite/postgresql.svg", hoverImg: "/icons/coloured/postgresql.svg", color: "#4169E1" },
   { name: "MySQL", img: "/icons/blackandwhite/mysql.svg", hoverImg: "/icons/coloured/mysql.svg", color: "#4479A1" },
   { name: "MongoDB", img: "/icons/blackandwhite/mongodb.svg", hoverImg: "/icons/coloured/mongodb.svg", color: "#47A248" },
@@ -41,22 +35,16 @@ const technologies = [
   { name: "Docker", img: "/icons/blackandwhite/docker.svg", hoverImg: "/icons/coloured/docker.svg", color: "#2496ED" },
   { name: "Kubernetes", img: "/icons/blackandwhite/kubernetes.svg", hoverImg: "/icons/coloured/kubernetes.svg", color: "#326CE5" },
   { name: "Linux", img: "/icons/blackandwhite/linux.svg", hoverImg: "/icons/coloured/linux.svg", color: "#FCC624" },
-
-  // Row 4 — DevOps + AI/ML (6)
   { name: "GitHub", img: "/icons/blackandwhite/github.svg", hoverImg: "/icons/coloured/github.svg", color: "#FFFFFF" },
   { name: "TensorFlow", img: "/icons/blackandwhite/tensorflow.svg", hoverImg: "/icons/coloured/tensorflow.svg", color: "#FF6F00" },
   { name: "PyTorch", img: "/icons/blackandwhite/pytorch.svg", hoverImg: "/icons/coloured/pytorch.svg", color: "#EE4C2C" },
   { name: "Pandas", img: "/icons/blackandwhite/pandas.svg", hoverImg: "/icons/coloured/pandas.svg", color: "#776DD3" },
   { name: "Scikit-learn", img: "/icons/blackandwhite/scikitlearn.svg", hoverImg: "/icons/coloured/scikitlearn.svg", color: "#F7931E" },
   { name: "OpenCV", img: "/icons/blackandwhite/opencv.svg", hoverImg: "/icons/coloured/opencv.svg", color: "#5C3EE8" },
-
-  // Row 5 — Tools (4)
   { name: "Postman", img: "/icons/blackandwhite/postman.svg", hoverImg: "/icons/coloured/postman.svg", color: "#FF6C37" },
   { name: "Figma", img: "/icons/blackandwhite/figma.svg", hoverImg: "/icons/coloured/figma.svg", color: "#F24E1E" },
   { name: "Jira", img: "/icons/blackandwhite/jira.svg", hoverImg: "/icons/coloured/jira.svg", color: "#2684FF" },
   { name: "Power BI", img: "/icons/blackandwhite/powerBI.svg", hoverImg: "/icons/coloured/powerBI.svg", color: "#F2C811" },
-
-  // Row 6 — Tools (2)
   { name: "Selenium", img: "/icons/blackandwhite/selenium.svg", hoverImg: "/icons/coloured/selenium.svg", color: "#43B02A" },
   { name: "n8n", img: "/icons/blackandwhite/n8n.svg", hoverImg: "/icons/coloured/n8n.svg", color: "#FF6D5D" },
 ];
@@ -69,16 +57,13 @@ const diamondRows = layoutPattern.map(count => {
   return row;
 });
 
-// Compute parallax offset per tile — how far it starts from its final position
 function getTileParallaxOffset(rowIndex: number, colIndex: number, totalCols: number) {
   const center = (totalCols - 1) / 2;
   const distFromCenter = colIndex - center;
-  const normalizedDist = center === 0 ? 0 : distFromCenter / center; // -1 to 1
-
+  const normalizedDist = center === 0 ? 0 : distFromCenter / center;
   const xOffset = normalizedDist * 300;
   const yOffset = (rowIndex - 2.5) * 80 - Math.abs(normalizedDist) * 50;
   const rotation = normalizedDist * 20;
-
   return { xOffset, yOffset, rotation };
 }
 
@@ -103,47 +88,158 @@ const TechCard = ({
   const scale = useTransform(scrollProgress, [0, 0.70], [0.5, 1], { ease: (t: number) => 1 - Math.pow(1 - t, 3) });
   const opacity = useTransform(scrollProgress, [0, 0.60], [0, 1]);
 
+  const animDelay = `${(rowIndex * 0.05 + colIndex * 0.03).toFixed(2)}s`;
+
   return (
     <motion.div
       style={{ x, y, rotate, scale, opacity, willChange: 'transform, opacity' }}
       className="relative w-[60px] h-[72px] sm:w-[68px] sm:h-[80px] lg:w-[76px] lg:h-[88px] origin-center z-10 pointer-events-none"
     >
-      {/* Outer container with lift effect */}
-      <div
-        className="relative w-full h-full z-20 pointer-events-none"
-      >
+      <style>{`
+        /* === Scan line sweep === */
+        @keyframes scan-sweep {
+          0%   { transform: translateY(-100%); opacity: 0; }
+          10%  { opacity: 1; }
+          90%  { opacity: 1; }
+          100% { transform: translateY(300%); opacity: 0; }
+        }
+
+        /* === Corner ping burst === */
+        @keyframes corner-ping {
+          0%   { opacity: 1; transform: scale(0.6); }
+          60%  { opacity: 0.6; transform: scale(1.4); }
+          100% { opacity: 0; transform: scale(1.8); }
+        }
+
+        /* === Border circuit trace === */
+        @keyframes circuit-trace {
+          0%   { stroke-dashoffset: 320; }
+          100% { stroke-dashoffset: 0; }
+        }
+
+        /* === Glitch label flicker === */
+        @keyframes glitch-flicker {
+          0%,100% { opacity: 1; transform: skewX(0deg) translateX(0); }
+          20%  { opacity: 0.8; transform: skewX(-4deg) translateX(-2px); }
+          40%  { opacity: 1;   transform: skewX(0deg) translateX(0); }
+          60%  { opacity: 0.7; transform: skewX(3deg)  translateX(1px); }
+          80%  { opacity: 1;   transform: skewX(0deg) translateX(0); }
+        }
+
+        /* === Hover glow breathing === */
+        @keyframes glow-breathe {
+          0%,100% { opacity: 0.85; }
+          50%      { opacity: 1; }
+        }
+
+        /* === Hover pulse ring === */
+        @keyframes idle-pulse {
+          0%,100% { box-shadow: 0 0 0 0px transparent; }
+          50%      { box-shadow: 0 0 0 3px rgba(99,179,237,0.12); }
+        }
+
+        /* Group hover triggers */
+        .tech-card-inner:hover                   { animation: idle-pulse 1.5s ease-in-out infinite; }
+        .tech-card-inner:hover .scan-line        { animation: scan-sweep 0.55s ease-in-out forwards; }
+        .tech-card-inner:hover .corner-tl,
+        .tech-card-inner:hover .corner-tr,
+        .tech-card-inner:hover .corner-bl,
+        .tech-card-inner:hover .corner-br        { animation: corner-ping 0.4s ease-out forwards; }
+        .tech-card-inner:hover .circuit-svg path { animation: circuit-trace 0.5s ease-out forwards; }
+        .tech-card-inner:hover .glitch-label     { animation: glitch-flicker 0.4s steps(1) forwards; }
+        .tech-card-inner:hover .glow-bg          { animation: glow-breathe 1.2s ease-in-out infinite; }
+      `}</style>
+
+      <div className="relative w-full h-full z-20 pointer-events-none">
         <div
-          className={`group relative flex flex-col items-center justify-center w-full h-full rounded-[14px] backdrop-blur-xl bg-white/[0.06] transition-all duration-300 ease-out border border-white/10 shadow-lg pointer-events-auto cursor-pointer hover:z-50 hover:-translate-y-1.5 hover:scale-105 hover:border-b-2 hover:border-b-cyan-400 hover:shadow-[0_25px_30px_-10px_rgba(34,211,238,0.5),_0_10px_10px_-5px_rgba(59,130,246,0.6)] hover:bg-white/[0.12]`}
+          className="tech-card-inner group relative flex flex-col items-center justify-center w-full h-full rounded-[14px] backdrop-blur-xl bg-white/[0.06] transition-all duration-300 ease-out border border-white/10 shadow-lg pointer-events-auto cursor-pointer overflow-hidden hover:z-50 hover:-translate-y-2 hover:scale-110 hover:border-transparent hover:border-b-2 hover:border-b-cyan-400"
+          style={{ animationDelay: animDelay }}
         >
-          {/* Explicit Hover Catch-All Overlay */}
-          <div className="absolute inset-0 w-full h-full z-10 pointer-events-none" />
+
+          {/* === Dynamic color bleed background on hover === */}
+          <div
+            className="glow-bg absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-[14px] pointer-events-none"
+            style={{
+              background: `radial-gradient(ellipse at 50% 120%, ${tech.color}28 0%, ${tech.color}10 50%, transparent 75%)`,
+            }}
+          />
+
+          {/* === Animated border via SVG circuit trace === */}
+          <svg
+            className="circuit-svg absolute inset-0 w-full h-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150 rounded-[14px]"
+            viewBox="0 0 76 88"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M8,0 H68 Q76,0 76,8 V80 Q76,88 68,88 H8 Q0,88 0,80 V8 Q0,0 8,0 Z"
+              stroke={tech.color}
+              strokeWidth="1.2"
+              strokeOpacity="0.7"
+              strokeDasharray="320"
+              strokeDashoffset="320"
+              fill="none"
+            />
+          </svg>
+
+          {/* === Scan line sweep === */}
+          <div
+            className="scan-line absolute left-0 right-0 h-[1.5px] pointer-events-none z-20 rounded-full opacity-0"
+            style={{
+              background: `linear-gradient(90deg, transparent 0%, ${tech.color}99 30%, ${tech.color}ff 50%, ${tech.color}99 70%, transparent 100%)`,
+              top: '20%',
+              filter: `blur(0.5px) drop-shadow(0 0 4px ${tech.color})`,
+            }}
+          />
+
+          {/* === Corner accent pings === */}
+          <div className="corner-tl absolute top-[3px] left-[3px] w-[6px] h-[6px] border-t border-l opacity-0 pointer-events-none z-20 rounded-tl-sm" style={{ borderColor: tech.color }} />
+          <div className="corner-tr absolute top-[3px] right-[3px] w-[6px] h-[6px] border-t border-r opacity-0 pointer-events-none z-20 rounded-tr-sm" style={{ borderColor: tech.color }} />
+          <div className="corner-bl absolute bottom-[3px] left-[3px] w-[6px] h-[6px] border-b border-l opacity-0 pointer-events-none z-20 rounded-bl-sm" style={{ borderColor: tech.color }} />
+          <div className="corner-br absolute bottom-[3px] right-[3px] w-[6px] h-[6px] border-b border-r opacity-0 pointer-events-none z-20 rounded-br-sm" style={{ borderColor: tech.color }} />
+
+          {/* === Outer glow ring on hover === */}
+          <div
+            className="absolute inset-[-2px] rounded-[16px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-0"
+            style={{
+              boxShadow: `0 0 0 1px ${tech.color}55, 0 0 18px 2px ${tech.color}40, 0 12px 28px -6px ${tech.color}60`,
+            }}
+          />
+
+          {/* === Bottom edge accent bar === */}
+          <div
+            className="absolute top-0 left-[15%] right-[15%] h-[2px] rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-20"
+            style={{
+              background: `linear-gradient(90deg, transparent, ${tech.color}, transparent)`,
+              boxShadow: `0 0 8px 2px ${tech.color}80`,
+            }}
+          />
 
           {/* Icon Container */}
-          <div className="relative w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 flex-shrink-0 mb-[2px] sm:mb-1 flex items-center justify-center pointer-events-none z-0">
-
-            {/* Colored icon (Hover state) with dynamic SVG drop-shadow */}
+          <div className="relative w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 flex-shrink-0 mb-[6px] sm:mb-2 flex items-center justify-center pointer-events-none z-10">
+            {/* Colored icon (Hover state) */}
             <img
               src={tech.hoverImg}
               alt={`${tech.name} colored`}
-              className="absolute w-full h-full object-contain scale-100 group-hover:scale-[1.15] transition-all duration-700 ease-in-out delay-100 opacity-0 group-hover:opacity-100 pointer-events-none"
+              className="absolute w-full h-full object-contain scale-100 group-hover:scale-[1.2] transition-all duration-500 ease-out opacity-0 group-hover:opacity-100 pointer-events-none"
               style={{
                 willChange: "opacity, transform, filter",
-                filter: `drop-shadow(0 0 8px ${tech.color}80) drop-shadow(0 0 20px ${tech.color}50)`
+                filter: `drop-shadow(0 0 6px ${tech.color}cc) drop-shadow(0 0 16px ${tech.color}80)`,
+                transitionDelay: '0.05s',
               }}
             />
-
             {/* B&W icon (Default state) */}
             <img
               src={tech.img}
               alt={`${tech.name} monochrome`}
-              className="absolute w-full h-full object-contain scale-100 group-hover:scale-[1.15] transition-all duration-700 ease-in-out delay-100 opacity-70 group-hover:opacity-0 pointer-events-none"
-              style={{ willChange: "opacity, transform" }}
+              className="absolute w-full h-full object-contain scale-100 group-hover:scale-[1.2] transition-all duration-500 ease-out opacity-70 group-hover:opacity-0 pointer-events-none"
+              style={{ willChange: "opacity, transform", transitionDelay: '0.05s' }}
             />
           </div>
 
-          {/* Tech name */}
+          {/* Tech name — glitch flicker on hover */}
           <span
-            className="text-[5px] sm:text-[6px] md:text-[8px] lg:text-[9px] font-medium tracking-wider text-center px-1 leading-tight pointer-events-none text-white/50 group-hover:text-white group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] transition-all duration-300 ease-out z-0"
+            className="glitch-label text-[5px] sm:text-[6px] md:text-[8px] lg:text-[9px] font-mono tracking-widest text-center px-1 leading-tight pointer-events-none text-white group-hover:text-white transition-colors duration-200 z-10 uppercase"
           >
             {tech.name}
           </span>
@@ -158,12 +254,9 @@ export default function Skills() {
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    // Start expanding later (when section start crosses 70% line) 
-    // Finish expanding later (when section start crosses 20% line)
     offset: ["start 77%", "start 8%"],
   });
 
-  // Smooth the raw scroll progress with a spring for fluid, non-jittery motion
   const smoothProgress = useSpring(scrollYProgress, {
     stiffness: 80,
     damping: 30,
@@ -177,7 +270,6 @@ export default function Skills() {
       className="bg-transparent relative w-full overflow-visible flex flex-col items-center justify-center py-20 min-h-screen z-10"
       style={{ background: 'radial-gradient(ellipse at center, #001a66 0%, #000d33 40%, #000000 75%)' }}
     >
-      {/* Custom styled title */}
       <style>{`
         .tech-stack-title {
           background: linear-gradient(
@@ -226,37 +318,26 @@ export default function Skills() {
           100% { background-position: -200% center; }
         }
       `}</style>
+
       <h2 className="tech-stack-title font-malinton text-5xl md:text-7xl font-bold mb-10 cursor-default select-none text-center">
         Tech Stack
         <span className="tech-stack-shimmer" aria-hidden="true">Tech Stack</span>
       </h2>
 
-      {/* Full-width relative wrapper for glow + grid */}
       <div className="relative w-full">
-        {/* Electric blue ambient glow */}
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[950px] h-[650px] rounded-full blur-[160px] pointer-events-none -z-10"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(0,150,255,0.35) 0%, rgba(0,80,255,0.25) 30%, rgba(0,30,120,0.15) 55%, rgba(0,0,0,0.9) 80%)",
-          }}
+          style={{ background: "radial-gradient(circle, rgba(0,150,255,0.35) 0%, rgba(0,80,255,0.25) 30%, rgba(0,30,120,0.15) 55%, rgba(0,0,0,0.9) 80%)" }}
         />
         <div
           className="absolute top-[-100px] left-1/2 -translate-x-1/2 w-[700px] h-[350px] rounded-full blur-[120px] pointer-events-none -z-10"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(0,170,255,0.25) 0%, rgba(0,70,255,0.18) 40%, transparent 75%)",
-          }}
+          style={{ background: "radial-gradient(circle, rgba(0,170,255,0.25) 0%, rgba(0,70,255,0.18) 40%, transparent 75%)" }}
         />
         <div
           className="absolute bottom-[-120px] left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full blur-[140px] pointer-events-none -z-10"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(0,120,255,0.25) 0%, rgba(0,60,200,0.15) 40%, transparent 80%)",
-          }}
+          style={{ background: "radial-gradient(circle, rgba(0,120,255,0.25) 0%, rgba(0,60,200,0.15) 40%, transparent 80%)" }}
         />
 
-        {/* Scroll-tracked grid container */}
         <div
           ref={sectionRef}
           className="relative z-10 w-full max-w-[1400px] mx-auto px-2 sm:px-4 flex flex-col items-center justify-center"
