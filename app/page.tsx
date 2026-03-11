@@ -132,30 +132,22 @@ export default function Home() {
 
                 {/* 1. EXPERIENCE */}
                 <div id="experience" className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-t-[3rem] md:rounded-t-[4rem] bg-black shadow-[0_20px_60px_rgba(0,0,0,0.8)] border-t border-white/5 overflow-hidden">
-                  <div className="w-full h-full overflow-y-auto hide-scrollbar">
-                    <Experience />
-                  </div>
+                  <Experience />
                 </div>
 
                 {/* 2. SKILLS */}
                 <div id="skills" className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-t-[3rem] md:rounded-t-[4rem] bg-zinc-950 shadow-[0_-20px_60px_rgba(0,0,0,0.8)] border-t border-white/5 overflow-hidden">
-                  <div className="w-full h-full overflow-y-auto hide-scrollbar">
-                    <Skills />
-                  </div>
+                  <Skills />
                 </div>
 
                 {/* 3. PROJECTS */}
                 <div id="projects" className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-t-[3rem] md:rounded-t-[4rem] bg-black shadow-[0_-20px_60px_rgba(0,0,0,0.8)] border-t border-white/5 overflow-hidden">
-                  <div className="w-full h-full overflow-y-auto hide-scrollbar">
-                    <Projects />
-                  </div>
+                  <Projects />
                 </div>
 
                 {/* 4. CERTIFICATIONS */}
                 <div id="certifications" className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-t-[3rem] md:rounded-t-[4rem] bg-zinc-950 shadow-[0_-20px_60px_rgba(0,0,0,0.8)] border-t border-white/5 overflow-hidden">
-                  <div className="w-full h-full overflow-y-auto hide-scrollbar">
-                    <Certifications />
-                  </div>
+                  <Certifications />
                 </div>
 
                 {/* 5. FOOTER */}
