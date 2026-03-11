@@ -17,7 +17,7 @@ const technologies = [
   { name: "Swift", img: "https://cdn.simpleicons.org/swift/F05138", color: "#F05138" },
   { name: "Bash", img: "https://cdn.simpleicons.org/gnubash/4EAA25", color: "#4EAA25" },
   { name: "React", img: "https://cdn.simpleicons.org/react/61DAFB", color: "#61DAFB" },
-  { name: "Next.js", img: "https://cdn.simpleicons.org/nextdotjs/white", color: "#000000" },
+  { name: "Next.js", img: "https://cdn.simpleicons.org/nextdotjs/white", color: "#FFFFFF" }, // FIX: was #000000
   { name: "Angular", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/angularjs/angularjs-original.svg", color: "#DD0031" },
 
   // Row 2 — Frontend + Backend (10)
@@ -25,9 +25,9 @@ const technologies = [
   { name: "Bootstrap", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bootstrap/bootstrap-original.svg", color: "#7952B3" },
   { name: "HTML5", img: "https://cdn.simpleicons.org/html5/E34F26", color: "#E34F26" },
   { name: "CSS3", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg", color: "#1572B6" },
-  { name: "Three.js", img: "https://cdn.simpleicons.org/threedotjs/white", color: "#000000" },
+  { name: "Three.js", img: "https://cdn.simpleicons.org/threedotjs/white", color: "#FFFFFF" }, // FIX: was #000000
   { name: "Node.js", img: "https://cdn.simpleicons.org/nodedotjs/339933", color: "#339933" },
-  { name: "Express.js", img: "https://cdn.simpleicons.org/express/white", color: "#000000" },
+  { name: "Express.js", img: "https://cdn.simpleicons.org/express/white", color: "#FFFFFF" }, // FIX: was #000000
   { name: "Spring", img: "https://cdn.simpleicons.org/spring/6DB33F", color: "#6DB33F" },
   { name: "Spring Boot", img: "https://cdn.simpleicons.org/springboot/6DB33F", color: "#6DB33F" },
   { name: "GraphQL", img: "https://cdn.simpleicons.org/graphql/E10098", color: "#E10098" },
@@ -38,26 +38,26 @@ const technologies = [
   { name: "MongoDB", img: "https://cdn.simpleicons.org/mongodb/47A248", color: "#47A248" },
   { name: "Redis", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg", color: "#DD0031" },
   { name: "AWS", img: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg", color: "#FF9900" },
-  { name: "Docker", img: "https://cdn.simpleicons.org/docker/2496ED?v=bust", color: "#2496ED" },
-  { name: "Kubernetes", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg?v=bust", color: "#326CE5" },
+  { name: "Docker", img: "https://cdn.simpleicons.org/docker/2496ED", color: "#2496ED" },
+  { name: "Kubernetes", img: "https://cdn.simpleicons.org/kubernetes/326CE5", color: "#326CE5" },
   { name: "Linux", img: "https://cdn.simpleicons.org/linux/FCC624", color: "#FCC624" },
 
   // Row 4 — DevOps + AI/ML (6)
   { name: "Git", img: "https://cdn.simpleicons.org/git/F05032", color: "#F05032" },
   { name: "TensorFlow", img: "https://cdn.simpleicons.org/tensorflow/FF6F00", color: "#FF6F00" },
   { name: "PyTorch", img: "https://cdn.simpleicons.org/pytorch/EE4C2C", color: "#EE4C2C" },
-  { name: "Scikit-learn", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/scikitlearn/scikitlearn-original.svg?v=bust", color: "#F7931E" },
   { name: "Pandas", img: "https://cdn.simpleicons.org/pandas/776DD3", color: "#776DD3" },
-  { name: "Selenium", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/selenium/selenium-original.svg?v=bust", color: "#43B02A" },
+  { name: "Scikit-learn", img: "https://cdn.simpleicons.org/scikitlearn/F7931E", color: "#F7931E" },
+  { name: "Selenium", img: "https://cdn.simpleicons.org/selenium/43B02A", color: "#43B02A" },
 
   // Row 5 — Tools (4)
   { name: "Postman", img: "https://cdn.simpleicons.org/postman/FF6C37", color: "#FF6C37" },
   { name: "Figma", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg", color: "#F24E1E" },
-  { name: "Jira", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jira/jira-original.svg?v=bust", color: "#2684FF" },
-  { name: "Power BI", img: "https://upload.wikimedia.org/wikipedia/commons/c/cf/New_Power_BI_Logo.svg?v=bust", color: "#F2C811" },
+  { name: "Jira", img: "https://cdn.simpleicons.org/jira/2684FF", color: "#2684FF" },
+  { name: "Power BI", img: "https://cdn.simpleicons.org/powerbi/F2C811", color: "#F2C811" },
 
   // Row 6 — Tools (2)
-  { name: "Vercel", img: "https://cdn.simpleicons.org/vercel/white", color: "#000000" },
+  { name: "Vercel", img: "https://cdn.simpleicons.org/vercel/white", color: "#FFFFFF" }, // FIX: was #000000
   { name: "Eclipse", img: "https://cdn.simpleicons.org/eclipseide/FE7A15", color: "#FE7A15" },
 ];
 
@@ -75,19 +75,13 @@ function getTileParallaxOffset(rowIndex: number, colIndex: number, totalCols: nu
   const distFromCenter = colIndex - center;
   const normalizedDist = center === 0 ? 0 : distFromCenter / center; // -1 to 1
 
-  // Horizontal: tiles fan out from center (left goes left, right goes right)
   const xOffset = normalizedDist * 300;
-
-  // Vertical: rows spread out vertically — top rows go up, bottom rows go down
   const yOffset = (rowIndex - 2.5) * 80 - Math.abs(normalizedDist) * 50;
-
-  // Rotation proportional to horizontal position
   const rotation = normalizedDist * 20;
 
   return { xOffset, yOffset, rotation };
 }
 
-// Single tech card with scroll-driven parallax - NEW RELIABLE HOVER SYSTEM
 const TechCard = ({
   tech,
   rowIndex,
@@ -104,95 +98,62 @@ const TechCard = ({
   const [isHovered, setIsHovered] = useState(false);
   const { xOffset, yOffset, rotation } = getTileParallaxOffset(rowIndex, colIndex, totalCols);
 
-  // Map scroll progress (0→1) to tile transform values
   const x = useTransform(scrollProgress, [0, 0.75], [xOffset, 0], { ease: (t: number) => 1 - Math.pow(1 - t, 3) });
   const y = useTransform(scrollProgress, [0, 0.75], [yOffset, 0], { ease: (t: number) => 1 - Math.pow(1 - t, 3) });
   const rotate = useTransform(scrollProgress, [0, 0.75], [rotation, 0], { ease: (t: number) => 1 - Math.pow(1 - t, 3) });
   const scale = useTransform(scrollProgress, [0, 0.70], [0.5, 1], { ease: (t: number) => 1 - Math.pow(1 - t, 3) });
   const opacity = useTransform(scrollProgress, [0, 0.60], [0, 1]);
 
+  // FIX: opacity:0 elements still block pointer events — disable hover until tile is visible
+  const pointerEvents = useTransform(opacity, (val) =>
+    val > 0.1 ? "auto" : "none"
+  ) as import("framer-motion").MotionValue<"auto" | "none">;
+
   return (
     <motion.div
-      style={{ x, y, rotate, scale, opacity, willChange: 'transform, opacity' }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      className="relative cursor-pointer w-[60px] h-[72px] sm:w-[68px] sm:h-[80px] lg:w-[76px] lg:h-[88px]"
+      style={{ x, y, rotate, scale, opacity, pointerEvents, willChange: 'transform, opacity' }}
+      className="relative cursor-pointer w-[60px] h-[72px] sm:w-[68px] sm:h-[80px] lg:w-[76px] lg:h-[88px] group origin-center"
     >
       {/* Outer container with lift effect */}
-      <motion.div
-        animate={{
-          y: isHovered ? -6 : 0,
-          scale: isHovered ? 1.05 : 1
-        }}
-        transition={{
-          type: "spring",
-          stiffness: 400,
-          damping: 17,
-          duration: 0.3
-        }}
-        className="relative w-full h-full z-20"
+      <div
+        className="relative w-full h-full z-20 transition-transform duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] group-hover:-translate-y-1.5 group-hover:scale-105"
       >
         <div
-          className={`flex flex-col items-center justify-center w-full h-full rounded-[14px] backdrop-blur-xl bg-white/[0.06] transition-all duration-300 ease-out border border-white/10 shadow-lg ${isHovered
-            ? 'border-b-2 border-b-cyan-400 shadow-[0_25px_30px_-10px_rgba(34,211,238,0.5),_0_10px_10px_-5px_rgba(59,130,246,0.6)] bg-white/[0.12]'
-            : 'shadow-lg'
-            }`}
+          className={`relative flex flex-col items-center justify-center w-full h-full rounded-[14px] backdrop-blur-xl bg-white/[0.06] transition-all duration-300 ease-out border border-white/10 shadow-lg group-hover:border-b-2 group-hover:border-b-cyan-400 group-hover:shadow-[0_25px_30px_-10px_rgba(34,211,238,0.5),_0_10px_10px_-5px_rgba(59,130,246,0.6)] group-hover:bg-white/[0.12]`}
         >
+          {/* Explicit Hover Catch-All Overlay */}
+          <div className="absolute inset-0 w-full h-full z-10" />
+
           {/* Icon Container */}
-          <div className="relative w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 flex-shrink-0 mb-[2px] sm:mb-1 flex items-center justify-center">
+          <div className="relative w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 flex-shrink-0 mb-[2px] sm:mb-1 flex items-center justify-center pointer-events-none z-0">
 
-            {/* Glowing ring effect on hover - rendered underneath icon */}
+            {/* Glowing ring effect on hover */}
             <div
-              className="absolute w-full h-full rounded-full pointer-events-none"
+              className="absolute w-full h-full rounded-full opacity-0 group-hover:opacity-80 transition-opacity duration-300 ease-out"
               style={{
-                boxShadow: isHovered ? `0 0 20px ${tech.color}50, 0 0 40px ${tech.color}30` : "none",
-                opacity: isHovered ? 0.8 : 0,
-                transition: "opacity 0.3s ease, box-shadow 0.3s ease",
+                boxShadow: `0 0 20px ${tech.color}50, 0 0 40px ${tech.color}30`,
               }}
             />
 
-            {/* Default white icon */}
+            {/* The Icon - Temporarily Removed for Testing */}
+            {/* 
             <img
               src={tech.img}
               alt={tech.name}
-              className="absolute w-full h-full object-contain pointer-events-none z-10"
-              style={{
-                filter: "grayscale(1) brightness(10)",
-                opacity: isHovered ? 0 : 0.65,
-                transform: isHovered ? "scale(1.1)" : "scale(1)",
-                transition: "opacity 0.25s ease, transform 0.25s ease",
-                willChange: "opacity, transform",
-              }}
+              className="absolute w-full h-full object-contain scale-100 group-hover:scale-[1.15] transition-all duration-400 ease-out opacity-70 group-hover:opacity-100 filter brightness-0 invert group-hover:brightness-100 group-hover:invert-0"
+              style={{ willChange: "opacity, transform, filter" }}
             />
-
-            {/* Colored hover icon */}
-            <img
-              src={tech.img}
-              alt={tech.name}
-              className="absolute w-full h-full object-contain pointer-events-none z-20"
-              style={{
-                opacity: isHovered ? 1 : 0,
-                transform: isHovered ? "scale(1.1)" : "scale(1)",
-                transition: "opacity 0.25s ease, transform 0.25s ease",
-                filter: `drop-shadow(0 0 6px ${tech.color}80) drop-shadow(0 0 4px ${tech.color}50)`,
-                willChange: "opacity, transform",
-              }}
-            />
+            */}
           </div>
 
           {/* Tech name */}
           <span
-            style={{
-              color: isHovered ? "rgba(255,255,255,1)" : "rgba(255,255,255,0.5)",
-              textShadow: isHovered ? "0 0 8px rgba(255,255,255,0.8)" : "none",
-              transition: "color 0.3s ease, text-shadow 0.3s ease",
-            }}
-            className="text-[5px] sm:text-[6px] md:text-[8px] lg:text-[9px] font-medium tracking-wider text-center px-1 leading-tight pointer-events-none"
+            className="text-[5px] sm:text-[6px] md:text-[8px] lg:text-[9px] font-medium tracking-wider text-center px-1 leading-tight pointer-events-none text-white/50 group-hover:text-white group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] transition-all duration-300 ease-out z-0"
           >
             {tech.name}
           </span>
         </div>
-      </motion.div>
+      </div>
     </motion.div>
   );
 };
