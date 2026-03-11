@@ -107,24 +107,24 @@ const TechCard = ({
   return (
     <motion.div
       style={{ x, y, rotate, scale, opacity, willChange: 'transform, opacity' }}
-      className="relative cursor-pointer w-[60px] h-[72px] sm:w-[68px] sm:h-[80px] lg:w-[76px] lg:h-[88px] group origin-center z-10 hover:z-50"
+      className="relative w-[60px] h-[72px] sm:w-[68px] sm:h-[80px] lg:w-[76px] lg:h-[88px] origin-center z-10 pointer-events-none"
     >
       {/* Outer container with lift effect */}
       <div
-        className="relative w-full h-full z-20 transition-transform duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] group-hover:-translate-y-1.5 group-hover:scale-105"
+        className="relative w-full h-full z-20 pointer-events-none"
       >
         <div
-          className={`relative flex flex-col items-center justify-center w-full h-full rounded-[14px] backdrop-blur-xl bg-white/[0.06] transition-all duration-300 ease-out border border-white/10 shadow-lg group-hover:border-b-2 group-hover:border-b-cyan-400 group-hover:shadow-[0_25px_30px_-10px_rgba(34,211,238,0.5),_0_10px_10px_-5px_rgba(59,130,246,0.6)] group-hover:bg-white/[0.12]`}
+          className={`group relative flex flex-col items-center justify-center w-full h-full rounded-[14px] backdrop-blur-xl bg-white/[0.06] transition-all duration-300 ease-out border border-white/10 shadow-lg pointer-events-auto cursor-pointer hover:z-50 hover:-translate-y-1.5 hover:scale-105 hover:border-b-2 hover:border-b-cyan-400 hover:shadow-[0_25px_30px_-10px_rgba(34,211,238,0.5),_0_10px_10px_-5px_rgba(59,130,246,0.6)] hover:bg-white/[0.12]`}
         >
           {/* Explicit Hover Catch-All Overlay */}
-          <div className="absolute inset-0 w-full h-full z-10" />
+          <div className="absolute inset-0 w-full h-full z-10 pointer-events-none" />
 
           {/* Icon Container */}
           <div className="relative w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 flex-shrink-0 mb-[2px] sm:mb-1 flex items-center justify-center pointer-events-none z-0">
 
             {/* Glowing ring effect on hover */}
             <div
-              className="absolute w-full h-full rounded-full opacity-0 group-hover:opacity-80 transition-opacity duration-300 ease-out"
+              className="absolute w-full h-full rounded-full opacity-0 group-hover:opacity-80 transition-opacity duration-300 ease-out pointer-events-none"
               style={{
                 boxShadow: `0 0 20px ${tech.color}50, 0 0 40px ${tech.color}30`,
               }}
@@ -135,7 +135,7 @@ const TechCard = ({
             <img
               src={tech.img}
               alt={tech.name}
-              className="absolute w-full h-full object-contain scale-100 group-hover:scale-[1.15] transition-all duration-400 ease-out opacity-70 group-hover:opacity-100 filter brightness-0 invert group-hover:brightness-100 group-hover:invert-0"
+              className="absolute w-full h-full object-contain scale-100 group-hover:scale-[1.15] transition-all duration-400 ease-out opacity-70 group-hover:opacity-100 filter brightness-0 invert group-hover:brightness-100 group-hover:invert-0 pointer-events-none"
               style={{ willChange: "opacity, transform, filter" }}
             />
             */}
