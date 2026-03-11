@@ -1,7 +1,7 @@
 "use client";
 
 import Section from "@/components/section";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, MotionValue } from "framer-motion";
 import { useRef, useState } from "react";
 
 // Technology Data — 42 Skills with fallback colored SVGs
@@ -93,7 +93,7 @@ const TechCard = ({
   rowIndex: number;
   colIndex: number;
   totalCols: number;
-  scrollProgress: import("framer-motion").MotionValue<number>;
+  scrollProgress: MotionValue<number>;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const { xOffset, yOffset, rotation } = getTileParallaxOffset(rowIndex, colIndex, totalCols);
@@ -104,15 +104,10 @@ const TechCard = ({
   const scale = useTransform(scrollProgress, [0, 0.70], [0.5, 1], { ease: (t: number) => 1 - Math.pow(1 - t, 3) });
   const opacity = useTransform(scrollProgress, [0, 0.60], [0, 1]);
 
-  // FIX: opacity:0 elements still block pointer events — disable hover until tile is visible
-  const pointerEvents = useTransform(opacity, (val) =>
-    val > 0.1 ? "auto" : "none"
-  ) as import("framer-motion").MotionValue<"auto" | "none">;
-
   return (
     <motion.div
-      style={{ x, y, rotate, scale, opacity, pointerEvents, willChange: 'transform, opacity' }}
-      className="relative cursor-pointer w-[60px] h-[72px] sm:w-[68px] sm:h-[80px] lg:w-[76px] lg:h-[88px] group origin-center"
+      style={{ x, y, rotate, scale, opacity, willChange: 'transform, opacity' }}
+      className="relative cursor-pointer w-[60px] h-[72px] sm:w-[68px] sm:h-[80px] lg:w-[76px] lg:h-[88px] group origin-center z-10 hover:z-50"
     >
       {/* Outer container with lift effect */}
       <div
@@ -163,7 +158,7 @@ export default function Skills() {
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["start end", "start 0.15"],
+    offset: ["start end", "start 0.60"],
   });
 
   // Smooth the raw scroll progress with a spring for fluid, non-jittery motion
