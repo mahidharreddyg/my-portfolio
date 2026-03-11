@@ -122,27 +122,22 @@ const TechCard = ({
           {/* Icon Container */}
           <div className="relative w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 flex-shrink-0 mb-[2px] sm:mb-1 flex items-center justify-center pointer-events-none z-0">
 
-            {/* Glowing ring effect on hover */}
-            <div
-              className="absolute w-full h-full rounded-full opacity-0 group-hover:opacity-80 transition-opacity duration-300 ease-out pointer-events-none"
-              style={{
-                boxShadow: `0 0 20px ${tech.color}50, 0 0 40px ${tech.color}30`,
-              }}
-            />
-
-            {/* Colored icon (Hover state) */}
+            {/* Colored icon (Hover state) with dynamic SVG drop-shadow */}
             <img
               src={tech.hoverImg}
               alt={`${tech.name} colored`}
-              className="absolute w-full h-full object-contain scale-100 group-hover:scale-[1.15] transition-all duration-400 ease-out opacity-0 group-hover:opacity-100 pointer-events-none"
-              style={{ willChange: "opacity, transform" }}
+              className="absolute w-full h-full object-contain scale-100 group-hover:scale-[1.15] transition-all duration-700 ease-in-out delay-100 opacity-0 group-hover:opacity-100 pointer-events-none"
+              style={{
+                willChange: "opacity, transform, filter",
+                filter: `drop-shadow(0 0 8px ${tech.color}80) drop-shadow(0 0 20px ${tech.color}50)`
+              }}
             />
 
             {/* B&W icon (Default state) */}
             <img
               src={tech.img}
               alt={`${tech.name} monochrome`}
-              className="absolute w-full h-full object-contain scale-100 group-hover:scale-[1.15] transition-all duration-400 ease-out opacity-70 group-hover:opacity-0 pointer-events-none"
+              className="absolute w-full h-full object-contain scale-100 group-hover:scale-[1.15] transition-all duration-700 ease-in-out delay-100 opacity-70 group-hover:opacity-0 pointer-events-none"
               style={{ willChange: "opacity, transform" }}
             />
           </div>
