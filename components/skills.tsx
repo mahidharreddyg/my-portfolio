@@ -7,58 +7,58 @@ import { useRef, useState } from "react";
 // Technology Data — 42 Skills with fallback colored SVGs
 const technologies = [
   // Row 1 — Programming Languages (12)
-  { name: "Java", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-plain.svg", color: "#E76F51" },
-  { name: "C", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-original.svg", color: "#A8B9CC" },
-  { name: "C++", img: "https://cdn.simpleicons.org/cplusplus/00599C", color: "#00599C" },
-  { name: "Python", img: "https://cdn.simpleicons.org/python/3776AB", color: "#3776AB" },
-  { name: "JavaScript", img: "https://cdn.simpleicons.org/javascript/F7DF1E", color: "#F7DF1E" },
-  { name: "TypeScript", img: "https://cdn.simpleicons.org/typescript/3178C6", color: "#3178C6" },
-  { name: "Go", img: "https://cdn.simpleicons.org/go/00ADD8", color: "#00ADD8" },
-  { name: "Swift", img: "https://cdn.simpleicons.org/swift/F05138", color: "#F05138" },
-  { name: "Bash", img: "https://cdn.simpleicons.org/gnubash/4EAA25", color: "#4EAA25" },
-  { name: "React", img: "https://cdn.simpleicons.org/react/61DAFB", color: "#61DAFB" },
-  { name: "Next.js", img: "https://cdn.simpleicons.org/nextdotjs/white", color: "#FFFFFF" }, // FIX: was #000000
-  { name: "Angular", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/angularjs/angularjs-original.svg", color: "#DD0031" },
+  { name: "Python", img: "/icons/blackandwhite/python.svg", hoverImg: "/icons/coloured/python.svg", color: "#3776AB" },
+  { name: "JavaScript", img: "/icons/blackandwhite/js.svg", hoverImg: "/icons/coloured/js.svg", color: "#F7DF1E" },
+  { name: "TypeScript", img: "/icons/blackandwhite/typescript.svg", hoverImg: "/icons/coloured/typescript.svg", color: "#3178C6" },
+  { name: "Java", img: "/icons/blackandwhite/java.svg", hoverImg: "/icons/coloured/java.svg", color: "#E76F51" },
+  { name: "C++", img: "/icons/blackandwhite/c++.svg", hoverImg: "/icons/coloured/c++.svg", color: "#00599C" },
+  { name: "Go", img: "/icons/blackandwhite/go.svg", hoverImg: "/icons/coloured/go.svg", color: "#00ADD8" },
+  { name: "Swift", img: "/icons/blackandwhite/swift.svg", hoverImg: "/icons/coloured/swift.svg", color: "#F05138" },
+  { name: "Bash", img: "/icons/blackandwhite/bash.svg", hoverImg: "/icons/coloured/bash.svg", color: "#4EAA25" },
+  { name: "HTML5", img: "/icons/blackandwhite/html.svg", hoverImg: "/icons/coloured/html5.svg", color: "#E34F26" },
+  { name: "CSS3", img: "/icons/blackandwhite/css3.svg", hoverImg: "/icons/coloured/css3.svg", color: "#1572B6" },
+  { name: "React", img: "/icons/blackandwhite/react.svg", hoverImg: "/icons/coloured/react.svg", color: "#61DAFB" },
+  { name: "Next.js", img: "/icons/blackandwhite/nextjs2.svg", hoverImg: "/icons/coloured/nextjs2.svg", color: "#FFFFFF" },
 
   // Row 2 — Frontend + Backend (10)
-  { name: "Tailwind CSS", img: "https://cdn.simpleicons.org/tailwindcss/06B6D4", color: "#06B6D4" },
-  { name: "Bootstrap", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bootstrap/bootstrap-original.svg", color: "#7952B3" },
-  { name: "HTML5", img: "https://cdn.simpleicons.org/html5/E34F26", color: "#E34F26" },
-  { name: "CSS3", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg", color: "#1572B6" },
-  { name: "Three.js", img: "https://cdn.simpleicons.org/threedotjs/white", color: "#FFFFFF" }, // FIX: was #000000
-  { name: "Node.js", img: "https://cdn.simpleicons.org/nodedotjs/339933", color: "#339933" },
-  { name: "Express.js", img: "https://cdn.simpleicons.org/express/white", color: "#FFFFFF" }, // FIX: was #000000
-  { name: "Spring", img: "https://cdn.simpleicons.org/spring/6DB33F", color: "#6DB33F" },
-  { name: "Spring Boot", img: "https://cdn.simpleicons.org/springboot/6DB33F", color: "#6DB33F" },
-  { name: "GraphQL", img: "https://cdn.simpleicons.org/graphql/E10098", color: "#E10098" },
+  { name: "Angular", img: "/icons/blackandwhite/angular17.svg", hoverImg: "/icons/coloured/angular17.svg", color: "#DD0031" },
+  { name: "Node.js", img: "/icons/blackandwhite/nodejs.svg", hoverImg: "/icons/coloured/nodejs.svg", color: "#339933" },
+  { name: "Express.js", img: "/icons/blackandwhite/expressjs.svg", hoverImg: "/icons/coloured/expressjs.svg", color: "#FFFFFF" },
+  { name: "Spring Boot", img: "/icons/blackandwhite/simple-icons_springboot.svg", hoverImg: "/icons/coloured/simple-icons_springboot.svg", color: "#6DB33F" },
+  { name: "GraphQL", img: "/icons/blackandwhite/graphql.svg", hoverImg: "/icons/coloured/graphql.svg", color: "#E10098" },
+  { name: "Bootstrap", img: "/icons/blackandwhite/bootstrap5.svg", hoverImg: "/icons/coloured/bootstrap5.svg", color: "#7952B3" },
+  { name: "Redux", img: "/icons/blackandwhite/redux.svg", hoverImg: "/icons/coloured/redux.svg", color: "#764ABC" },
+  { name: "Three.js", img: "/icons/blackandwhite/threejs.svg", hoverImg: "/icons/coloured/threejs.svg", color: "#FFFFFF" },
+  { name: "Firebase", img: "/icons/blackandwhite/firebase.svg", hoverImg: "/icons/coloured/firebase.svg", color: "#FFCA28" },
+  { name: "Vercel", img: "/icons/blackandwhite/vercel.svg", hoverImg: "/icons/coloured/vercel.svg", color: "#FFFFFF" },
 
   // Row 3 — Databases + Cloud + DevOps (8)
-  { name: "PostgreSQL", img: "https://cdn.simpleicons.org/postgresql/4169E1", color: "#4169E1" },
-  { name: "MySQL", img: "https://cdn.simpleicons.org/mysql/4479A1", color: "#4479A1" },
-  { name: "MongoDB", img: "https://cdn.simpleicons.org/mongodb/47A248", color: "#47A248" },
-  { name: "Redis", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg", color: "#DD0031" },
-  { name: "AWS", img: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg", color: "#FF9900" },
-  { name: "Docker", img: "https://cdn.simpleicons.org/docker/2496ED", color: "#2496ED" },
-  { name: "Kubernetes", img: "https://cdn.simpleicons.org/kubernetes/326CE5", color: "#326CE5" },
-  { name: "Linux", img: "https://cdn.simpleicons.org/linux/FCC624", color: "#FCC624" },
+  { name: "PostgreSQL", img: "/icons/blackandwhite/postgresql.svg", hoverImg: "/icons/coloured/postgresql.svg", color: "#4169E1" },
+  { name: "MySQL", img: "/icons/blackandwhite/mysql.svg", hoverImg: "/icons/coloured/mysql.svg", color: "#4479A1" },
+  { name: "MongoDB", img: "/icons/blackandwhite/mongodb.svg", hoverImg: "/icons/coloured/mongodb.svg", color: "#47A248" },
+  { name: "Redis", img: "/icons/blackandwhite/redis.svg", hoverImg: "/icons/coloured/redis.svg", color: "#DD0031" },
+  { name: "AWS", img: "/icons/blackandwhite/aws.svg", hoverImg: "/icons/coloured/aws.svg", color: "#FF9900" },
+  { name: "Docker", img: "/icons/blackandwhite/docker.svg", hoverImg: "/icons/coloured/docker.svg", color: "#2496ED" },
+  { name: "Kubernetes", img: "/icons/blackandwhite/kubernetes.svg", hoverImg: "/icons/coloured/kubernetes.svg", color: "#326CE5" },
+  { name: "Linux", img: "/icons/blackandwhite/linux.svg", hoverImg: "/icons/coloured/linux.svg", color: "#FCC624" },
 
   // Row 4 — DevOps + AI/ML (6)
-  { name: "Git", img: "https://cdn.simpleicons.org/git/F05032", color: "#F05032" },
-  { name: "TensorFlow", img: "https://cdn.simpleicons.org/tensorflow/FF6F00", color: "#FF6F00" },
-  { name: "PyTorch", img: "https://cdn.simpleicons.org/pytorch/EE4C2C", color: "#EE4C2C" },
-  { name: "Pandas", img: "https://cdn.simpleicons.org/pandas/776DD3", color: "#776DD3" },
-  { name: "Scikit-learn", img: "https://cdn.simpleicons.org/scikitlearn/F7931E", color: "#F7931E" },
-  { name: "Selenium", img: "https://cdn.simpleicons.org/selenium/43B02A", color: "#43B02A" },
+  { name: "GitHub", img: "/icons/blackandwhite/github.svg", hoverImg: "/icons/coloured/github.svg", color: "#FFFFFF" },
+  { name: "TensorFlow", img: "/icons/blackandwhite/tensorflow.svg", hoverImg: "/icons/coloured/tensorflow.svg", color: "#FF6F00" },
+  { name: "PyTorch", img: "/icons/blackandwhite/pytorch.svg", hoverImg: "/icons/coloured/pytorch.svg", color: "#EE4C2C" },
+  { name: "Pandas", img: "/icons/blackandwhite/pandas.svg", hoverImg: "/icons/coloured/pandas.svg", color: "#776DD3" },
+  { name: "Scikit-learn", img: "/icons/blackandwhite/scikitlearn.svg", hoverImg: "/icons/coloured/scikitlearn.svg", color: "#F7931E" },
+  { name: "OpenCV", img: "/icons/blackandwhite/opencv.svg", hoverImg: "/icons/coloured/opencv.svg", color: "#5C3EE8" },
 
   // Row 5 — Tools (4)
-  { name: "Postman", img: "https://cdn.simpleicons.org/postman/FF6C37", color: "#FF6C37" },
-  { name: "Figma", img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg", color: "#F24E1E" },
-  { name: "Jira", img: "https://cdn.simpleicons.org/jira/2684FF", color: "#2684FF" },
-  { name: "Power BI", img: "https://cdn.simpleicons.org/powerbi/F2C811", color: "#F2C811" },
+  { name: "Postman", img: "/icons/blackandwhite/postman.svg", hoverImg: "/icons/coloured/postman.svg", color: "#FF6C37" },
+  { name: "Figma", img: "/icons/blackandwhite/figma.svg", hoverImg: "/icons/coloured/figma.svg", color: "#F24E1E" },
+  { name: "Jira", img: "/icons/blackandwhite/jira.svg", hoverImg: "/icons/coloured/jira.svg", color: "#2684FF" },
+  { name: "Power BI", img: "/icons/blackandwhite/powerBI.svg", hoverImg: "/icons/coloured/powerBI.svg", color: "#F2C811" },
 
   // Row 6 — Tools (2)
-  { name: "Vercel", img: "https://cdn.simpleicons.org/vercel/white", color: "#FFFFFF" }, // FIX: was #000000
-  { name: "Eclipse", img: "https://cdn.simpleicons.org/eclipseide/FE7A15", color: "#FE7A15" },
+  { name: "Selenium", img: "/icons/blackandwhite/selenium.svg", hoverImg: "/icons/coloured/selenium.svg", color: "#43B02A" },
+  { name: "n8n", img: "/icons/blackandwhite/n8n.svg", hoverImg: "/icons/coloured/n8n.svg", color: "#FF6D5D" },
 ];
 
 const layoutPattern = [12, 10, 8, 6, 4, 2];
@@ -89,7 +89,7 @@ const TechCard = ({
   totalCols,
   scrollProgress,
 }: {
-  tech: { name: string; img: string; color: string };
+  tech: { name: string; img: string; hoverImg: string; color: string };
   rowIndex: number;
   colIndex: number;
   totalCols: number;
@@ -130,15 +130,21 @@ const TechCard = ({
               }}
             />
 
-            {/* The Icon - Temporarily Removed for Testing */}
-            {/* 
+            {/* Colored icon (Hover state) */}
+            <img
+              src={tech.hoverImg}
+              alt={`${tech.name} colored`}
+              className="absolute w-full h-full object-contain scale-100 group-hover:scale-[1.15] transition-all duration-400 ease-out opacity-0 group-hover:opacity-100 pointer-events-none"
+              style={{ willChange: "opacity, transform" }}
+            />
+
+            {/* B&W icon (Default state) */}
             <img
               src={tech.img}
-              alt={tech.name}
-              className="absolute w-full h-full object-contain scale-100 group-hover:scale-[1.15] transition-all duration-400 ease-out opacity-70 group-hover:opacity-100 filter brightness-0 invert group-hover:brightness-100 group-hover:invert-0 pointer-events-none"
-              style={{ willChange: "opacity, transform, filter" }}
+              alt={`${tech.name} monochrome`}
+              className="absolute w-full h-full object-contain scale-100 group-hover:scale-[1.15] transition-all duration-400 ease-out opacity-70 group-hover:opacity-0 pointer-events-none"
+              style={{ willChange: "opacity, transform" }}
             />
-            */}
           </div>
 
           {/* Tech name */}
