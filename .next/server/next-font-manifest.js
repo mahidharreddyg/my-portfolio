@@ -1,1 +1,1 @@
-self.__NEXT_FONT_MANIFEST='{"pages":{},"app":{"/Users/mahidharreddyg/Mahi/My Projects/Web Dev/my-portfolio/app/layout":["static/media/636a5ac981f94f8b-s.p.woff2","static/media/eebd8834f6af1796-s.p.otf"]},"appUsingSizeAdjust":true,"pagesUsingSizeAdjust":false}';
+self.__NEXT_FONT_MANIFEST="{\"pages\":{},\"app\":{\"/Users/mahidharreddyg/Mahi/My Projects/Web Dev/my-portfolio/app/layout\":[\"static/media/636a5ac981f94f8b-s.p.woff2\",\"static/media/eebd8834f6af1796-s.p.otf\"]},\"appUsingSizeAdjust\":true,\"pagesUsingSizeAdjust\":false}"
