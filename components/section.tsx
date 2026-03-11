@@ -87,7 +87,7 @@ export default function Section({ id, title, children, className = "", style }: 
         {/* Decorative elements */}
         {isInView && (
           <motion.div
-            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full blur-3xl will-change-transform"
+            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full blur-3xl will-change-transform pointer-events-none z-[-1]"
             animate={{
               scale: [1, 1.2, 1],
               rotate: [0, 180, 360],
