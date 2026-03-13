@@ -54,8 +54,8 @@ const CATEGORIES = [
     id: "languages",
     label: "Languages",
     subLabel: "COMPILED · SCRIPTED · TYPED",
-    color: "#3B82F6",
-    glowColor: "rgba(59,130,246,0.6)",
+    color: "#FFFFFF",
+    glowColor: "rgba(255,255,255,0.6)",
   },
   {
     id: "full-stack",
@@ -272,58 +272,27 @@ const CategoryLabel = ({
   onHover,
   onLeave,
   count,
+  sequenceIndex,
 }: {
   category: typeof CATEGORIES[0];
   isHovered: boolean;
   onHover: () => void;
   onLeave: () => void;
   count: number;
+  sequenceIndex: number;
 }) => {
   return (
-    /*
-      LAYOUT-SHIFT FIX:
-      - Outer wrapper is `position: relative` with a FIXED width slot (flex-1).
-      - All decorative elements that appear on hover (sub-label, badge, arms, glow)
-        use `visibility + opacity` or `position: absolute`, never adding/removing
-        from flow. The container height is therefore constant.
-      - `min-h` on sub-label and badge rows reserves their height at all times.
-    */
+
     <div
-      className="relative flex-1 flex flex-col items-center cursor-crosshair select-none"
+      className="relative flex-1 flex flex-col items-center cursor-pointer select-none"
       style={{ minWidth: 0 }}
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
     >
-      <style>{`
-        @keyframes cat-flicker {
-          0%, 100% { opacity: 1; }
-          15% { opacity: 0.35; }
-          30% { opacity: 1; }
-          55% { opacity: 0.6; }
-          70% { opacity: 1; }
-        }
-        @keyframes badge-rise {
-          0%   { opacity: 0; transform: translateY(4px); }
-          100% { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes hex-orbit {
-          0%   { transform: scale(0.7) rotate(0deg);   opacity: 0.7; }
-          100% { transform: scale(2.2) rotate(45deg);  opacity: 0; }
-        }
-        @keyframes arm-extend {
-          0%   { width: 0%; opacity: 0; }
-          100% { width: 40%; opacity: 1; }
-        }
-        @keyframes underline-trace {
-          from { transform: scaleX(0); }
-          to   { transform: scaleX(1); }
-        }
-      `}</style>
-
-
       {/* ── Main label block ── fixed outer size so nothing shifts ── */}
+
       <div
-        className="relative flex flex-col items-center gap-[4px] px-4 py-[7px]"
+        className="relative flex flex-col items-center gap-[4px] px-4 py-[7px] bg-transparent rounded-lg"
         style={{ width: '100%' }}
       >
         {/* Corner brackets — absolutely placed, zero flow impact */}
@@ -343,52 +312,54 @@ const CategoryLabel = ({
               borderLeft: c.endsWith('l') ? `1px solid ${isHovered ? category.color : 'rgba(255,255,255,0.14)'}` : 'none',
               borderRight: c.endsWith('r') ? `1px solid ${isHovered ? category.color : 'rgba(255,255,255,0.14)'}` : 'none',
               opacity: isHovered ? 1 : 0.35,
+              zIndex: 10,
             }}
           />
         ))}
 
         {/* Label row — constant size, style swaps on hover */}
-        <div className="relative flex items-center justify-center" style={{ whiteSpace: 'nowrap' }}>
-          {/*
-            CAMOUFLAGE TECHNIQUE:
-            Idle state = the text is rendered but with color: transparent.
-            Behind the transparent text we draw a dashed circuit-board underline
-            using a repeating-linear-gradient background on the text element itself
-            (background-position: bottom). This gives a "redacted / encrypted"
-            HUD feel without any border, outline, or box — pure background trick.
-          */}
+        <div className="relative flex items-center justify-center" style={{ whiteSpace: 'nowrap', zIndex: 10 }}>
           <span
-            className="block font-mono uppercase font-semibold tracking-[0.3em]"
+            className="block font-mono uppercase font-semibold tracking-[0.3em] relative transition-all duration-300"
             style={{
-              fontSize: 'clamp(10px, 1.1vw, 13px)',
-              // Idle: transparent text + subtle dashed bottom rule
+              fontSize: 'clamp(14px, 1.5vw, 18px)',
+
+              // Idle state: Transparent text revealed only by a shimmer sweep
+              // Hover state: Full colored flicker glow
+              WebkitTextFillColor: isHovered ? 'currentcolor' : 'transparent',
               color: isHovered ? category.color : 'transparent',
-              // Idle decoration via background — looks like a PCB trace under redacted text
-              backgroundImage: isHovered
-                ? 'none'
-                : `repeating-linear-gradient(
-                    90deg,
-                    rgba(255,255,255,0.18) 0px,
-                    rgba(255,255,255,0.18) 5px,
-                    transparent 5px,
-                    transparent 9px
-                  ),
-                  repeating-linear-gradient(
-                    90deg,
-                    rgba(255,255,255,0.06) 0px,
-                    rgba(255,255,255,0.06) 100%
-                  )`,
-              backgroundSize: isHovered ? 'auto' : '9px 1px, 100% 100%',
-              backgroundPosition: isHovered ? 'auto' : 'bottom, top',
-              backgroundRepeat: 'repeat-x, no-repeat',
+
+              backgroundColor: 'transparent',
+              backgroundImage: !isHovered
+                ? `linear-gradient(115deg, 
+                    transparent 10%, 
+                    rgba(255,255,255,0.03) 30%, 
+                    rgba(255,255,255,0.15) 42%, 
+                    rgba(255,255,255,0.7) 50%, 
+                    rgba(255,255,255,0.15) 58%, 
+                    rgba(255,255,255,0.03) 70%, 
+                    transparent 90%
+                  )`
+                : 'none',
+              backgroundSize: '250% 100%',
+              backgroundRepeat: 'no-repeat',
+              WebkitBackgroundClip: !isHovered ? 'text' : 'none',
+              backgroundClip: !isHovered ? 'text' : 'none',
+
               textShadow: isHovered
                 ? `0 0 10px ${category.glowColor}, 0 0 24px ${category.glowColor}`
                 : 'none',
-              animation: isHovered ? 'cat-flicker 0.35s steps(1) forwards' : 'none',
-              transition: 'color 0.2s ease, text-shadow 0.3s ease',
+
+              animationName: isHovered
+                ? 'cat-flicker'
+                : (sequenceIndex === 0 || sequenceIndex === 1 ? 'cat-shimmer-sweep-rtl' : 'cat-shimmer-sweep-ltr'),
+              animationDuration: isHovered ? '0.35s' : '10s',
+              animationTimingFunction: isHovered ? 'steps(1)' : 'linear',
+              animationIterationCount: isHovered ? '1' : 'infinite',
+              animationFillMode: isHovered ? 'forwards' : 'none',
+              animationDelay: isHovered ? '0s' : `${sequenceIndex * 2.5}s`,
+
               letterSpacing: '0.3em',
-              // Faint character ghost so you can just barely read it when idle
-              WebkitTextStroke: isHovered ? '0px' : '0.5px rgba(255,255,255,0.09)',
             }}
           >
             {category.label}
@@ -412,7 +383,7 @@ const CategoryLabel = ({
           <span
             className="font-mono uppercase tracking-[0.2em] text-center"
             style={{
-              fontSize: 'clamp(5px, 0.55vw, 7px)',
+              fontSize: 'clamp(8px, 0.8vw, 11px)',
               color: `${category.color}99`,
               visibility: isHovered ? 'visible' : 'hidden',
               opacity: isHovered ? 1 : 0,
@@ -439,7 +410,7 @@ const CategoryLabel = ({
           <div className="w-[3px] h-[3px] rounded-full" style={{ background: category.color, boxShadow: `0 0 5px ${category.color}` }} />
           <span
             className="font-mono tracking-widest uppercase"
-            style={{ fontSize: 'clamp(6px, 0.6vw, 8px)', color: `${category.color}cc` }}
+            style={{ fontSize: 'clamp(10px, 0.9vw, 12px)', color: `${category.color}cc` }}
           >
             {count} TOOLS
           </span>
@@ -543,6 +514,29 @@ export default function Skills() {
           0%   { background-position: 200% center; }
           100% { background-position: -200% center; }
         }
+
+        /* Category Label Animations */
+        @keyframes cat-shimmer-sweep-ltr {
+          0%   { background-position: -150% 0; }
+          35%  { background-position: 150% 0; }
+          100% { background-position: 150% 0; }
+        }
+        @keyframes cat-shimmer-sweep-rtl {
+          0%   { background-position: 150% 0; }
+          35%  { background-position: -150% 0; }
+          100% { background-position: -150% 0; }
+        }
+        @keyframes cat-flicker {
+          0%, 100% { opacity: 1; }
+          15% { opacity: 0.35; }
+          30% { opacity: 1; }
+          55% { opacity: 0.6; }
+          70% { opacity: 1; }
+        }
+        @keyframes badge-rise {
+          0%   { opacity: 0; transform: translateY(4px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
       `}</style>
 
       <h2 className="tech-stack-title font-malinton text-5xl md:text-7xl font-bold mb-10 cursor-default select-none text-center">
@@ -576,6 +570,41 @@ export default function Skills() {
           ) : null;
         })()}
 
+        {/* ── Category Labels (Absolute Full-Width) ── */}
+        <div className="absolute top-[65%] left-0 right-0 z-30 pointer-events-none">
+          {/* Left Side Pair */}
+          <div className="absolute left-[-200px] top-0 flex flex-col gap-12 items-start pointer-events-auto">
+            {CATEGORIES.slice(0, 2).map((cat) => (
+              <div key={cat.id} className="w-[180px] sm:w-[220px]">
+                <CategoryLabel
+                  category={cat}
+                  isHovered={activeCategory === cat.id}
+                  onHover={() => setActiveCategory(cat.id)}
+                  onLeave={() => setActiveCategory(null)}
+                  count={getCategoryCount(cat.id)}
+                  sequenceIndex={cat.id === 'languages' ? 0 : 3}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Right Side Pair */}
+          <div className="absolute right-[-200px] top-0 flex flex-col gap-12 items-end text-right pointer-events-auto">
+            {CATEGORIES.slice(2).map((cat) => (
+              <div key={cat.id} className="w-[180px] sm:w-[220px]">
+                <CategoryLabel
+                  category={cat}
+                  isHovered={activeCategory === cat.id}
+                  onHover={() => setActiveCategory(cat.id)}
+                  onLeave={() => setActiveCategory(null)}
+                  count={getCategoryCount(cat.id)}
+                  sequenceIndex={cat.id === 'devops' ? 1 : 2}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div
           ref={sectionRef}
           className="relative z-10 w-full max-w-[1400px] mx-auto px-2 sm:px-4 flex flex-col items-center justify-center"
@@ -603,41 +632,7 @@ export default function Skills() {
             ))}
           </div>
 
-          {/* ── Category Labels Row ── */}
-          <div className="relative w-full mt-14 mb-2">
-            {/* Horizontal rule — purely decorative, behind labels */}
-            <div
-              className="absolute top-[35px] left-0 right-0 h-[1px] pointer-events-none"
-              style={{
-                background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 15%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 85%, transparent 100%)',
-              }}
-            />
 
-            {/* Category strip — flex row, each item is flex-1 so widths are locked */}
-            <div className="relative z-10 flex items-start justify-between w-full px-4 sm:px-8 md:px-16 gap-2">
-              {CATEGORIES.map((cat) => (
-                <CategoryLabel
-                  key={cat.id}
-                  category={cat}
-                  isHovered={activeCategory === cat.id}
-                  onHover={() => setActiveCategory(cat.id)}
-                  onLeave={() => setActiveCategory(null)}
-                  count={getCategoryCount(cat.id)}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Hint */}
-          <p
-            className="font-mono text-[8px] tracking-[0.3em] uppercase mt-4 transition-all duration-300"
-            style={{ color: activeCategory ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.1)' }}
-          >
-            {activeCategory
-              ? `${getCategoryCount(activeCategory)} tools highlighted`
-              : '[ hover to filter by domain ]'
-            }
-          </p>
         </div>
       </div>
     </Section>
