@@ -160,20 +160,6 @@ function EnhancedBackground() {
 
       </svg>
 
-      {/* Moving Tech Dots/Data Nodes (CSS Animation) */}
-      <div className="absolute inset-0 z-0 opacity-30 overflow-hidden">
-        {/* Top Left Float */}
-        <div className="absolute top-[10%] left-[15%] w-1.5 h-1.5 bg-blue-400 rounded-full animate-[ping_3s_ease-in-out_infinite]" />
-        <div className="absolute top-[20%] left-[10%] w-0.5 h-12 bg-blue-500/20 rotate-45" />
-
-        {/* Bottom Right Float */}
-        <div className="absolute bottom-[20%] right-[15%] w-2 h-2 bg-emerald-400 rounded-full animate-[ping_4s_ease-in-out_infinite_1s]" />
-        <div className="absolute bottom-[25%] right-[20%] w-12 h-0.5 bg-emerald-500/20 -rotate-12" />
-
-        {/* Center Right Float */}
-        <div className="absolute top-[40%] right-[10%] w-1 h-1 bg-white/50 rounded-full animate-pulse shadow-[0_0_10px_white]" />
-      </div>
-
       {/* 3. Ambient Glows (Deepened for tech contrast) */}
       <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-blue-600/10 blur-[140px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-600/10 blur-[140px] pointer-events-none" />
