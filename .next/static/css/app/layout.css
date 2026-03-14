@@ -2828,6 +2828,11 @@ video {
   --tw-shadow-colored: 0 -20px 100px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
+.shadow-\[0_-50px_100px_rgba\(0\2c 0\2c 0\2c 0\.9\)\] {
+  --tw-shadow: 0 -50px 100px rgba(0,0,0,0.9);
+  --tw-shadow-colored: 0 -50px 100px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
 .shadow-blue-400\/60 {
   --tw-shadow-color: rgb(96 165 250 / 0.6);
   --tw-shadow: var(--tw-shadow-colored);

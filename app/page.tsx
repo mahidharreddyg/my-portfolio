@@ -148,15 +148,19 @@ export default function Home() {
                   <Projects />
                 </div>
 
-                {/* 4. CERTIFICATIONS - z40 (Stacks OVER Projects) */}
-                <div id="certifications" className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-t-[3rem] md:rounded-t-[4rem] bg-zinc-950 shadow-[0_-20px_100px_rgba(0,0,0,0.9)] border-t border-white/5 z-40 overflow-hidden">
-                  <Certifications />
+                {/* 4. CERTIFICATIONS - z40 (Stacks OVER Projects, then PEELS OFF to reveal Footer) */}
+                <div className="relative h-[135vh] z-40 mt-[-100vh] bg-black">
+                  <div id="certifications" className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-t-[3rem] md:rounded-t-[4rem] bg-zinc-950 shadow-[0_-50px_100px_rgba(0,0,0,0.9)] border-t border-white/5 overflow-hidden">
+                    <Certifications />
+                  </div>
                 </div>
 
-                {/* 5. FOOTER - z50 */}
-                <div id="footer" className="relative h-screen sm:h-[60vh] md:h-[50vh] w-full flex flex-col justify-end bg-black shadow-[0_-20px_100px_rgba(0,0,0,1)] border-t border-white/10 z-50">
-                  <div className="w-full h-full">
-                    <Footer />
+                {/* 5. FOOTER - z35 (Revealed by Certifications peeling away) */}
+                <div className="relative z-35 mt-[-100vh]">
+                  <div id="footer" className="relative h-screen sm:h-[60vh] md:h-[50vh] w-full flex flex-col justify-end bg-black shadow-[0_-20px_100px_rgba(0,0,0,1)] border-t border-white/10">
+                    <div className="w-full h-full overflow-hidden">
+                      <Footer />
+                    </div>
                   </div>
                 </div>
 
