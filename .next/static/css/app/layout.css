@@ -637,6 +637,9 @@ video {
 .inset-\[-10\%\] {
   inset: -10%;
 }
+.inset-\[-15\%\] {
+  inset: -15%;
+}
 .inset-x-0 {
   left: 0px;
   right: 0px;
@@ -2032,6 +2035,9 @@ video {
   --tw-bg-opacity: 1;
   background-color: rgb(9 9 11 / var(--tw-bg-opacity, 1));
 }
+.bg-\[\#020617\]\/40 {
+  background-color: rgb(2 6 23 / 0.4);
+}
 .bg-\[linear-gradient\(90deg\2c transparent_0\%\2c \#4facfe20_30\%\2c transparent_70\%\)\] {
   background-image: linear-gradient(90deg,transparent 0%,#4facfe20 30%,transparent 70%);
 }
@@ -2731,6 +2737,9 @@ video {
 }
 .opacity-10 {
   opacity: 0.1;
+}
+.opacity-\[0\.08\] {
+  opacity: 0.08;
 }
 .mix-blend-screen {
   mix-blend-mode: screen;

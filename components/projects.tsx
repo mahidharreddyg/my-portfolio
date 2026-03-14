@@ -325,7 +325,7 @@ export default function Projects() {
       <style>{`@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@700;800&display=swap');`}</style>
 
       <div ref={sectionRef} className="relative h-full w-full">
-        <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-t-[3rem] md:rounded-t-[4rem] bg-[#020617] shadow-[0_-20px_60px_rgba(0,0,0,0.8)] border-t border-white/5 overflow-hidden">
+        <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-t-[3rem] md:rounded-t-[4rem] bg-black border-t border-white/5 overflow-hidden">
 
           <style>{`
             @keyframes nebula-float {
@@ -344,33 +344,34 @@ export default function Projects() {
           `}</style>
 
           {/* ── Background layers ── */}
-          {/* Base Layer */}
-          <div className="absolute inset-0 bg-[#020617]" />
+          {/* Seamless Base Layer - Matches Page Background */}
+          <div className="absolute inset-0 bg-black" />
+          <div className="absolute inset-0 bg-[#020617]/40" />
 
           {/* Optimized Single-Layer Nebula Background */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none transform-gpu will-change-transform">
-            <div className="absolute inset-[-10%] opacity-40 nebula-layer" style={{
-              background: `radial-gradient(circle at 20% 30%, rgba(30, 58, 138, 0.45) 0%, transparent 50%),
-                           radial-gradient(circle at 80% 70%, rgba(15, 23, 42, 0.3) 0%, transparent 60%)`,
-              animation: 'nebula-float 30s infinite ease-in-out alternate'
+            <div className="absolute inset-[-15%] opacity-30 nebula-layer" style={{
+              background: `radial-gradient(circle at 20% 40%, rgba(30, 58, 138, 0.35) 0%, transparent 60%),
+                           radial-gradient(circle at 80% 60%, rgba(15, 23, 42, 0.25) 0%, transparent 70%)`,
+              animation: 'nebula-float 35s infinite ease-in-out alternate'
             }} />
           </div>
 
           {/* Mesh Overlay - High Performance */}
-          <div className="absolute inset-0 opacity-10 pointer-events-none transform-gpu" style={{
+          <div className="absolute inset-0 opacity-[0.08] pointer-events-none transform-gpu" style={{
             backgroundImage: `radial-gradient(rgba(255,255,255,0.05) 1px, transparent 0)`,
             backgroundSize: '48px 48px'
           }} />
 
           {/* Optimized Horizontal circuit traces */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none transform-gpu opacity-40" style={{ zIndex: 1 }}>
+          <svg className="absolute inset-0 w-full h-full pointer-events-none transform-gpu opacity-30" style={{ zIndex: 1 }}>
             {[25, 75].map((y, i) => (
               <line 
                 key={y} x1="0" y1={`${y}%`} x2="100%" y2={`${y}%`} 
                 stroke={project.accentColor} 
                 style={{ 
                   animation: `pulse-trace 8s infinite ease-in-out ${i * 2}s`,
-                  strokeDasharray: "4 80",
+                  strokeDasharray: "4 120",
                   strokeWidth: 0.5
                 }} 
               />
@@ -379,9 +380,9 @@ export default function Projects() {
 
           {/* Accent glow blob - High Contrast, Low Load */}
           <div className="absolute inset-0 pointer-events-none transition-all duration-1000 ease-in-out transform-gpu will-change-transform" style={{
-            background: `radial-gradient(circle at 30% 50%, rgba(${project.accentRgb}, 0.2), transparent 70%)`,
-            filter: 'blur(60px)',
-            opacity: 0.6,
+            background: `radial-gradient(circle at 30% 50%, rgba(${project.accentRgb}, 0.15), transparent 70%)`,
+            filter: 'blur(80px)',
+            opacity: 0.5,
             zIndex: 1
           }} />
 
@@ -574,11 +575,10 @@ export default function Projects() {
             ))}
           </div>
 
-          {/* ── Bottom terminal bar ── */}
-          <div className="absolute bottom-0 left-0 right-0 h-7 flex items-center px-8 gap-6 z-50" style={{
-            background: "rgba(0,0,0,0.6)",
-            borderTop: `1px solid rgba(${project.accentRgb},0.12)`,
-            backdropFilter: "blur(4px)",
+          {/* ── Bottom terminal bar - Refined to be Seamless ── */}
+          <div className="absolute bottom-0 left-0 right-0 h-10 flex items-center px-8 gap-6 z-50" style={{
+            background: "linear-gradient(to top, rgba(0,0,0,0.4), transparent)",
+            backdropFilter: "blur(2px)",
           }}>
             <span className="text-[9px]" style={{ color: `rgba(${project.accentRgb},0.7)`, fontFamily: "monospace" }}>
               PROJECTS.TSX
