@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useTransition } from "react";
 
 /* ─────────────────────────────────────────────────────────────
    GLASS
@@ -85,7 +85,7 @@ const ALL_TECH = [...TECH_ROW_1, ...TECH_ROW_2, ...TECH_ROW_3, ...TECH_ROW_4];
 
 const projects = [
   {
-    id: 1, name: "StarForge", subtitle: "AI SaaS Template", year: "2024", type: "SaaS Product",
+    id: 1, name: "StarForge", subtitle: "AI SaaS Template", year: "2024", type: "SaaS Product", category: "UI UX",
     status: "DEPLOYED", ping: "42ms", commits: "347",
     description: "A sleek and modern AI SaaS landing page built for performance and visual impact. Smooth parallax interactions that captivate users from the first scroll.",
     bullets: ["Built with React and Vite for fast, scalable development", "Fully responsive layouts via Tailwind CSS", "Smooth animations with react-just-parallax"],
@@ -96,7 +96,7 @@ const projects = [
     hexCoord: "0x4F2A",
   },
   {
-    id: 2, name: "RuneAI", subtitle: "Intelligent AI Assistant", year: "2024", type: "AI Application",
+    id: 2, name: "RuneAI", subtitle: "Intelligent AI Assistant", year: "2024", type: "AI Application", category: "AI/ML",
     status: "LIVE", ping: "18ms", commits: "892",
     description: "AI assistant with RAG system, three specialized models and 500K context limit. Advanced Web Search and intelligent Tool Calling automation.",
     bullets: ["Three models: Fast (Groq), Thinking (Gemini), and Pro", "500K context limit for deep document analysis", "Advanced Web Search with automated Tool Calling"],
@@ -107,7 +107,40 @@ const projects = [
     hexCoord: "0x7C1E",
   },
   {
-    id: 3, name: "SUS Goals", subtitle: "Sustainability Platform", year: "2023", type: "Side Project",
+    id: 3, name: "Neural Link", subtitle: "Brain-Computer Interface Spec", year: "2024", type: "Research Prototype", category: "AI/ML",
+    status: "ALPHA", ping: "12ms", commits: "124",
+    description: "Real-time EEG data processing dashboard. Visualizing neural pathways and cognitive load using advanced signal processing and deep learning.",
+    bullets: ["Real-time data streaming from OpenBCI hardware", "Cognitive state classification using CNN-LSTM", "Interactive 3D brain map visualization"],
+    usedTech: ["Python", "PyTorch", "OpenCV", "MySQL", "React", "TypeScript", "Framer Motion"],
+    accentColor: "#0ea5e9", accentRgb: "14,165,233", bgGlow: "rgba(14,165,233,0.12)",
+    tagActive: { bg: "rgba(14,165,233,0.15)", border: "rgba(14,165,233,0.5)", text: "#7dd3fc" },
+    cardGrad: "linear-gradient(145deg,#00081a 0%,#001e4a 45%,#074d91 75%,#0ea5e9 100%)",
+    hexCoord: "0x9E2D",
+  },
+  {
+    id: 4, name: "OmniShop", subtitle: "Next-Gen E-Commerce", year: "2024", type: "Full-Stack Web App", category: "Full Stack",
+    status: "BETA", ping: "25ms", commits: "512",
+    description: "Multi-vendor marketplace with real-time inventory sync and AI-generated product descriptions. High-performance storefront with localized experience.",
+    bullets: ["End-to-end encryption for secure transactions", "Real-time inventory management with Redis", "Scalable microservices architecture via AWS"],
+    usedTech: ["Next.js", "Express.js", "Node.js", "PostgreSQL", "Redis", "AWS", "Framer Motion"],
+    accentColor: "#8b5cf6", accentRgb: "139,92,246", bgGlow: "rgba(139,92,246,0.15)",
+    tagActive: { bg: "rgba(139,92,246,0.15)", border: "rgba(139,92,246,0.5)", text: "#c084fc" },
+    cardGrad: "linear-gradient(145deg,#0a011a 0%,#2e1065 45%,#5b21b6 75%,#8b5cf6 100%)",
+    hexCoord: "0xFC3A",
+  },
+  {
+    id: 5, name: "ZenSpace", subtitle: "Mindfulness Experience", year: "2023", type: "Design Concept", category: "UI UX",
+    status: "CONCEPT", ping: "0ms", commits: "0",
+    description: "Ultra-minimalist meditation app focusing on spatial soundscapes and haptic feedback. A masterclass in whitespace and motion design.",
+    bullets: ["Neumorphic UI components with glass textures", "Generative audio environments", "Custom interactions designed in Figma"],
+    usedTech: ["Figma", "React", "Framer Motion", "Tailwind CSS"],
+    accentColor: "#a855f7", accentRgb: "168,85,247", bgGlow: "rgba(168,85,247,0.15)",
+    tagActive: { bg: "rgba(168,85,247,0.15)", border: "rgba(168,85,247,0.5)", text: "#d8b4fe" },
+    cardGrad: "linear-gradient(145deg,#05010a 0%,#2a0d45 45%,#6b21a8 75%,#a855f7 100%)",
+    hexCoord: "0xA8F7",
+  },
+  {
+    id: 6, name: "SUS Goals", subtitle: "Sustainability Platform", year: "2023", type: "Side Project", category: "Full Stack",
     status: "STABLE", ping: "67ms", commits: "214",
     description: "College project promoting SDGs. Daily eco-tasks for users with a live global counter tracking sustainable actions worldwide.",
     bullets: ["Daily SDG tasks promoting sustainable habits", "Global counter tracking eco-actions in real time", "AI-powered personalised recommendations"],
@@ -264,7 +297,58 @@ function ProjectCard({ p }: { p: typeof projects[0] }) {
 export default function Projects() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
-  const [tick, setTick] = useState(0); // for blinking cursor
+  const [tick, setTick] = useState(0);
+  const [activeCategory, setActiveCategory] = useState<string>("Full Stack");
+  const [, startTransition] = useTransition();
+
+  /* ── Toggle pill state ── */
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [pillLeft, setPillLeft] = useState(0);
+  const [pillWidth, setPillWidth] = useState(0);
+
+  const categories = ["Full Stack", "AI/ML", "UI UX"];
+
+  const handleCategoryChange = (cat: string) => {
+    if (cat === activeCategory) return;
+    startTransition(() => {
+      setActiveCategory(cat);
+    });
+  };
+
+  /* Update pill position whenever activeCategory changes */
+  useEffect(() => {
+    const idx = categories.indexOf(activeCategory);
+    const tab = tabRefs.current[idx];
+    const wrap = wrapRef.current;
+    if (!tab || !wrap) return;
+    const wR = wrap.getBoundingClientRect();
+    const tR = tab.getBoundingClientRect();
+    setPillLeft(tR.left - wR.left);
+    setPillWidth(tR.width);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeCategory]);
+
+  /* Also set pill on mount & resize */
+  useEffect(() => {
+    const update = () => {
+      const idx = categories.indexOf(activeCategory);
+      const tab = tabRefs.current[idx];
+      const wrap = wrapRef.current;
+      if (!tab || !wrap) return;
+      const wR = wrap.getBoundingClientRect();
+      const tR = tab.getBoundingClientRect();
+      setPillLeft(tR.left - wR.left);
+      setPillWidth(tR.width);
+    };
+    // slight delay so layout is settled
+    const t = setTimeout(update, 30);
+    window.addEventListener("resize", update);
+    return () => { clearTimeout(t); window.removeEventListener("resize", update); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const filteredProjects = projects.filter(p => p.category === activeCategory);
 
   useEffect(() => {
     const onScroll = () => {
@@ -273,21 +357,12 @@ export default function Projects() {
       const rect = s.getBoundingClientRect();
       const sectionHeight = s.offsetHeight;
       const viewportHeight = window.innerHeight;
-
-      // Implementation of "Reveal-Wait" pacing:
-      // total scroll = 500vh parent height
-      // 0 - 100vh: Skills peels away (reveal deadzone)
-      // 100vh - 400vh: Projects cycle (internal focus)
-      // 400vh - 500vh: Projects stay static on SUS Goals (lock deadzone)
-      
       const scrolled = -rect.top;
       const totalScrollable = sectionHeight - viewportHeight;
-      const revealZone = viewportHeight; // Wait for previous section to peel away
-      const exitZone = viewportHeight;   // Wait before next section covers us
-      
+      const revealZone = viewportHeight;
+      const exitZone = viewportHeight;
       const activeScroll = Math.max(0, scrolled - revealZone);
       const activeTotal = totalScrollable - revealZone - exitZone;
-
       const p = activeTotal > 0 ? Math.min(Math.max(0, activeScroll / activeTotal), 1) : 0;
       setProgress(p);
     };
@@ -296,28 +371,28 @@ export default function Projects() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Blinking cursor
   useEffect(() => {
     const id = setInterval(() => setTick(t => t + 1), 600);
     return () => clearInterval(id);
   }, []);
 
-  const N = projects.length;
+  const N = filteredProjects.length;
   const scaled = progress * N;
   const activeIndex = Math.min(Math.floor(scaled), N - 1);
   const slot = scaled - activeIndex;
 
-  const project = projects[activeIndex];
+  const project = filteredProjects[activeIndex];
   if (!project) return null;
-  const next = projects[activeIndex + 1] ?? null;
+  const next = filteredProjects[activeIndex + 1] ?? null;
 
-  // Outgoing slides DOWN — pushed out the bottom as incoming rises up
   const outY = `${slot * 30}%`;
   const outScale = 1 - slot * 0.06;
   const outOpacity = 1 - slot * 0.55;
   const inY = next ? `${(1 - slot) * 100}vh` : undefined;
 
   const cursor = tick % 2 === 0 ? "█" : " ";
+
+  const activeIdx = categories.indexOf(activeCategory);
 
   return (
     <>
@@ -341,14 +416,19 @@ export default function Projects() {
               filter: blur(120px);
               mix-blend-mode: screen;
             }
+            @keyframes pillSqueeze {
+              0%   { transform: scaleX(1)    scaleY(1);   }
+              25%  { transform: scaleX(1.05) scaleY(0.91);}
+              60%  { transform: scaleX(0.97) scaleY(1.04);}
+              85%  { transform: scaleX(1.01) scaleY(0.99);}
+              100% { transform: scaleX(1)    scaleY(1);   }
+            }
           `}</style>
 
           {/* ── Background layers ── */}
-          {/* Seamless Base Layer - Matches Page Background */}
           <div className="absolute inset-0 bg-black" />
           <div className="absolute inset-0 bg-[#020617]/40" />
 
-          {/* Optimized Single-Layer Nebula Background */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none transform-gpu will-change-transform">
             <div className="absolute inset-[-15%] opacity-30 nebula-layer" style={{
               background: `radial-gradient(circle at 20% 40%, rgba(30, 58, 138, 0.35) 0%, transparent 60%),
@@ -357,28 +437,25 @@ export default function Projects() {
             }} />
           </div>
 
-          {/* Mesh Overlay - High Performance */}
           <div className="absolute inset-0 opacity-[0.08] pointer-events-none transform-gpu" style={{
             backgroundImage: `radial-gradient(rgba(255,255,255,0.05) 1px, transparent 0)`,
             backgroundSize: '48px 48px'
           }} />
 
-          {/* Optimized Horizontal circuit traces */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none transform-gpu opacity-30" style={{ zIndex: 1 }}>
             {[25, 75].map((y, i) => (
-              <line 
-                key={y} x1="0" y1={`${y}%`} x2="100%" y2={`${y}%`} 
-                stroke={project.accentColor} 
-                style={{ 
+              <line
+                key={y} x1="0" y1={`${y}%`} x2="100%" y2={`${y}%`}
+                stroke={project.accentColor}
+                style={{
                   animation: `pulse-trace 8s infinite ease-in-out ${i * 2}s`,
                   strokeDasharray: "4 120",
                   strokeWidth: 0.5
-                }} 
+                }}
               />
             ))}
           </svg>
 
-          {/* Accent glow blob - High Contrast, Low Load */}
           <div className="absolute inset-0 pointer-events-none transition-all duration-1000 ease-in-out transform-gpu will-change-transform" style={{
             background: `radial-gradient(circle at 30% 50%, rgba(${project.accentRgb}, 0.15), transparent 70%)`,
             filter: 'blur(80px)',
@@ -392,7 +469,6 @@ export default function Projects() {
             {/* ── LEFT: card stage ── */}
             <div className="flex-shrink-0 flex flex-col gap-3" style={{ width: "45%" }}>
 
-              {/* Section header */}
               <div className="flex items-center gap-3 mb-1">
                 <div className="flex items-center gap-1.5">
                   <div className="w-1.5 h-1.5 rounded-full" style={{ background: project.accentColor, boxShadow: `0 0 6px ${project.accentColor}` }} />
@@ -406,9 +482,7 @@ export default function Projects() {
                 </span>
               </div>
 
-              {/* Card viewport */}
               <div className="relative" style={{ height: "65vh" }}>
-                {/* Outgoing */}
                 <div className="absolute inset-0" style={{
                   transform: `translateY(${outY}) scale(${outScale})`,
                   opacity: outOpacity,
@@ -417,7 +491,6 @@ export default function Projects() {
                 }}>
                   <ProjectCard p={project} />
                 </div>
-                {/* Incoming */}
                 {next && (
                   <div className="absolute inset-0" style={{
                     transform: `translateY(${inY})`,
@@ -432,7 +505,6 @@ export default function Projects() {
             {/* ── RIGHT: info panel ── */}
             <div className="flex-1 flex flex-col gap-0 self-center">
 
-              {/* Terminal breadcrumb */}
               <div className="flex items-center gap-2 mb-5 text-[10px]" style={{ fontFamily: "'JetBrains Mono',monospace", color: "rgba(255,255,255,0.2)" }}>
                 <span>~/projects/</span>
                 <GlitchText
@@ -442,7 +514,6 @@ export default function Projects() {
                 <span style={{ color: project.accentColor, opacity: 0.7 }}>{cursor}</span>
               </div>
 
-              {/* Project name */}
               <h2 className="leading-none mb-1 transition-all duration-300" style={{
                 fontSize: "clamp(2.2rem,4.5vw,4rem)",
                 color: "white",
@@ -461,7 +532,26 @@ export default function Projects() {
                 </span>
               </div>
 
-              {/* Status chips */}
+              {/* Stabilized text container to prevent vertical jumping */}
+              <div className="min-h-[220px]">
+                <p className="text-sm leading-relaxed mb-5" style={{
+                  color: "rgba(255,255,255,0.48)",
+                  fontFamily: "system-ui,sans-serif",
+                  maxWidth: "36ch",
+                }}>
+                  {project.description}
+                </p>
+
+                <div className="mb-6 flex flex-col gap-1.5">
+                  {project.bullets.map((b, i) => (
+                    <div key={i} className="flex items-start gap-2 text-[12px]" style={{ color: "rgba(255,255,255,0.5)", fontFamily: "system-ui,sans-serif" }}>
+                      <span className="mt-0.5 text-[10px]" style={{ color: project.accentColor, fontFamily: "monospace", flexShrink: 0 }}>▸</span>
+                      {b}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <div className="flex items-center gap-2 mb-5">
                 <span className="text-[10px] px-2.5 py-1 rounded" style={{
                   background: `rgba(${project.accentRgb},0.12)`,
@@ -485,25 +575,6 @@ export default function Projects() {
                 </span>
               </div>
 
-              <p className="text-sm leading-relaxed mb-5" style={{
-                color: "rgba(255,255,255,0.48)",
-                fontFamily: "system-ui,sans-serif",
-                maxWidth: "36ch",
-              }}>
-                {project.description}
-              </p>
-
-              {/* Bullet list — terminal style */}
-              <div className="mb-6 flex flex-col gap-1.5">
-                {project.bullets.map((b, i) => (
-                  <div key={i} className="flex items-start gap-2 text-[12px]" style={{ color: "rgba(255,255,255,0.5)", fontFamily: "system-ui,sans-serif" }}>
-                    <span className="mt-0.5 text-[10px]" style={{ color: project.accentColor, fontFamily: "monospace", flexShrink: 0 }}>▸</span>
-                    {b}
-                  </div>
-                ))}
-              </div>
-
-              {/* Divider with label */}
               <div className="flex items-center gap-3 mb-3">
                 <span className="text-[9px] tracking-[0.3em]" style={{ color: "rgba(255,255,255,0.18)", fontFamily: "'JetBrains Mono',monospace" }}>
                   STACK
@@ -514,8 +585,7 @@ export default function Projects() {
                 </span>
               </div>
 
-              {/* Tech tags - exact Bento cell design */}
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-1.5 mb-10">
                 {ALL_TECH.map((t) => {
                   const used = project.usedTech.includes(t);
                   return (
@@ -535,8 +605,6 @@ export default function Projects() {
                       }}
                     >
                       {used && <GlassHighlight />}
-
-                      {/* Icon Wrapper matching Bento design */}
                       <div
                         className="rounded bg-white/5 p-0.5 flex items-center justify-center shrink-0 border border-white/10"
                         style={{ width: "20px", height: "20px" }}
@@ -545,7 +613,6 @@ export default function Projects() {
                           <TechLogo name={t} />
                         </span>
                       </div>
-
                       <span className="text-[10px] font-semibold whitespace-nowrap" style={{ fontFamily: "'JetBrains Mono',monospace", opacity: used ? 0.95 : 0.4 }}>
                         {t}
                       </span>
@@ -553,12 +620,124 @@ export default function Projects() {
                   );
                 })}
               </div>
+
+              {/* ── CATEGORY TOGGLE ── */}
+              <div
+                ref={wrapRef}
+                className="relative inline-flex items-stretch self-center mt-6"
+                style={{
+                  padding: 5,
+                  borderRadius: 18,
+                  background: "transparent",
+                  border: "1px solid rgba(255,255,255,0.13)",
+                }}
+              >
+                {/* Top caustic highlight on the outer shell */}
+                <div
+                  className="absolute pointer-events-none z-10"
+                  style={{
+                    top: 0, left: 18, right: 18, height: 1,
+                    background: "linear-gradient(90deg,transparent,rgba(255,255,255,0.4) 30%,rgba(255,255,255,0.55) 50%,rgba(255,255,255,0.4) 70%,transparent)",
+                  }}
+                />
+
+                {/* Liquid glass pill */}
+                <div
+                  className="absolute pointer-events-none z-[1]"
+                  style={{
+                    top: 4,
+                    bottom: 4,
+                    borderRadius: 10,
+                    left: pillLeft,
+                    width: pillWidth,
+                    background: "linear-gradient(175deg,rgba(255,255,255,0.22) 0%,rgba(255,255,255,0.08) 40%,rgba(255,255,255,0.04) 65%,rgba(255,255,255,0.14) 100%)",
+                    border: "1px solid rgba(255,255,255,0.3)",
+                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5),inset 0 -1px 0 rgba(0,0,0,0.3),inset 1px 0 0 rgba(255,255,255,0.1),inset -1px 0 0 rgba(255,255,255,0.1),0 6px 28px rgba(0,0,0,0.45),0 2px 6px rgba(0,0,0,0.3)",
+                    backdropFilter: "blur(28px)",
+                    WebkitBackdropFilter: "blur(28px)",
+                    transition: "left 0.4s cubic-bezier(0.34,1.44,0.64,1),width 0.4s cubic-bezier(0.34,1.44,0.64,1)",
+                    animation: "pillSqueeze 0.4s cubic-bezier(0.34,1.44,0.64,1)",
+                  }}
+                >
+                  {/* Pill inner top gleam */}
+                  <div
+                    className="absolute pointer-events-none"
+                    style={{
+                      top: 1, left: 14, right: 14, height: 1,
+                      background: "linear-gradient(90deg,transparent,rgba(255,255,255,0.6) 30%,rgba(255,255,255,0.92) 50%,rgba(255,255,255,0.6) 70%,transparent)",
+                      borderRadius: 1,
+                    }}
+                  />
+                  {/* Pill bottom refraction */}
+                  <div
+                    className="absolute pointer-events-none"
+                    style={{
+                      bottom: 2, left: 22, right: 22, height: 0.5,
+                      background: "linear-gradient(90deg,transparent,rgba(255,255,255,0.18) 50%,transparent)",
+                    }}
+                  />
+                </div>
+
+                {/* Tabs + separators */}
+                {categories.map((cat, i) => {
+                  const hideSep = i > 0 && (i === activeIdx || i === activeIdx + 1);
+                  return (
+                    <React.Fragment key={cat}>
+                      {/* Separator line between tabs */}
+                      {i > 0 && (
+                        <div
+                          style={{
+                            width: 1,
+                            alignSelf: "stretch",
+                            margin: "10px 0",
+                            flexShrink: 0,
+                            pointerEvents: "none",
+                            background: "linear-gradient(180deg,transparent,rgba(255,255,255,0.18) 30%,rgba(255,255,255,0.22) 50%,rgba(255,255,255,0.18) 70%,transparent)",
+                            opacity: hideSep ? 0 : 1,
+                            transition: "opacity 0.3s ease",
+                          }}
+                        />
+                      )}
+
+                      <button
+                        ref={(el) => { tabRefs.current[i] = el; }}
+                        onClick={() => handleCategoryChange(cat)}
+                        style={{
+                          position: "relative",
+                          zIndex: 2,
+                          border: "none",
+                          background: "transparent",
+                          cursor: "pointer",
+                          outline: "none",
+                          borderRadius: 11,
+                          flex: 1,
+                          minWidth: 150,
+                          height: 38,
+                          fontFamily: "'JetBrains Mono',monospace",
+                          fontSize: 11,
+                          fontWeight: 700,
+                          letterSpacing: "0.18em",
+                          whiteSpace: "nowrap",
+                          userSelect: "none",
+                          color: cat === activeCategory ? "rgba(255,255,255,1)" : "rgba(255,255,255,0.35)",
+                          textShadow: cat === activeCategory ? "0 1px 12px rgba(255,255,255,0.4)" : "none",
+                          transition: "color 0.3s ease,text-shadow 0.3s ease",
+                        }}
+                      >
+                        {cat.toUpperCase()}
+                      </button>
+                    </React.Fragment>
+                  );
+                })}
+              </div>
+              {/* ── END CATEGORY TOGGLE ── */}
+
             </div>
           </div>
 
           {/* ── Side scroll bar ── */}
           <div className="absolute right-5 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-50">
-            {projects.map((p, i) => (
+            {filteredProjects.map((p, i) => (
               <div key={i} className="flex flex-col items-center gap-1">
                 {i === activeIndex && (
                   <span className="text-[8px] mb-1" style={{ color: p.accentColor, fontFamily: "monospace", writingMode: "vertical-rl" }}>
@@ -575,16 +754,16 @@ export default function Projects() {
             ))}
           </div>
 
-          {/* ── Bottom terminal bar - Refined to be Seamless ── */}
+          {/* ── Bottom terminal bar ── */}
           <div className="absolute bottom-0 left-0 right-0 h-10 flex items-center px-8 gap-6 z-50" style={{
             background: "linear-gradient(to top, rgba(0,0,0,0.4), transparent)",
             backdropFilter: "blur(2px)",
           }}>
             <span className="text-[9px]" style={{ color: `rgba(${project.accentRgb},0.7)`, fontFamily: "monospace" }}>
-              PROJECTS.TSX
+              PROJECTS.TSX // {activeCategory.toUpperCase()}
             </span>
             <span className="text-[9px]" style={{ color: "rgba(255,255,255,0.15)", fontFamily: "monospace" }}>
-              {project.name.toUpperCase()} · {project.type.toUpperCase()} · {project.year}
+              {project.name.toUpperCase()} · {project.type.toUpperCase()} · v2.0
             </span>
             <div className="flex-1" />
             <span className="text-[9px]" style={{ color: "rgba(255,255,255,0.15)", fontFamily: "monospace" }}>
