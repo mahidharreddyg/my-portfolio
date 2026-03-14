@@ -274,12 +274,21 @@ export default function Projects() {
       const sectionHeight = s.offsetHeight;
       const viewportHeight = window.innerHeight;
 
-      // Calculate how far we are into the 300vh section
-      // rect.top is current distance from viewport top
+      // Implementation of "Reveal-Wait" pacing:
+      // total scroll = 500vh parent height
+      // 0 - 100vh: Skills peels away (reveal deadzone)
+      // 100vh - 400vh: Projects cycle (internal focus)
+      // 400vh - 500vh: Projects stay static on SUS Goals (lock deadzone)
+      
       const scrolled = -rect.top;
-      const total = sectionHeight - viewportHeight;
+      const totalScrollable = sectionHeight - viewportHeight;
+      const revealZone = viewportHeight; // Wait for previous section to peel away
+      const exitZone = viewportHeight;   // Wait before next section covers us
+      
+      const activeScroll = Math.max(0, scrolled - revealZone);
+      const activeTotal = totalScrollable - revealZone - exitZone;
 
-      const p = Math.min(Math.max(0, scrolled / total), 1);
+      const p = activeTotal > 0 ? Math.min(Math.max(0, activeScroll / activeTotal), 1) : 0;
       setProgress(p);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -299,6 +308,7 @@ export default function Projects() {
   const slot = scaled - activeIndex;
 
   const project = projects[activeIndex];
+  if (!project) return null;
   const next = projects[activeIndex + 1] ?? null;
 
   // Outgoing slides DOWN — pushed out the bottom as incoming rises up
@@ -314,33 +324,65 @@ export default function Projects() {
       {/* Font import */}
       <style>{`@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@700;800&display=swap');`}</style>
 
-      <div ref={sectionRef} className="relative h-full w-full overflow-visible">
-        <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-t-[3rem] md:rounded-t-[4rem] bg-black shadow-[0_-20px_60px_rgba(0,0,0,0.8)] border-t border-white/5 overflow-hidden">
+      <div ref={sectionRef} className="relative h-full w-full">
+        <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-t-[3rem] md:rounded-t-[4rem] bg-[#020617] shadow-[0_-20px_60px_rgba(0,0,0,0.8)] border-t border-white/5 overflow-hidden">
+
+          <style>{`
+            @keyframes nebula-float {
+              0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+              33% { transform: translate(5%, -5%) scale(1.1); opacity: 0.6; }
+              66% { transform: translate(-5%, 5%) scale(0.9); opacity: 0.3; }
+            }
+            @keyframes pulse-trace {
+              0%, 100% { opacity: 0.03; stroke-width: 0.5; }
+              50% { opacity: 0.08; stroke-width: 1.2; }
+            }
+            .nebula-layer {
+              filter: blur(120px);
+              mix-blend-mode: screen;
+            }
+          `}</style>
 
           {/* ── Background layers ── */}
-          <div className="absolute inset-0" style={{
-            background: "linear-gradient(145deg,#020c1b 0%,#040e24 40%,#06101e 70%,#020a14 100%)",
+          {/* Base Layer */}
+          <div className="absolute inset-0 bg-[#020617]" />
+
+          {/* Optimized Single-Layer Nebula Background */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none transform-gpu will-change-transform">
+            <div className="absolute inset-[-10%] opacity-40 nebula-layer" style={{
+              background: `radial-gradient(circle at 20% 30%, rgba(30, 58, 138, 0.45) 0%, transparent 50%),
+                           radial-gradient(circle at 80% 70%, rgba(15, 23, 42, 0.3) 0%, transparent 60%)`,
+              animation: 'nebula-float 30s infinite ease-in-out alternate'
+            }} />
+          </div>
+
+          {/* Mesh Overlay - High Performance */}
+          <div className="absolute inset-0 opacity-10 pointer-events-none transform-gpu" style={{
+            backgroundImage: `radial-gradient(rgba(255,255,255,0.05) 1px, transparent 0)`,
+            backgroundSize: '48px 48px'
           }} />
 
-          {/* Circuit-board dot grid */}
-          <div className="absolute inset-0 pointer-events-none" style={{
-            backgroundImage: "radial-gradient(circle,rgba(255,255,255,0.045) 1px,transparent 1px)",
-            backgroundSize: "32px 32px",
-          }} />
-
-          {/* Horizontal circuit traces */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ opacity: 0.04 }}>
-            {[15, 35, 55, 70, 85].map(y => (
-              <line key={y} x1="0" y1={`${y}%`} x2="100%" y2={`${y}%`} stroke={project.accentColor} strokeWidth="1" strokeDasharray="4 40" />
-            ))}
-            {[10, 30, 60, 80].map(x => (
-              <line key={x} x1={`${x}%`} y1="0" x2={`${x}%`} y2="100%" stroke={project.accentColor} strokeWidth="1" strokeDasharray="4 60" />
+          {/* Optimized Horizontal circuit traces */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none transform-gpu opacity-40" style={{ zIndex: 1 }}>
+            {[25, 75].map((y, i) => (
+              <line 
+                key={y} x1="0" y1={`${y}%`} x2="100%" y2={`${y}%`} 
+                stroke={project.accentColor} 
+                style={{ 
+                  animation: `pulse-trace 8s infinite ease-in-out ${i * 2}s`,
+                  strokeDasharray: "4 80",
+                  strokeWidth: 0.5
+                }} 
+              />
             ))}
           </svg>
 
-          {/* Accent glow blob */}
-          <div className="absolute inset-0 pointer-events-none transition-all duration-700" style={{
-            background: `radial-gradient(ellipse 55% 70% at 25% 50%,${project.bgGlow},transparent 65%)`,
+          {/* Accent glow blob - High Contrast, Low Load */}
+          <div className="absolute inset-0 pointer-events-none transition-all duration-1000 ease-in-out transform-gpu will-change-transform" style={{
+            background: `radial-gradient(circle at 30% 50%, rgba(${project.accentRgb}, 0.2), transparent 70%)`,
+            filter: 'blur(60px)',
+            opacity: 0.6,
+            zIndex: 1
           }} />
 
           {/* ── CONTENT ── */}
