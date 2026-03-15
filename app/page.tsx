@@ -129,9 +129,9 @@ export default function Home() {
                   (Hardware-accelerated and buttery smooth, no scroll trapping)
                   ========================================= */}
               <div className="relative w-full bg-black">
-                
+
                 {/* 1. EXPERIENCE - z10 */}
-                <div id="experience" className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-t-[3rem] md:rounded-t-[4rem] bg-black shadow-[0_20px_100px_rgba(0,0,0,0.9)] border-t border-white/5 z-10 overflow-hidden">
+                <div id="experience" className="relative w-full z-10">
                   <Experience />
                 </div>
 
