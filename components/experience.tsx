@@ -23,6 +23,8 @@ interface Entry {
   color: string;
   logo?: string; // URL — drop your logo URLs here later
   href?: string; // page to open on click
+  logoScale?: number;
+  orgLabel?: string;
 }
 
 const ENTRIES: Entry[] = [
@@ -39,8 +41,9 @@ const ENTRIES: Entry[] = [
     desc: "Completed ICSE secondary education. Built a strong foundation in science, mathematics, and computer science fundamentals over a decade of schooling.",
     tags: ["Mathematics", "Science", "Computer Science", "English"],
     color: "#38bdf8",
-    logo: "",
+    logo: "/icons/skps.svg",
     href: "/experience/sri-kumaran",
+    logoScale: 1.3,
   },
   {
     id: 2,
@@ -55,8 +58,9 @@ const ENTRIES: Entry[] = [
     desc: "Completed higher secondary education under the CBSE curriculum with a focus on PCM (Physics, Chemistry, Mathematics) and Computer Science.",
     tags: ["Physics", "Chemistry", "Mathematics", "Computer Science"],
     color: "#f472b6",
-    logo: "",
+    logo: "/icons/nehru.svg",
     href: "/experience/nehru-smaraka",
+    logoScale: 1.25,
   },
   {
     id: 3,
@@ -71,15 +75,16 @@ const ENTRIES: Entry[] = [
     desc: "Pursuing BTech in Computer Science. Active member of Entrepreneurship Cell VIT and Apple Developer's Group VIT. Focused on software engineering and product development.",
     tags: ["DSA", "OS", "DBMS", "Swift", "Problem Solving"],
     color: "#a78bfa",
-    logo: "",
+    logo: "/icons/vit.svg",
     href: "/experience/vit",
+    logoScale: 1.25,
   },
   {
     id: 4,
     kind: "work",
     year: "2024",
     role: "Software Developer Intern",
-    org: "Synclovis Systems Pvt. Ltd.",
+    org: "Synclovis Systems.",
     period: "Jun 2024 — Sep 2024",
     location: "Bengaluru, India",
     duration: "4m",
@@ -89,7 +94,7 @@ const ENTRIES: Entry[] = [
     desc: "On-site internship building production features for real-world software systems. Gained hands-on exposure to professional engineering workflows and collaborative development.",
     tags: ["Software Development", "On-site", "Bengaluru"],
     color: "#34d399",
-    logo: "",
+    logo: "/icons/Synclovis.svg",
     href: "/experience/synclovis",
   },
   {
@@ -98,6 +103,7 @@ const ENTRIES: Entry[] = [
     year: "2024",
     role: "Director of Creativity",
     org: "Entrepreneurship Cell, VIT",
+    orgLabel: "student organisation",
     period: "Jul 2024 — Jul 2025",
     location: "VIT, Vellore",
     duration: "1y",
@@ -107,8 +113,9 @@ const ENTRIES: Entry[] = [
     desc: "Led the creative direction for one of VIT's most active student organizations. Drove design, branding, and event experiences for entrepreneurship initiatives across campus.",
     tags: ["Leadership", "Branding", "Design", "Event Management"],
     color: "#fb923c",
-    logo: "",
+    logo: "/icons/ecell vit.svg",
     href: "/experience/ecell-vit",
+    logoScale: 1.2,
   },
 ];
 
@@ -216,8 +223,14 @@ function EntryCard({ entry }: { entry: Entry }) {
 
         {/* Logo slot — top-right */}
         <div className="ec-logo-wrap">
+          <div className={`ec-logo-shimmer ${hov ? "active" : ""}`} />
           {entry.logo ? (
-            <img src={entry.logo} alt={entry.org} className="ec-logo-img" />
+            <img
+              src={entry.logo}
+              alt={entry.org}
+              className="ec-logo-img"
+              style={{ transform: entry.logoScale ? `scale(${entry.logoScale})` : "none" }}
+            />
           ) : (
             <LogoPlaceholder entry={entry} />
           )}
@@ -242,7 +255,7 @@ function EntryCard({ entry }: { entry: Entry }) {
           <div className="ec-org-wrap">
             <div className="ec-org-line" />
             <div className="ec-org-inner">
-              <span className="ec-org-label">{entry.kind === "work" ? "company" : "institution"}</span>
+              <span className="ec-org-label">{entry.orgLabel || (entry.kind === "work" ? "company" : "institution")}</span>
               <span className="ec-org-name">{entry.org}</span>
             </div>
           </div>
@@ -630,13 +643,13 @@ export default function ExperienceSection() {
           transform-style: preserve-3d;
         }
         .ec-card.hov {
-          border-color: rgba(var(--rgb), 0.7);
+          border-color: rgba(255, 255, 255, 0.4);
           box-shadow:
-            0 45px 80px rgba(0, 0, 0, 0.7),
-            0 15px 30px rgba(0, 0, 0, 0.4),
-            inset 0 1px 0 rgba(255, 255, 255, 0.3),
-            0 0 0 1px rgba(var(--rgb), 0.3),
-            0 0 60px rgba(var(--rgb),0.2);
+            0 45px 80px rgba(0, 0, 0, 0.8),
+            0 15px 30px rgba(0, 0, 0, 0.5),
+            inset 0 1px 0 rgba(255, 255, 255, 0.4),
+            0 0 0 1px rgba(255, 255, 255, 0.1),
+            0 0 60px rgba(200, 230, 255, 0.15);
           transform: translateY(-12px) scale(1.025) rotateX(1deg);
         }
 
@@ -646,9 +659,9 @@ export default function ExperienceSection() {
           background: linear-gradient(
             180deg,
             transparent 0%,
-            rgba(var(--rgb),0.06) 48%,
-            rgba(var(--rgb),0.10) 50%,
-            rgba(var(--rgb),0.06) 52%,
+            rgba(255, 255, 255, 0.04) 48%,
+            rgba(255, 255, 255, 0.12) 50%,
+            rgba(255, 255, 255, 0.04) 52%,
             transparent 100%
           );
           transition: opacity .35s;
@@ -662,10 +675,10 @@ export default function ExperienceSection() {
         /* Corner brackets — elevated glow */
         .ec-corner {
           position: absolute; width: 14px; height: 14px;
-          border-color: rgba(var(--rgb), 0.9); border-style: solid;
+          border-color: rgba(255, 255, 255, 0.8); border-style: solid;
           pointer-events: none; z-index: 6;
           animation: cornerIn .18s ease forwards;
-          filter: drop-shadow(0 0 5px rgba(var(--rgb), 0.6));
+          filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
         }
         @keyframes cornerIn {
           from { opacity: 0; transform: scale(0.6); }
@@ -701,26 +714,55 @@ export default function ExperienceSection() {
           background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
           mix-blend-mode: overlay;
         }
-        .ecl-g { position:absolute;bottom:-1px;left:8%;right:8%;height:80px;background:radial-gradient(ellipse,rgba(var(--rgb),0.20) 0%,transparent 70%);pointer-events:none;transition:opacity .4s; }
+        .ecl-g { position:absolute;bottom:-1px;left:8%;right:8%;height:80px;background:radial-gradient(ellipse,rgba(255, 255, 255, 0.12) 0%,transparent 70%);pointer-events:none;transition:opacity .4s; }
 
         /* ── LOGO SLOT ── */
         .ec-logo-wrap {
           position: absolute; top: 16px; right: 16px;
           z-index: 5; pointer-events: none;
-          width: 48px; height: 48px;
-        }
-        .ec-logo-img {
-          width: 48px; height: 48px;
-          object-fit: contain; border-radius: 11px;
+          width: 56px; height: 56px;
+          display: flex; align-items: center; justify-content: center;
+          border-radius: 14px;
           border: 1px solid rgba(255,255,255,0.15);
           background: rgba(255,255,255,0.03);
-          backdrop-filter: blur(5px);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+          backdrop-filter: blur(8px);
+          box-shadow: 
+            0 6px 16px rgba(0,0,0,0.25),
+            inset 0 1px 0 rgba(255,255,255,0.1);
+          overflow: hidden;
+        }
+        .ec-logo-shimmer {
+          position: absolute; inset: 0; z-index: 2;
+          background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0) 40%,
+            rgba(255, 255, 255, 0.3) 50%,
+            rgba(255, 255, 255, 0) 60%,
+            transparent 100%
+          );
+          transform: translateX(-150%) skewX(-25deg);
+          pointer-events: none;
+        }
+        .ec-logo-shimmer.active {
+          animation: logoShimmer 1.8s cubic-bezier(0.19, 1, 0.22, 1) infinite;
+        }
+        @keyframes logoShimmer {
+          0%   { transform: translateX(-150%) skewX(-25deg); opacity: 0; }
+          20%  { opacity: 1; }
+          80%  { opacity: 1; }
+          100% { transform: translateX(150%) skewX(-25deg); opacity: 0; }
+        }
+        .ec-logo-img {
+          width: 34px; height: 34px;
+          object-fit: contain;
+          filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+          position: relative; z-index: 1;
         }
         .ec-logo-ph {
-          width: 48px; height: 48px; border-radius: 12px;
+          width: 34px; height: 34px; border-radius: 10px;
           display: flex; align-items: center; justify-content: center;
-          font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800;
+          font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 800;
           letter-spacing: 0.5px; line-height: 1;
           background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(var(--rgb), 0.15) 100%);
           border: 1px solid rgba(var(--rgb), 0.35);
@@ -790,7 +832,7 @@ export default function ExperienceSection() {
         }
         .ec-role {
           font-family:'JetBrains Mono',monospace; font-size:11px;
-          font-weight:500; color:rgba(180,215,255,0.65); margin:0; line-height:1.2;
+          font-weight:500; color:rgba(255,255,255,0.95); margin:0; line-height:1.2;
           white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
           flex:1; min-width:0; letter-spacing:0.1px;
         }
@@ -812,10 +854,10 @@ export default function ExperienceSection() {
           color:rgba(var(--rgb),0.55);line-height:1;
         }
         .ec-org-name {
-          font-family:'Syne',sans-serif;
-          font-size:clamp(16px,1.9vw,21px); font-weight:800;
-          color:#e8f4ff; line-height:1.2; letter-spacing:-0.3px;
-          display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+          font-family: var(--font-malinton), 'Syne', sans-serif;
+          font-size: clamp(17px, 2.1vw, 24px); font-weight: 500;
+          color: #e8f4ff; line-height: 1.15; letter-spacing: 0.1px;
+          margin-top: 4px; white-space: pre-line;
         }
 
         /* Pills */
