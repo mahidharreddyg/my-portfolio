@@ -210,8 +210,11 @@ function EntryCard({ entry }: { entry: Entry }) {
         <div className="ecl-n" />
         <div className="ecl-g" style={{ opacity: hov ? 1 : 0 }} />
 
-        {/* Hover: scanline sweep overlay */}
+        {/* Tech hover layers */}
+        <div className="ecl-grid" />
         <div className="ecl-scan" style={{ opacity: hov ? 1 : 0 }} />
+        <div className="ecl-holographic-ribbon" style={{ opacity: hov ? 1 : 0 }} />
+        <div className="ecl-border-line" />
 
         {/* Hover: corner bracket indicators */}
         {hov && <>
@@ -340,13 +343,17 @@ function TimelineCanvas({ canvasRef, scrollPct, W, H }: {
     const SPREAD_DEG = 60;
     const circleCX = W * 0.54 - R;
     const circleCY = H * 0.50;
-    const activeF = scrollPct * (N - 1);
+    const progress = Math.min(1, scrollPct / 0.8);
+    const activeF = progress * (N - 1);
     const degPerEntry = SPREAD_DEG / Math.max(N - 1, 1);
+
+    const spineOffset = R * 0.03;
+    const midCX = circleCX + spineOffset / 2;
 
     const entryAngle = (i: number) => ((i - activeF) * degPerEntry) * Math.PI / 180;
     const entryPos = (i: number) => {
       const a = entryAngle(i);
-      return { x: circleCX + R * Math.cos(a), y: circleCY + R * Math.sin(a) };
+      return { x: midCX + R * Math.cos(a), y: circleCY + R * Math.sin(a) };
     };
 
     /* BG RINGS */
@@ -383,7 +390,7 @@ function TimelineCanvas({ canvasRef, scrollPct, W, H }: {
       }
     });
 
-    /* SPINE DOTS — scroll-driven travel */
+    /* SPINE DOTS — scroll-driven travel (LEFT spine) */
     const scrollShiftDeg = activeF * degPerEntry;
     for (let s = 0; s < 300; s++) {
       const baseDeg = (s / 300) * 360 - 180;
@@ -403,6 +410,27 @@ function TimelineCanvas({ canvasRef, scrollPct, W, H }: {
       const alpha = onArc ? Math.max(0.06, 0.75 - distFromActive * 0.20) : 0.04;
       ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(255,255,255,${alpha})`; ctx.fill();
+    }
+
+    /* SPINE DOTS — MIRRORED (RIGHT spine, counter-rotating) */
+    const circleCX2 = circleCX + spineOffset;
+    for (let s = 0; s < 300; s++) {
+      const baseDeg = (s / 300) * 360 - 180;
+      const shiftedDeg2 = baseDeg + scrollShiftDeg; // OPPOSITE direction
+      const wrappedDeg2 = ((shiftedDeg2 + 180) % 360 + 360) % 360 - 180;
+      const angleRad2 = wrappedDeg2 * Math.PI / 180;
+      const px2 = circleCX2 + R * Math.cos(angleRad2);
+      const py2 = circleCY + R * Math.sin(angleRad2);
+      const iF2 = activeF + wrappedDeg2 / degPerEntry;
+      const nearEntryI2 = Math.round(iF2);
+      const nearEntry2 = Math.abs(iF2 - nearEntryI2);
+      const distFromActive2 = Math.abs(wrappedDeg2) / degPerEntry;
+      const onArc2 = Math.abs(wrappedDeg2) <= SPREAD_DEG / 2 + 8;
+      const sizeBoost2 = nearEntry2 < 0.25 ? 2.5 : nearEntry2 < 0.45 ? 1.6 : 1.0;
+      const r2 = sizeBoost2 * (onArc2 ? Math.max(0.4, 1.1 - distFromActive2 * 0.08) : 0.5);
+      const alpha2 = onArc2 ? Math.max(0.06, 0.75 - distFromActive2 * 0.20) : 0.04;
+      ctx.beginPath(); ctx.arc(px2, py2, r2, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${alpha2})`; ctx.fill();
     }
 
     /* CLUSTER SCATTER */
@@ -461,7 +489,7 @@ function TimelineCanvas({ canvasRef, scrollPct, W, H }: {
       const yearSize = Math.round((isActive ? 48 : 28) * yearScale);
       const yearX = ex - (isActive ? 32 : 22);
       ctx.save();
-      ctx.font = `${isActive ? 800 : 600} ${yearSize}px 'Syne', sans-serif`;
+      ctx.font = `${isActive ? 800 : 600} ${yearSize}px 'Outfit', sans-serif`;
       ctx.textAlign = "right"; ctx.textBaseline = "middle"; ctx.globalAlpha = yearAlpha;
       ctx.fillStyle = isActive ? entry.color : "rgba(210,225,255,0.75)";
       if (isActive) { ctx.shadowBlur = 20; ctx.shadowColor = colA(0.7); }
@@ -501,7 +529,7 @@ function VerticalProgress({ scrollPct, activeI, total, activeColor }: {
       <div className="vp-track">
         <div className="vp-fill" style={{
           height: `${scrollPct * 100}%`,
-          background: `linear-gradient(180deg, ${activeColor}, #a78bfa)`,
+          background: `linear-gradient(180deg, ${activeColor}, #38bdf8)`,
           boxShadow: `0 0 8px ${activeColor}88`,
         }} />
       </div>
@@ -539,13 +567,14 @@ export default function ExperienceSection() {
   }, []);
 
   const N = ENTRIES.length;
-  const activeI = Math.min(Math.round(scrollPct * (N - 1)), N - 1);
+  const progress = Math.min(1, scrollPct / 0.8);
+  const activeI = Math.min(Math.round(progress * (N - 1)), N - 1);
   const activeEntry = ENTRIES[Math.max(0, activeI)];
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&family=Outfit:wght@400;600;700;800&display=swap');
 
         .tl-outer { position: relative; }
         .tl-sticky {
@@ -559,10 +588,10 @@ export default function ExperienceSection() {
         .tl-bg {
           position: absolute; inset: 0; z-index: 0;
           background:
-            radial-gradient(ellipse 80% 70% at 5% 50%, rgba(45,20,140,0.7) 0%, transparent 60%),
-            radial-gradient(ellipse 60% 80% at 25% 20%, rgba(30,10,110,0.5) 0%, transparent 55%),
-            radial-gradient(ellipse 70% 60% at 90% 70%, rgba(15,10,80,0.45) 0%, transparent 55%),
-            linear-gradient(160deg,#140d42 0%,#0d0a32 35%,#080825 65%,#06091e 100%);
+            radial-gradient(ellipse 80% 70% at 5% 50%, rgba(10,40,120,0.55) 0%, transparent 60%),
+            radial-gradient(ellipse 60% 80% at 25% 20%, rgba(8,30,100,0.4) 0%, transparent 55%),
+            radial-gradient(ellipse 70% 60% at 90% 70%, rgba(5,20,80,0.35) 0%, transparent 55%),
+            linear-gradient(160deg,#0a1628 0%,#080e1e 35%,#060a18 65%,#040812 100%);
           pointer-events: none;
         }
         .tl-stars {
@@ -595,28 +624,32 @@ export default function ExperienceSection() {
         .tl-heading { margin-bottom: 24px; }
         .tl-eyebrow {
           font-size: 10px; letter-spacing: 5px; text-transform: uppercase;
-          color: rgba(160,180,255,0.4); margin-bottom: 10px; display: block;
+          color: rgba(56, 189, 248, 0.5); margin-bottom: 10px; display: block;
+          position: relative;
         }
         .tl-h1 {
-          font-family: 'Syne', sans-serif; font-size: clamp(26px, 3.2vw, 42px);
+          font-family: var(--font-malinton), 'Syne', sans-serif; font-size: clamp(26px, 3.2vw, 42px);
           font-weight: 800; color: #ffffff; letter-spacing: -1.5px;
-          line-height: 1.05; margin: 0 0 10px;
+          line-height: 1.05; margin: 0 0 10px; position: relative;
         }
-        .tl-h1 .tc  { color: #38bdf8; }
-        .tl-h1 .tc2 { color: #a78bfa; }
+        .tl-h1 .tc  { color: #38bdf8; text-shadow: 0 0 20px rgba(56, 189, 248, 0.4); }
+        .tl-h1 .tc2 { color: #60a5fa; text-shadow: 0 0 20px rgba(96, 165, 250, 0.3); }
         .tl-version {
           display: inline-flex; align-items: center; gap: 8px;
           font-family: 'JetBrains Mono', monospace;
-          font-size: 10px; color: rgba(100,180,255,0.35);
-          background: rgba(56,189,248,0.06);
-          border: 1px solid rgba(56,189,248,0.14);
-          border-radius: 999px; padding: 4px 12px;
+          font-size: 10px; color: rgba(100,180,255,0.45);
+          background: rgba(56,189,248,0.08);
+          border: 1px solid rgba(56,189,248,0.2);
+          border-radius: 999px; padding: 5px 14px;
           letter-spacing: 0.3px; width: fit-content;
+          position: relative;
+          box-shadow: 0 0 12px rgba(56, 189, 248, 0.08);
         }
         .tl-version .dot {
-          width: 5px; height: 5px; border-radius: 50%;
-          background: #38bdf8; opacity: 0.6;
+          width: 6px; height: 6px; border-radius: 50%;
+          background: #38bdf8; opacity: 0.7;
           animation: pulse 2s ease-in-out infinite;
+          box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
         }
         @keyframes pulse {
           0%,100% { opacity: 0.4; transform: scale(1); }
@@ -629,41 +662,47 @@ export default function ExperienceSection() {
           cursor: pointer;
         }
         .ec-card {
-          position: relative; border-radius: 20px; overflow: hidden;
+          position: relative; border-radius: 22px; overflow: hidden;
           width: 100%; height: 100%;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          backdrop-filter: blur(25px) saturate(200%) brightness(1.1);
-          -webkit-backdrop-filter: blur(25px) saturate(200%) brightness(1.1);
+          background: linear-gradient(145deg, rgba(200,225,255,0.06) 0%, rgba(150,200,255,0.02) 50%, rgba(100,180,255,0.04) 100%);
+          border: 1px solid rgba(180,220,255,0.14);
+          backdrop-filter: blur(40px) saturate(180%) brightness(1.08);
+          -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.08);
           box-shadow:
-            0 25px 50px rgba(0, 0, 0, 0.4),
-            inset 0 1px 0 rgba(255, 255, 255, 0.15),
-            inset 0 -1px 0 rgba(255, 255, 255, 0.05);
-          transition: border-color .4s, box-shadow .45s, transform .4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            0 25px 60px rgba(0, 0, 0, 0.5),
+            0 8px 24px rgba(0, 20, 60, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2),
+            inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+            inset 1px 0 0 rgba(255, 255, 255, 0.06),
+            inset -1px 0 0 rgba(255, 255, 255, 0.06);
+          transition: border-color .4s, box-shadow .45s, transform .4s cubic-bezier(0.2, 0.8, 0.2, 1), background .4s;
           transform-style: preserve-3d;
         }
         .ec-card.hov {
-          border-color: rgba(255, 255, 255, 0.4);
+          background: linear-gradient(145deg, rgba(200,225,255,0.12) 0%, rgba(150,200,255,0.06) 50%, rgba(100,180,255,0.08) 100%);
+          border-color: rgba(var(--rgb), 0.4);
           box-shadow:
-            0 45px 80px rgba(0, 0, 0, 0.8),
-            0 15px 30px rgba(0, 0, 0, 0.5),
-            inset 0 1px 0 rgba(255, 255, 255, 0.4),
-            0 0 0 1px rgba(255, 255, 255, 0.1),
-            0 0 60px rgba(200, 230, 255, 0.15);
-          transform: translateY(-12px) scale(1.025) rotateX(1deg);
+            0 40px 80px rgba(0, 0, 0, 0.6),
+            0 10px 30px rgba(0, 20, 60, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.35),
+            0 0 0 1px rgba(var(--rgb), 0.2),
+            0 0 40px rgba(var(--rgb), 0.1);
+          transform: scale(1.015) translateY(-2px)
+            perspective(1000px) rotateX(calc((var(--my) - 0.5) * -3deg)) rotateY(calc((var(--mx) - 0.5) * 3deg));
         }
 
-        /* Scanline sweep — moves top to bottom on hover */
+        /* Scanline sweep — cyan tint, HUD-style */
         .ecl-scan {
           position: absolute; inset: 0; pointer-events: none; z-index: 4;
           background: linear-gradient(
             180deg,
             transparent 0%,
-            rgba(255, 255, 255, 0.04) 48%,
-            rgba(255, 255, 255, 0.12) 50%,
-            rgba(255, 255, 255, 0.04) 52%,
+            rgba(56, 189, 248, 0.03) 44%,
+            rgba(56, 189, 248, 0.18) 50%,
+            rgba(56, 189, 248, 0.03) 56%,
             transparent 100%
           );
+          background-size: 100% 300%;
           transition: opacity .35s;
           animation: scan 2.2s ease-in-out infinite;
         }
@@ -672,16 +711,83 @@ export default function ExperienceSection() {
           100% { background-position-y: 200%; }
         }
 
-        /* Corner brackets — elevated glow */
-        .ec-corner {
-          position: absolute; width: 14px; height: 14px;
-          border-color: rgba(255, 255, 255, 0.8); border-style: solid;
+        /* Data grid overlay — appears on hover */
+        .ecl-grid {
+          position: absolute; inset: 0; pointer-events: none; z-index: 3;
+          background-image:
+            linear-gradient(rgba(56, 189, 248, 0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(56, 189, 248, 0.04) 1px, transparent 1px);
+          background-size: 24px 24px;
+          opacity: 0; transition: opacity .5s;
+        }
+        .ec-card.hov .ecl-grid { opacity: 1; }
+
+        /* Holographic ribbon — subtle sharp sweep */
+        .ecl-holographic-ribbon {
+          position: absolute; inset: 0; pointer-events: none; z-index: 5;
+          background: linear-gradient(
+            115deg,
+            transparent 0%,
+            transparent 45%,
+            rgba(255, 255, 255, 0.1) 48%,
+            rgba(56, 189, 248, 0.3) 50%,
+            rgba(255, 255, 255, 0.1) 52%,
+            transparent 55%,
+            transparent 100%
+          );
+          background-size: 200% 100%;
+          transition: opacity .4s;
+          animation: hovRibbon 3s infinite;
+        }
+        @keyframes hovRibbon {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+
+        /* Border refine */
+        .ecl-border-line {
+          position: absolute; inset: 0; border-radius: inherit;
+          border: 1px solid rgba(var(--rgb), 0.3); opacity: 0; transition: opacity .4s;
           pointer-events: none; z-index: 6;
-          animation: cornerIn .18s ease forwards;
-          filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
+        }
+        .ec-card.hov .ecl-border-line { opacity: 1; }
+        .ec-card.hov .ecl-border-scan { opacity: 1; }
+        @keyframes borderScan {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+
+        /* Status indicator — bottom left */
+        .ec-status {
+          position: absolute; bottom: 16px; left: 18px; z-index: 7;
+          display: flex; align-items: center; gap: 6px;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 8.5px; letter-spacing: 2px; text-transform: uppercase;
+          color: rgba(56, 189, 248, 0.7); pointer-events: none;
+          opacity: 0; transition: opacity .4s .15s;
+        }
+        .ec-card.hov .ec-status { opacity: 1; }
+        .ec-status-dot {
+          width: 5px; height: 5px; border-radius: 50%;
+          background: #38bdf8;
+          animation: statusPulse 1.5s ease-in-out infinite;
+          box-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
+        }
+        @keyframes statusPulse {
+          0%, 100% { opacity: 0.5; transform: scale(0.9); }
+          50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* Corner brackets — colored glow matching entry */
+        .ec-corner {
+          position: absolute; width: 16px; height: 16px;
+          border-color: var(--cc); border-style: solid;
+          pointer-events: none; z-index: 6;
+          animation: cornerIn .22s ease forwards;
+          filter: drop-shadow(0 0 6px var(--cc));
         }
         @keyframes cornerIn {
-          from { opacity: 0; transform: scale(0.6); }
+          from { opacity: 0; transform: scale(0.5); }
           to   { opacity: 1; transform: scale(1); }
         }
         .ec-corner-tl { top: 10px; left: 10px; border-width: 1.5px 0 0 1.5px; border-radius: 3px 0 0 0; }
@@ -702,19 +808,20 @@ export default function ExperienceSection() {
         /* Glass layer styles */
         .ecl-s {
           position: absolute; inset: 0; pointer-events: none;
-          background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
-                      radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.12) 0%, transparent 60%);
-          opacity: 0.8;
+          background: linear-gradient(145deg, rgba(180,220,255,0.10) 0%, rgba(255,255,255,0.03) 40%, transparent 70%),
+                      radial-gradient(circle at 25% 15%, rgba(200,230,255,0.14) 0%, transparent 55%),
+                      radial-gradient(circle at 75% 85%, rgba(100,180,255,0.06) 0%, transparent 50%);
+          opacity: 0.85;
         }
-        .ecl-sp { position:absolute;width:260px;height:260px;border-radius:50%;pointer-events:none;z-index:1;transition:opacity .25s;background:radial-gradient(circle,rgba(255,255,255,0.10) 0%,transparent 65%);left:calc(var(--mx,0.5)*100% - 130px);top:calc(var(--my,0.5)*100% - 130px);filter:blur(10px); }
-        .ecl-r { position:absolute;top:0;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.5) 40%,rgba(255,255,255,0.65) 60%,transparent);pointer-events:none;z-index:2; }
+        .ecl-sp { position:absolute;width:280px;height:280px;border-radius:50%;pointer-events:none;z-index:1;transition:opacity .25s;background:radial-gradient(circle,rgba(180,220,255,0.12) 0%,rgba(255,255,255,0.04) 40%,transparent 65%);left:calc(var(--mx,0.5)*100% - 140px);top:calc(var(--my,0.5)*100% - 140px);filter:blur(12px); }
+        .ecl-r { position:absolute;top:0;left:5%;right:5%;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(180,220,255,0.3) 20%,rgba(255,255,255,0.6) 45%,rgba(255,255,255,0.7) 55%,rgba(180,220,255,0.3) 80%,transparent 100%);pointer-events:none;z-index:2; }
         .ecl-n {
           position: absolute; inset: 0; border-radius: inherit;
-          opacity: 0.04; pointer-events: none;
+          opacity: 0.03; pointer-events: none;
           background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
           mix-blend-mode: overlay;
         }
-        .ecl-g { position:absolute;bottom:-1px;left:8%;right:8%;height:80px;background:radial-gradient(ellipse,rgba(255, 255, 255, 0.12) 0%,transparent 70%);pointer-events:none;transition:opacity .4s; }
+        .ecl-g { position:absolute;bottom:-1px;left:5%;right:5%;height:90px;background:radial-gradient(ellipse,rgba(140, 200, 255, 0.10) 0%,rgba(255,255,255,0.04) 40%,transparent 70%);pointer-events:none;transition:opacity .4s; }
 
         /* ── LOGO SLOT ── */
         .ec-logo-wrap {
@@ -879,10 +986,10 @@ export default function ExperienceSection() {
           box-shadow: 0 3px 12px rgba(var(--rgb), 0.12), inset 1px 1px 0 rgba(255, 255, 255, 0.1);
         }
         .ec-pill-type {
-          border-color: rgba(120, 100, 255, 0.35);
-          color: rgba(160, 150, 255, 0.9);
-          background: rgba(120, 100, 255, 0.08);
-          box-shadow: 0 3px 12px rgba(120, 100, 255, 0.12), inset 1px 1px 0 rgba(255, 255, 255, 0.1);
+          border-color: rgba(56, 189, 248, 0.3);
+          color: rgba(130, 200, 255, 0.85);
+          background: rgba(56, 189, 248, 0.06);
+          box-shadow: 0 3px 12px rgba(56, 189, 248, 0.10), inset 1px 1px 0 rgba(255, 255, 255, 0.1);
         }
 
         /* Desc */
@@ -923,8 +1030,8 @@ export default function ExperienceSection() {
 
         /* ══ GHOST YEAR ══ */
         .tl-ghost {
-          position:absolute; left:3%; top:50%; transform:translateY(-50%);
-          font-family:'Syne',sans-serif; font-size:clamp(100px,14vw,180px);
+          position:absolute; left:39%; top:57%; transform:translate(-50%, -50%);
+          font-family: var(--font-malinton), 'Syne', sans-serif; font-size:clamp(100px,14vw,180px);
           font-weight:800; color:transparent; -webkit-text-stroke:1px rgba(255,255,255,0.04);
           pointer-events:none; z-index:1; letter-spacing:-6px; user-select:none; transition:opacity .5s;
         }
@@ -950,7 +1057,7 @@ export default function ExperienceSection() {
         }
       `}</style>
 
-      <section className="tl-outer" ref={outerRef} style={{ height: `${(N + 1.5) * 100}vh` }}>
+      <section className="tl-outer" ref={outerRef} style={{ height: `${(N + 2.5) * 100}vh` }}>
         <div className="tl-sticky" ref={stickyRef}>
           <div className="tl-bg" />
           <div className="tl-stars" />
@@ -975,7 +1082,7 @@ export default function ExperienceSection() {
           </div>
 
           <VerticalProgress
-            scrollPct={scrollPct}
+            scrollPct={progress}
             activeI={activeI}
             total={N}
             activeColor={activeEntry.color}

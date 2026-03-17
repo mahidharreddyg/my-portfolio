@@ -43,16 +43,12 @@ export default function Navbar({ isMonochrome = false }: { isMonochrome?: boolea
             <motion.div
               className="relative rounded-full px-6 py-4 flex items-center justify-between shadow-2xl group transition-all duration-300"
               style={{
-                // True Liquid Glass Background - High Transparency, Minimal Blur
-                background: 'rgba(255, 255, 255, 0.03)', // Much more transparent
-                backdropFilter: 'blur(1px) saturate(200%)', // Minimal blur for clarity
-                WebkitBackdropFilter: 'blur(1px) saturate(200%)',
-                border: '1px solid rgba(255, 255, 255, 0.15)', // Subtle border
-                boxShadow: `
-                  0 8px 32px rgba(0, 0, 0, 0.08),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.2),
-                  inset 0 -1px 0 rgba(255, 255, 255, 0.05)
-                `,
+                // True Liquid Glass Background - Bento Grid Style
+                background: 'rgba(255, 255, 255, 0.03)', 
+                backdropFilter: 'blur(3px) saturate(200%)', 
+                WebkitBackdropFilter: 'blur(3px) saturate(200%)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.05)',
                 // Liquid Glass Shine Effects
                 position: 'relative',
                 overflow: 'hidden',
@@ -78,6 +74,14 @@ export default function Navbar({ isMonochrome = false }: { isMonochrome?: boolea
                 className="absolute top-0 left-0 right-0 h-1/2 rounded-t-full pointer-events-none"
                 style={{
                   background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 100%)',
+                }}
+              />
+
+              {/* Depth Shadow Layer */}
+              <div
+                className="absolute inset-x-0 bottom-0 h-2/3 pointer-events-none rounded-b-full z-0"
+                style={{
+                  background: "linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent)",
                 }}
               />
 

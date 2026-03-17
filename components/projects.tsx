@@ -400,7 +400,7 @@ export default function Projects() {
       <style>{`@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@700;800&display=swap');`}</style>
 
       <div ref={sectionRef} className="relative h-full w-full">
-        <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-t-[3rem] md:rounded-t-[4rem] bg-black border-t border-white/5 overflow-hidden">
+        <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-[3rem] md:rounded-[4rem] bg-black border-t border-white/5 overflow-hidden">
 
           <style>{`
             @keyframes nebula-float {

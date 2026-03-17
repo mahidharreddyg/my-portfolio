@@ -135,28 +135,27 @@ export default function Home() {
                   <Experience />
                 </div>
 
-                {/* 2. SKILLS - z30 (Stacks OVER Experience, but PEELS OFF to reveal Projects) */}
-                <div className="relative h-[135vh] z-30">
-                  <div id="skills" className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-t-[3rem] md:rounded-t-[4rem] bg-[#050505] shadow-[0_20px_100px_rgba(0,0,0,0.9)] border-t border-white/5 overflow-hidden">
+                {/* 2. SKILLS - z30 (Stacks OVER Experience AND covers Projects for reveal) */}
+                <div className="relative h-[200vh] z-30 mt-[-100vh]">
+                  <div id="skills" className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-[3rem] md:rounded-[4rem] bg-[#050505] shadow-[0_20px_100px_rgba(0,0,0,0.9)] border-t border-white/5 overflow-hidden">
                     <Skills />
                   </div>
                 </div>
 
-                {/* 3. PROJECTS - z20 (Revealed by Skills, but internal scroll needs space) */}
-                {/* Increased to 500vh: 100vh (reveal) + 300vh (projects) + 100vh (lock/exit) */}
+                {/* 3. PROJECTS - z20 (Hidden behind Skills, revealed as Skills scrolls away) */}
                 <div id="projects" className="relative h-[500vh] w-full z-20 mt-[-100vh] bg-black">
                   <Projects />
                 </div>
 
-                {/* 4. CERTIFICATIONS - z40 (Stacks OVER Projects, then PEELS OFF to reveal Footer) */}
+                {/* 4. CERTIFICATIONS - z40 (Stacks OVER Projects) */}
                 <div className="relative h-[135vh] z-40 mt-[-100vh] bg-black">
-                  <div id="certifications" className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-t-[3rem] md:rounded-t-[4rem] bg-zinc-950 shadow-[0_-50px_100px_rgba(0,0,0,0.9)] border-t border-white/5 overflow-hidden">
+                  <div id="certifications" className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-[3rem] md:rounded-[4rem] bg-zinc-950 shadow-[0_-50px_100px_rgba(0,0,0,0.9)] border-t border-white/5 overflow-hidden">
                     <Certifications />
                   </div>
                 </div>
 
-                {/* 5. FOOTER - z35 (Revealed by Certifications peeling away) */}
-                <div className="relative z-35 mt-[-100vh]">
+                {/* 5. FOOTER - z50 (Stacks OVER Certifications) */}
+                <div className="relative z-50 mt-[-100vh]">
                   <div id="footer" className="relative h-screen sm:h-[60vh] md:h-[50vh] w-full flex flex-col justify-end bg-black shadow-[0_-20px_100px_rgba(0,0,0,1)] border-t border-white/10">
                     <div className="w-full h-full overflow-hidden">
                       <Footer />
