@@ -623,7 +623,7 @@ export default function HeroSection({ onThemeToggle }: { onThemeToggle?: () => v
                 backdropFilter: index === 2 ? "blur(3px) saturate(140%)" : "blur(3px) saturate(180%)",
                 WebkitBackdropFilter: index === 2 ? "blur(3px) saturate(140%)" : "blur(3px) saturate(180%)",
                 border: index === 2 ? "1px solid rgba(255, 255, 255, 0.1)" : "1px solid rgba(255, 255, 255, 0.14)",
-                boxShadow: index === 2 
+                boxShadow: index === 2
                   ? "0 4px 24px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -1px 0 rgba(255, 255, 255, 0.03)"
                   : "0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(255, 255, 255, 0.06)",
                 willChange: "transform",

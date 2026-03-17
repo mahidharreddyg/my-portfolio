@@ -978,6 +978,9 @@ video {
 .mt-\[-100vh\] {
   margin-top: -100vh;
 }
+.mt-\[-60vh\] {
+  margin-top: -60vh;
+}
 .block {
   display: block;
 }
@@ -1077,9 +1080,6 @@ video {
 .h-\[130vmin\] {
   height: 130vmin;
 }
-.h-\[135vh\] {
-  height: 135vh;
-}
 .h-\[18px\] {
   height: 18px;
 }
@@ -1121,6 +1121,9 @@ video {
 }
 .h-\[600px\] {
   height: 600px;
+}
+.h-\[60vh\] {
+  height: 60vh;
 }
 .h-\[650px\] {
   height: 650px;
@@ -1546,9 +1549,6 @@ video {
 .justify-start {
   justify-content: flex-start;
 }
-.justify-end {
-  justify-content: flex-end;
-}
 .justify-center {
   justify-content: center;
 }
@@ -1659,6 +1659,9 @@ video {
 .break-words {
   overflow-wrap: break-word;
 }
+.break-all {
+  word-break: break-all;
+}
 .rounded {
   border-radius: 0.25rem;
 }
@@ -1699,6 +1702,10 @@ video {
   border-bottom-right-radius: 1rem;
   border-bottom-left-radius: 1rem;
 }
+.rounded-b-full {
+  border-bottom-right-radius: 9999px;
+  border-bottom-left-radius: 9999px;
+}
 .rounded-t-2xl {
   border-top-left-radius: 1rem;
   border-top-right-radius: 1rem;
@@ -1706,10 +1713,6 @@ video {
 .rounded-t-full {
   border-top-left-radius: 9999px;
   border-top-right-radius: 9999px;
-}
-.rounded-b-full {
-  border-bottom-right-radius: 9999px;
-  border-bottom-left-radius: 9999px;
 }
 .rounded-bl-sm {
   border-bottom-left-radius: calc(var(--radius) - 4px);
@@ -2686,11 +2689,6 @@ video {
 .shadow-2xl {
   --tw-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
   --tw-shadow-colored: 0 25px 50px -12px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-.shadow-\[0_-20px_100px_rgba\(0\2c 0\2c 0\2c 1\)\] {
-  --tw-shadow: 0 -20px 100px rgba(0,0,0,1);
-  --tw-shadow-colored: 0 -20px 100px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 .shadow-\[0_-50px_100px_rgba\(0\2c 0\2c 0\2c 0\.9\)\] {
@@ -3725,10 +3723,6 @@ body {
     height: 18px;
   }
 
-  .sm\:h-\[60vh\] {
-    height: 60vh;
-  }
-
   .sm\:h-\[80px\] {
     height: 80px;
   }
@@ -3864,6 +3858,10 @@ body {
     margin-top: 4rem;
   }
 
+  .md\:block {
+    display: block;
+  }
+
   .md\:flex {
     display: flex;
   }
@@ -3894,10 +3892,6 @@ body {
 
   .md\:h-\[443\.5px\] {
     height: 443.5px;
-  }
-
-  .md\:h-\[50vh\] {
-    height: 50vh;
   }
 
   .md\:h-\[60px\] {

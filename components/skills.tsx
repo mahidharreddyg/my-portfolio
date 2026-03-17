@@ -2,7 +2,7 @@
 
 import Section from "@/components/section";
 import { motion, useScroll, useTransform, useSpring, MotionValue } from "framer-motion";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 const technologies = [
   { name: "Python", img: "/icons/blackandwhite/python.svg", hoverImg: "/icons/coloured/python.svg", color: "#3776AB", categories: ["ai-ml", "languages"] },
@@ -96,6 +96,128 @@ function getTileParallaxOffset(rowIndex: number, colIndex: number, totalCols: nu
   const yOffset = (rowIndex - 2.5) * 80 - Math.abs(normalizedDist) * 50;
   const rotation = normalizedDist * 20;
   return { xOffset, yOffset, rotation };
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   BACKGROUND
+───────────────────────────────────────────────────────────────────────────── */
+function Background() {
+  const ref = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const c = ref.current;
+    if (!c) return;
+    const ctx = c.getContext("2d");
+    if (!ctx) return;
+    let raf: number;
+
+    const resize = () => {
+      const parent = c.parentElement;
+      if (parent) {
+        c.width = parent.offsetWidth;
+        c.height = parent.offsetHeight;
+      } else {
+        c.width = window.innerWidth;
+        c.height = window.innerHeight;
+      }
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const lines = Array.from({ length: 45 }, (_, i) => ({
+      x: (i / 45) + (Math.random() * 0.04 - 0.02), // Even distribution with slight jitter
+      y: Math.random() * 2 - 1,
+      speed: Math.random() * 0.0015 + 0.0005,
+      len: Math.random() * 0.3 + 0.1,
+      opacity: Math.random() * 0.3 + 0.15,
+      hue: Math.random() > 0.5 ? 210 : 255,
+    }));
+
+    function frame() {
+      if (!c || !ctx) return;
+      const W = c.width, H = c.height;
+      ctx.clearRect(0, 0, W, H);
+
+      ctx.save();
+      const horizon = H * 0.45;
+      ctx.strokeStyle = "rgba(56,189,248,0.15)"; // Original subtle look
+      ctx.lineWidth = 0.5;
+      ctx.shadowBlur = 0; // No glow on grid
+
+      for (let i = -14; i <= 14; i++) {
+        const xBase = W / 2 + i * (W * 0.08);
+        ctx.beginPath();
+        ctx.moveTo(W / 2, horizon);
+        ctx.lineTo(xBase, H);
+        ctx.stroke();
+      }
+
+      for (let j = 0; j < 15; j++) {
+        const p = (j / 14) ** 2;
+        const y = horizon + (H - horizon) * p;
+        const alpha = 0.15 * (1 - j / 15);
+        ctx.strokeStyle = `rgba(56,189,248,${alpha})`;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(W, y);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      const time = Date.now() / 1000;
+      const pulse = (Math.sin(time * Math.PI) + 1) / 2;
+
+      lines.forEach((l) => {
+        l.y -= l.speed * 2; // Further boosted speed
+        if (l.y < -0.4) l.y = 1.2;
+
+        const lx = l.x * W;
+        const lyTop = l.y * H;
+        const lyBot = (l.y + l.len) * H;
+
+        const g = ctx.createLinearGradient(0, lyTop, 0, lyBot);
+        g.addColorStop(0, "transparent");
+        g.addColorStop(0.15, `hsla(${l.hue}, 100%, 90%, ${l.opacity * (0.9 + 0.1 * pulse)})`); // Extremely bright "head"
+        g.addColorStop(0.4, `hsla(${l.hue}, 100%, 75%, ${l.opacity * (0.7 + 0.3 * pulse)})`);
+        g.addColorStop(1, "transparent");
+
+        ctx.shadowBlur = 15 + 20 * pulse; // Maximum intensity glow
+        ctx.shadowColor = `hsla(${l.hue}, 100%, 70%, ${l.opacity * pulse})`;
+        ctx.fillStyle = g;
+        ctx.fillRect(lx, lyTop, 3, Math.max(1, lyBot - lyTop)); // Thicker and brighter
+      });
+
+      const ag = ctx.createRadialGradient(W / 2, horizon, 0, W / 2, horizon, W * 0.7);
+      ag.addColorStop(0, "rgba(10,25,80,0.12)"); // Reduced "blueness" intensity
+      ag.addColorStop(1, "transparent");
+      ctx.fillStyle = ag;
+      ctx.fillRect(0, 0, W, H);
+
+      raf = requestAnimationFrame(frame);
+    }
+    frame();
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", resize);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={ref}
+      style={{
+        position: "absolute",
+        top: 0,
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: "100vw",
+        height: "100%",
+        zIndex: 0,
+        opacity: 0.6,
+        pointerEvents: "none"
+      }}
+    />
+  );
 }
 
 // ─── TechCard ─────────────────────────────────────────────────────────────────
@@ -483,7 +605,7 @@ export default function Skills() {
       id="skills-inner"
       title=""
       className="bg-transparent relative w-full overflow-visible flex flex-col items-center justify-center py-20 min-h-screen z-10"
-      style={{ background: 'radial-gradient(ellipse at center, #001a66 0%, #000d33 40%, #000000 75%)' }}
+      style={{ background: 'radial-gradient(ellipse at center, #020617 0%, #010414 40%, #000000 75%)' }}
     >
       <style>{`
         .tech-stack-title {
@@ -538,6 +660,8 @@ export default function Skills() {
           100% { opacity: 1; transform: translateY(0); }
         }
       `}</style>
+
+      <Background />
 
       <h2 className="tech-stack-title font-malinton text-5xl md:text-7xl font-bold mb-10 cursor-default select-none text-center">
         Tech Stack

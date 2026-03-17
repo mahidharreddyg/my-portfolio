@@ -147,21 +147,20 @@ export default function Home() {
                   <Projects />
                 </div>
 
-                {/* 4. CERTIFICATIONS - z40 (Stacks OVER Projects) */}
-                <div className="relative h-[135vh] z-40 mt-[-100vh] bg-black">
-                  <div id="certifications" className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-[3rem] md:rounded-[4rem] bg-zinc-950 shadow-[0_-50px_100px_rgba(0,0,0,0.9)] border-t border-white/5 overflow-hidden">
+                {/* 4. CERTIFICATIONS - z50 (Top Layer, uncovers footer) */}
+                <div className="relative h-[200vh] z-50 mt-[-100vh]">
+                  <div id="certifications" className="sticky top-0 h-screen w-full rounded-[3rem] md:rounded-[4rem] bg-zinc-950 shadow-[0_-50px_100px_rgba(0,0,0,0.9)] border-t border-white/5 overflow-hidden">
                     <Certifications />
                   </div>
                 </div>
 
-                {/* 5. FOOTER - z50 (Stacks OVER Certifications) */}
-                <div className="relative z-50 mt-[-100vh]">
-                  <div id="footer" className="relative h-screen sm:h-[60vh] md:h-[50vh] w-full flex flex-col justify-end bg-black shadow-[0_-20px_100px_rgba(0,0,0,1)] border-t border-white/10">
-                    <div className="w-full h-full overflow-hidden">
-                      <Footer />
-                    </div>
+                {/* 5. FOOTER - z40 (Revealed as Certifications scrolls away from bottom) */}
+                <div className="relative h-[60vh] z-40 mt-[-60vh]">
+                  <div id="footer" className="sticky bottom-0 h-[60vh] w-full bg-black border-t border-white/10">
+                    <Footer />
                   </div>
                 </div>
+
 
               </div>
 
