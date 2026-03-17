@@ -160,20 +160,6 @@ function EnhancedBackground() {
 
       </svg>
 
-      {/* Moving Tech Dots/Data Nodes (CSS Animation) */}
-      <div className="absolute inset-0 z-0 opacity-30 overflow-hidden">
-        {/* Top Left Float */}
-        <div className="absolute top-[10%] left-[15%] w-1.5 h-1.5 bg-blue-400 rounded-full animate-[ping_3s_ease-in-out_infinite]" />
-        <div className="absolute top-[20%] left-[10%] w-0.5 h-12 bg-blue-500/20 rotate-45" />
-
-        {/* Bottom Right Float */}
-        <div className="absolute bottom-[20%] right-[15%] w-2 h-2 bg-emerald-400 rounded-full animate-[ping_4s_ease-in-out_infinite_1s]" />
-        <div className="absolute bottom-[25%] right-[20%] w-12 h-0.5 bg-emerald-500/20 -rotate-12" />
-
-        {/* Center Right Float */}
-        <div className="absolute top-[40%] right-[10%] w-1 h-1 bg-white/50 rounded-full animate-pulse shadow-[0_0_10px_white]" />
-      </div>
-
       {/* 3. Ambient Glows (Deepened for tech contrast) */}
       <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-blue-600/10 blur-[140px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-600/10 blur-[140px] pointer-events-none" />
@@ -633,9 +619,13 @@ export default function HeroSection({ onThemeToggle }: { onThemeToggle?: () => v
               style={{
                 width: config.size,
                 height: config.size,
-                background: "radial-gradient(circle, #091119 55%, rgba(255, 255, 255, 0.25) 100%)",
-                border: "0.1px solid rgba(255, 255, 255, 0.12)",
-                boxShadow: "0 0 20px rgba(41, 141, 238, 0.25)",
+                background: index === 2 ? "rgba(255, 255, 255, 0.015)" : "rgba(255, 255, 255, 0.025)",
+                backdropFilter: index === 2 ? "blur(3px) saturate(140%)" : "blur(3px) saturate(180%)",
+                WebkitBackdropFilter: index === 2 ? "blur(3px) saturate(140%)" : "blur(3px) saturate(180%)",
+                border: index === 2 ? "1px solid rgba(255, 255, 255, 0.1)" : "1px solid rgba(255, 255, 255, 0.14)",
+                boxShadow: index === 2 
+                  ? "0 4px 24px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -1px 0 rgba(255, 255, 255, 0.03)"
+                  : "0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(255, 255, 255, 0.06)",
                 willChange: "transform",
               }}
               initial={{
