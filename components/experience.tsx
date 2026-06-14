@@ -16,13 +16,11 @@ interface Entry {
   location: string;
   duration?: string;
   type?: string;
-  adds?: number;
-  dels?: number;
   desc: string;
   tags: string[];
   color: string;
-  logo?: string; // URL — drop your logo URLs here later
-  href?: string; // page to open on click
+  logo?: string;
+  href?: string;
   logoScale?: number;
   orgLabel?: string;
 }
@@ -89,8 +87,6 @@ const ENTRIES: Entry[] = [
     location: "Bengaluru, India",
     duration: "4m",
     type: "Internship",
-    adds: 680,
-    dels: 120,
     desc: "On-site internship building production features for real-world software systems. Gained hands-on exposure to professional engineering workflows and collaborative development.",
     tags: ["Software Development", "On-site", "Bengaluru"],
     color: "#34d399",
@@ -108,8 +104,6 @@ const ENTRIES: Entry[] = [
     location: "VIT, Vellore",
     duration: "1y",
     type: "Leadership",
-    adds: 310,
-    dels: 40,
     desc: "Led the creative direction for one of VIT's most active student organizations. Drove design, branding, and event experiences for entrepreneurship initiatives across campus.",
     tags: ["Leadership", "Branding", "Design", "Event Management"],
     color: "#fb923c",
@@ -117,10 +111,59 @@ const ENTRIES: Entry[] = [
     href: "/experience/ecell-vit",
     logoScale: 1.2,
   },
+  {
+    id: 6,
+    kind: "work",
+    year: "2026",
+    role: "AI Solutions Engineer",
+    org: "Avaamo.ai",
+    period: "May 2026 — Present",
+    location: "Bengaluru, India",
+    duration: "ongoing",
+    type: "Full-time",
+    desc: "Building agentic AI solutions in Pre-Sales at the Strategic Partnerships BU. Architecting multi-agent systems and intelligent voice/chat co-pilots for enterprise clients across pharma and other verticals.",
+    tags: ["Agentic AI", "LLM Orchestration", "Pre-Sales", "Strategic Partnerships", "Voice AI"],
+    color: "#818cf8",
+    logo: "/icons/avaamo_logo.svg",
+    href: "/experience/avaamo",
+    logoScale: 1.4,
+  },
 ];
+
+/* ================================================================
+   YEAR CLUSTER HELPERS
+================================================================ */
+function buildYearClusters(entries: Entry[]) {
+  const map: Record<string, number[]> = {};
+  entries.forEach((e, i) => {
+    if (!map[e.year]) map[e.year] = [];
+    map[e.year].push(i);
+  });
+  return map;
+}
+
+// Returns the "canonical" display index for each year cluster — the midpoint index
+// used for placing the single spine node on the canvas.
+function getClusterCanonicalIndex(year: string, clusters: Record<string, number[]>): number {
+  const idxs = clusters[year];
+  // Use the midpoint so the node sits between all members
+  return (idxs[0] + idxs[idxs.length - 1]) / 2;
+}
 
 function hexRgb(hex: string): [number, number, number] {
   return [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];
+}
+
+function renderOrgName(name: string) {
+  const match = name.match(/^(.*)(\.ai)$/i);
+  if (!match) return name;
+  const [, base, suffix] = match;
+  return (
+    <>
+      {base}
+      <span className="ec-org-ai">{suffix}</span>
+    </>
+  );
 }
 
 /* ================================================================
@@ -128,22 +171,46 @@ function hexRgb(hex: string): [number, number, number] {
 ================================================================ */
 function useScrollPct(ref: React.RefObject<HTMLElement>) {
   const [p, setP] = useState(0);
+  const targetRef = useRef(0);
+  const currentRef = useRef(0);
+  const rafRef = useRef<number>(0);
+
   useEffect(() => {
-    const fn = () => {
+    const measure = () => {
       if (!ref.current) return;
       const { top, height } = ref.current.getBoundingClientRect();
       const vh = window.innerHeight;
-      setP(Math.max(0, Math.min(1, -top / (height - vh))));
+      targetRef.current = Math.max(0, Math.min(1, -top / (height - vh)));
     };
-    window.addEventListener("scroll", fn, { passive: true });
-    fn();
-    return () => window.removeEventListener("scroll", fn);
+
+    const tick = () => {
+      const cur = currentRef.current;
+      const tgt = targetRef.current;
+      const diff = tgt - cur;
+      if (Math.abs(diff) < 0.0003) {
+        currentRef.current = tgt;
+      } else {
+        currentRef.current = cur + diff * 0.18;
+      }
+      setP(currentRef.current);
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    measure();
+    window.addEventListener("scroll", measure, { passive: true });
+    window.addEventListener("resize", measure);
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      window.removeEventListener("scroll", measure);
+      window.removeEventListener("resize", measure);
+      cancelAnimationFrame(rafRef.current);
+    };
   }, []);
   return p;
 }
 
 /* ================================================================
-   LOGO PLACEHOLDER — shown when no logo URL is provided
+   LOGO PLACEHOLDER
 ================================================================ */
 function LogoPlaceholder({ entry }: { entry: Entry }) {
   const initials = entry.org
@@ -169,9 +236,15 @@ function LogoPlaceholder({ entry }: { entry: Entry }) {
 }
 
 /* ================================================================
-   LIQUID GLASS CARD — fixed size, logo slot top-right
+   ENTRY CARD — cleaned up (no diffstat, no branch pill)
 ================================================================ */
-function EntryCard({ entry }: { entry: Entry }) {
+function EntryCard({
+  entry,
+  transitionKey,
+}: {
+  entry: Entry;
+  transitionKey: number | string;
+}) {
   const [hov, setHov] = useState(false);
   const [mx, setMx] = useState(0.5);
   const [my, setMy] = useState(0.5);
@@ -183,10 +256,7 @@ function EntryCard({ entry }: { entry: Entry }) {
   const rgb = hexRgb(entry.color).join(",");
 
   const hashMap: Record<number, string> = {
-    1: "f0a1b2c", 2: "3d8e2f1", 3: "c5b8e3d", 4: "9a3c7f2", 5: "e1d4b90",
-  };
-  const branchMap: Record<number, string> = {
-    1: "icse-school", 2: "cbse-grade12", 3: "btech-cse", 4: "intern-dev", 5: "dir-creativity",
+    1: "f0a1b2c", 2: "3d8e2f1", 3: "c5b8e3d", 4: "9a3c7f2", 5: "e1d4b90", 6: "a7f3d08",
   };
 
   const handleClick = () => {
@@ -194,105 +264,112 @@ function EntryCard({ entry }: { entry: Entry }) {
   };
 
   return (
-    <div
-      className="ec-outer"
-      style={{ "--cc": entry.color, "--rgb": rgb, "--mx": mx, "--my": my } as React.CSSProperties}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      onMouseMove={onMove}
-      onClick={handleClick}
-    >
-      <div className={`ec-card ${hov ? "hov" : ""}`}>
-        {/* Glass layers */}
-        <div className="ecl-s" />
-        <div className="ecl-sp" style={{ opacity: hov ? 1 : 0 }} />
-        <div className="ecl-r" />
-        <div className="ecl-n" />
-        <div className="ecl-g" style={{ opacity: hov ? 1 : 0 }} />
+    <div className="ec-stack">
+      <div
+        key={transitionKey}
+        className="ec-outer ec-enter"
+        style={{ "--cc": entry.color, "--rgb": rgb, "--mx": mx, "--my": my } as React.CSSProperties}
+        onMouseEnter={() => setHov(true)}
+        onMouseLeave={() => setHov(false)}
+        onMouseMove={onMove}
+        onClick={handleClick}
+      >
+        <div className={`ec-card ${hov ? "hov" : ""}`}>
+          {/* Glass layers */}
+          <div className="ecl-s" />
+          <div className="ecl-r" />
+          <div className="ecl-n" />
+          <div className="ecl-g" style={{ opacity: hov ? 1 : 0 }} />
 
-        {/* Tech hover layers */}
-        <div className="ecl-grid" />
-        <div className="ecl-scan" style={{ opacity: hov ? 1 : 0 }} />
-        <div className="ecl-holographic-ribbon" style={{ opacity: hov ? 1 : 0 }} />
-        <div className="ecl-border-line" />
+          {/* Tech hover layers */}
+          <div className="ecl-grid" />
+          <div className="ecl-scan" style={{ opacity: hov ? 1 : 0 }} />
+          <div className="ecl-spotlight" />
+          <div className="ecl-border-line" />
+          <div className="ecl-edge" />
 
-        {/* Hover: corner bracket indicators */}
-        {hov && <>
-          <div className="ec-corner ec-corner-tl" />
-          <div className="ec-corner ec-corner-tr" />
-          <div className="ec-corner ec-corner-bl" />
-          <div className="ec-corner ec-corner-br" />
-        </>}
+          {/* Corner brackets */}
+          <div className="ec-corner ec-corner-tl" style={{ opacity: hov ? 1 : 0 }} />
+          <div className="ec-corner ec-corner-tr" style={{ opacity: hov ? 1 : 0 }} />
+          <div className="ec-corner ec-corner-bl" style={{ opacity: hov ? 1 : 0 }} />
+          <div className="ec-corner ec-corner-br" style={{ opacity: hov ? 1 : 0 }} />
 
-        {/* Logo slot — top-right */}
-        <div className="ec-logo-wrap">
-          <div className={`ec-logo-shimmer ${hov ? "active" : ""}`} />
-          {entry.logo ? (
-            <img
-              src={entry.logo}
-              alt={entry.org}
-              className="ec-logo-img"
-              style={{ transform: entry.logoScale ? `scale(${entry.logoScale})` : "none" }}
-            />
-          ) : (
-            <LogoPlaceholder entry={entry} />
-          )}
-        </div>
-
-        {/* Hover CTA */}
-        <div className="ec-hover-cta" style={{ opacity: hov ? 1 : 0 }}>
-          <span>view details</span>
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-
-        <div className="ec-body">
-          {/* Git-style top row */}
-          <div className="ec-toprow">
-            <span className="ec-hash">{hashMap[entry.id]}</span>
-            <span className="ec-branch">HEAD → {branchMap[entry.id]}</span>
+          {/* Logo slot */}
+          <div className="ec-logo-wrap">
+            <div className={`ec-logo-shimmer ${hov ? "active" : ""}`} />
+            {entry.logo ? (
+              <img
+                src={entry.logo}
+                alt={entry.org}
+                className="ec-logo-img"
+                style={{ transform: entry.logoScale ? `scale(${entry.logoScale})` : "none" }}
+              />
+            ) : (
+              <LogoPlaceholder entry={entry} />
+            )}
           </div>
 
-          {/* Org — prominent at top */}
-          <div className="ec-org-wrap">
-            <div className="ec-org-line" />
-            <div className="ec-org-inner">
-              <span className="ec-org-label">{entry.orgLabel || (entry.kind === "work" ? "company" : "institution")}</span>
-              <span className="ec-org-name">{entry.org}</span>
+          {/* Hover CTA */}
+          <div className="ec-hover-cta" style={{ opacity: hov ? 1 : 0 }}>
+            <span>view details</span>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path
+                d="M2 10L10 2M10 2H4M10 2V8"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+
+          <div className="ec-body">
+            {/* Commit hash only — no branch pill, no diffstat */}
+            <div className="ec-toprow">
+              <span className="ec-hash">{hashMap[entry.id]}</span>
+            </div>
+
+            {/* Org */}
+            <div className="ec-org-wrap">
+              <div className="ec-org-line" />
+              <div className="ec-org-inner">
+                <span className="ec-org-label">
+                  {entry.orgLabel || (entry.kind === "work" ? "company" : "institution")}
+                </span>
+                <span className="ec-org-name">{renderOrgName(entry.org)}</span>
+              </div>
+            </div>
+
+            {/* Role row */}
+            <div className="ec-role-row">
+              <span className="ec-kind-badge">{entry.kind === "work" ? "work" : "edu"}</span>
+              <h3 className="ec-role">{entry.role}</h3>
+            </div>
+
+            {/* Meta pills */}
+            <div className="ec-pills">
+              <span className="ec-pill ec-pill-dt">📅 {entry.period}</span>
+              {entry.duration && <span className="ec-pill ec-pill-dur">⏱ {entry.duration}</span>}
+              <span className="ec-pill">📍 {entry.location}</span>
+              <span className="ec-pill ec-pill-type">
+                {entry.type ?? (entry.kind === "work" ? "Full-time" : "Academic")}
+              </span>
+            </div>
+
+            {/* Description */}
+            <div className="ec-desc-wrap">
+              <p className="ec-desc">{entry.desc}</p>
+            </div>
+
+            {/* Tags */}
+            <div className="ec-tags">
+              {entry.tags.map((t, idx) => (
+                <span key={t} className="ec-tag" style={{ "--ti": idx } as React.CSSProperties}>
+                  {t}
+                </span>
+              ))}
             </div>
           </div>
-
-          {/* Role — smaller, below org */}
-          <div className="ec-role-row">
-            <span className="ec-kind-badge">{entry.kind === "work" ? "work" : "edu"}</span>
-            <h3 className="ec-role">{entry.role}</h3>
-          </div>
-
-          {/* Meta pills */}
-          <div className="ec-pills">
-            <span className="ec-pill ec-pill-dt">📅 {entry.period}</span>
-            {entry.duration && (
-              <span className="ec-pill ec-pill-dur">⏱ {entry.duration}</span>
-            )}
-            <span className="ec-pill">📍 {entry.location}</span>
-            <span className="ec-pill ec-pill-type">
-              {entry.type ?? (entry.kind === "work" ? "Full-time" : "Academic")}
-            </span>
-          </div>
-
-          {/* Description */}
-          <div className="ec-desc-wrap">
-            <p className="ec-desc">{entry.desc}</p>
-          </div>
-
-          {/* Tags */}
-          <div className="ec-tags">
-            {entry.tags.map((t) => (
-              <span key={t} className="ec-tag">{t}</span>
-            ))}
-          </div>
-
         </div>
       </div>
     </div>
@@ -312,193 +389,354 @@ function seededRand(seed: number) {
 
 /* ================================================================
    CANVAS
+   Key change: year clusters render as ONE node at the cluster's
+   canonical (midpoint) position. The pip track slides L→R as
+   activeF moves through the cluster's index range.
 ================================================================ */
-function TimelineCanvas({ canvasRef, scrollPct, W, H }: {
+function TimelineCanvas({
+  canvasRef,
+  scrollPct,
+  W,
+  H,
+}: {
   canvasRef: React.RefObject<HTMLCanvasElement>;
-  scrollPct: number; W: number; H: number;
+  scrollPct: number;
+  W: number;
+  H: number;
 }) {
   const animRef = useRef<number>(0);
   const timeRef = useRef(0);
   const lastTsRef = useRef<number | null>(null);
 
-  const draw = useCallback((timestamp?: number) => {
-    const canvas = canvasRef.current;
-    if (!canvas || W === 0 || H === 0) return;
-    if (timestamp !== undefined) {
-      if (lastTsRef.current !== null) timeRef.current += (timestamp - lastTsRef.current) * 0.001;
-      lastTsRef.current = timestamp;
-    }
-    const t = timeRef.current;
-    const dpr = window.devicePixelRatio || 1;
-    if (canvas.width !== W * dpr || canvas.height !== H * dpr) {
-      canvas.width = W * dpr; canvas.height = H * dpr;
-      canvas.style.width = `${W}px`; canvas.style.height = `${H}px`;
-    }
-    const ctx = canvas.getContext("2d")!;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, W, H);
+  const draw = useCallback(
+    (timestamp?: number) => {
+      const canvas = canvasRef.current;
+      if (!canvas || W === 0 || H === 0) return;
+      if (timestamp !== undefined) {
+        if (lastTsRef.current !== null) timeRef.current += (timestamp - lastTsRef.current) * 0.001;
+        lastTsRef.current = timestamp;
+      }
+      const t = timeRef.current;
+      const dpr = window.devicePixelRatio || 1;
+      if (canvas.width !== W * dpr || canvas.height !== H * dpr) {
+        canvas.width = W * dpr;
+        canvas.height = H * dpr;
+        canvas.style.width = `${W}px`;
+        canvas.style.height = `${H}px`;
+      }
+      const ctx = canvas.getContext("2d")!;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
 
-    const N = ENTRIES.length;
-    const R = H;
-    const SPREAD_DEG = 60;
-    const circleCX = W * 0.54 - R;
-    const circleCY = H * 0.50;
-    const progress = Math.min(1, scrollPct / 0.8);
-    const activeF = progress * (N - 1);
-    const degPerEntry = SPREAD_DEG / Math.max(N - 1, 1);
+      // Build clusters and a de-duplicated list of "spine points" —
+      // one per distinct year, positioned at the cluster's midpoint index.
+      const clusters = buildYearClusters(ENTRIES);
+      const uniqueYears = Array.from(new Set(ENTRIES.map((e) => e.year)));
 
-    const spineOffset = R * 0.03;
-    const midCX = circleCX + spineOffset / 2;
+      // Map each unique year → canonical spine index (midpoint of cluster)
+      const yearCanonical: Record<string, number> = {};
+      uniqueYears.forEach((yr) => {
+        yearCanonical[yr] = getClusterCanonicalIndex(yr, clusters);
+      });
 
-    const entryAngle = (i: number) => ((i - activeF) * degPerEntry) * Math.PI / 180;
-    const entryPos = (i: number) => {
-      const a = entryAngle(i);
-      return { x: midCX + R * Math.cos(a), y: circleCY + R * Math.sin(a) };
-    };
+      // The number of "spine slots" equals number of unique years
+      const N_SPINE = uniqueYears.length; // 5 distinct years
 
-    /* BG RINGS */
-    const ringCX = W * 0.5, ringCY = H * 0.5;
-    const easedScroll = 1 - Math.pow(1 - Math.min(scrollPct * 1.6, 1), 2.2);
-    const baseR = H * 0.04 + easedScroll * (Math.max(W, H) * 0.88 - H * 0.04);
-    const RINGS = [
-      { scale: 0.18, dotCount: 22, rotSpeed: 0.14, dotBaseR: 1.4, alpha: 0.32 },
-      { scale: 0.32, dotCount: 36, rotSpeed: -0.11, dotBaseR: 1.2, alpha: 0.26 },
-      { scale: 0.48, dotCount: 52, rotSpeed: 0.08, dotBaseR: 1.0, alpha: 0.21 },
-      { scale: 0.64, dotCount: 68, rotSpeed: -0.06, dotBaseR: 0.85, alpha: 0.16 },
-      { scale: 0.80, dotCount: 86, rotSpeed: 0.045, dotBaseR: 0.75, alpha: 0.12 },
-      { scale: 0.94, dotCount: 104, rotSpeed: -0.03, dotBaseR: 0.65, alpha: 0.09 },
-    ];
-    const ringFadeIn = Math.min(1, scrollPct * 8);
-    RINGS.forEach((ring) => {
-      const ringR = baseR * ring.scale;
-      if (ringR < 8) return;
-      const rotOffset = t * ring.rotSpeed;
-      const stepAngle = (Math.PI * 2) / ring.dotCount;
-      for (let di = 0; di < ring.dotCount; di++) {
-        const angle = di * stepAngle + rotOffset;
-        const dx = ringCX + ringR * Math.cos(angle);
-        const dy = ringCY + ringR * Math.sin(angle);
-        // Elevate size slightly and scale with scroll
-        const dotR = (di % 4 === 0 ? ring.dotBaseR * 2.6 : ring.dotBaseR * 1.3) * (1 + scrollPct * 0.6);
-        const edgeFade = Math.min(1, (dx + 40) / 80, (W - dx + 40) / 80, (dy + 40) / 80, (H - dy + 40) / 80);
-        const alpha = ring.alpha * Math.max(0, edgeFade) * ringFadeIn;
-        if (alpha < 0.005) continue;
+      const R = H;
+      const SPREAD_DEG = 60;
+      const circleCX = W * 0.54 - R;
+      const circleCY = H * 0.54;
+      const progress = Math.min(1, scrollPct / 0.8);
+      const rawActiveF = progress * (ENTRIES.length - 1); // still 0..5 over full scroll
+
+      // Apply quadratic ease-out to the fractional part so canvas transitions (spine, pips, color)
+      // happen earlier on scroll, matching the snappier card transitions.
+      const flRaw = Math.floor(rawActiveF);
+      const frRaw = rawActiveF - flRaw;
+      const easedFr = 1 - Math.pow(1 - frRaw, 2);
+      const activeF = flRaw + easedFr;
+
+      // Build a continuous entry→spine mapping. By mapping all entries in a
+      // cluster to the exact same spine slot index, the canvas will stay
+      // perfectly stationary when scrolling between entries of the same year.
+      const entrySpinePos: number[] = ENTRIES.map((entry) => {
+        return uniqueYears.indexOf(entry.year);
+      });
+      const flAF = Math.floor(Math.max(0, Math.min(ENTRIES.length - 1, activeF)));
+      const clAF = Math.min(flAF + 1, ENTRIES.length - 1);
+      const frAF = activeF - flAF;
+      const spineActiveF = entrySpinePos[flAF] + (entrySpinePos[clAF] - entrySpinePos[flAF]) * frAF;
+
+      const degPerSpine = SPREAD_DEG / Math.max(N_SPINE - 1, 1);
+      const spineOffset = R * 0.03;
+      const midCX = circleCX + spineOffset / 2;
+
+      const spineAngle = (si: number) => ((si - spineActiveF) * degPerSpine * Math.PI) / 180;
+      const spinePos = (si: number) => {
+        const a = spineAngle(si);
+        return { x: midCX + R * Math.cos(a), y: circleCY + R * Math.sin(a) };
+      };
+
+      /* BG RINGS */
+      const ringCX = W * 0.5, ringCY = H * 0.5;
+      const easedScroll = 1 - Math.pow(1 - Math.min(scrollPct * 1.6, 1), 2.2);
+      const baseR = H * 0.04 + easedScroll * (Math.max(W, H) * 0.88 - H * 0.04);
+      const RINGS = [
+        { scale: 0.18, dotCount: 22, rotSpeed: 0.14, dotBaseR: 1.4, alpha: 0.32 },
+        { scale: 0.32, dotCount: 36, rotSpeed: -0.11, dotBaseR: 1.2, alpha: 0.26 },
+        { scale: 0.48, dotCount: 52, rotSpeed: 0.08, dotBaseR: 1.0, alpha: 0.21 },
+        { scale: 0.64, dotCount: 68, rotSpeed: -0.06, dotBaseR: 0.85, alpha: 0.16 },
+        { scale: 0.8, dotCount: 86, rotSpeed: 0.045, dotBaseR: 0.75, alpha: 0.12 },
+        { scale: 0.94, dotCount: 104, rotSpeed: -0.03, dotBaseR: 0.65, alpha: 0.09 },
+      ];
+      const ringFadeIn = Math.min(1, scrollPct * 8);
+      RINGS.forEach((ring) => {
+        const ringR = baseR * ring.scale;
+        if (ringR < 8) return;
+        const rotOffset = t * ring.rotSpeed;
+        const stepAngle = (Math.PI * 2) / ring.dotCount;
+        for (let di = 0; di < ring.dotCount; di++) {
+          const angle = di * stepAngle + rotOffset;
+          const dx = ringCX + ringR * Math.cos(angle);
+          const dy = ringCY + ringR * Math.sin(angle);
+          const dotR =
+            (di % 4 === 0 ? ring.dotBaseR * 2.6 : ring.dotBaseR * 1.3) * (1 + scrollPct * 0.6);
+          const edgeFade = Math.min(1, (dx + 40) / 80, (W - dx + 40) / 80, (dy + 40) / 80, (H - dy + 40) / 80);
+          const alpha = ring.alpha * Math.max(0, edgeFade) * ringFadeIn;
+          if (alpha < 0.005) continue;
+          ctx.beginPath();
+          ctx.arc(dx, dy, Math.max(0.4, dotR), 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(160,185,255,${alpha})`;
+          ctx.fill();
+        }
+      });
+
+      /* SPINE DOTS — travel using spine slots */
+      const scrollShiftDeg = spineActiveF * degPerSpine;
+      for (let s = 0; s < 300; s++) {
+        const baseDeg = (s / 300) * 360 - 180;
+        const shiftedDeg = baseDeg - scrollShiftDeg;
+        const wrappedDeg = ((shiftedDeg + 180) % 360 + 360) % 360 - 180;
+        const angleRad = (wrappedDeg * Math.PI) / 180;
+        const px = circleCX + R * Math.cos(angleRad);
+        const py = circleCY + R * Math.sin(angleRad);
+        // Skip dot if it lands right on a spine node
+        const iF = spineActiveF + wrappedDeg / degPerSpine;
+        const nearEntryI = Math.round(iF);
+        const nearEntry = Math.abs(iF - nearEntryI);
+        if (nearEntry < 0.08 && nearEntryI >= 0 && nearEntryI < N_SPINE) continue;
+        const distFromActive = Math.abs(wrappedDeg) / degPerSpine;
+        const onArc = Math.abs(wrappedDeg) <= SPREAD_DEG / 2 + 8;
+        const sizeBoost = nearEntry < 0.25 ? 2.5 : nearEntry < 0.45 ? 1.6 : 1.0;
+        const r = sizeBoost * (onArc ? Math.max(0.4, 1.1 - distFromActive * 0.08) : 0.5);
+        const alpha = onArc ? Math.max(0.06, 0.75 - distFromActive * 0.2) : 0.04;
         ctx.beginPath();
-        ctx.arc(dx, dy, Math.max(0.4, dotR), 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(160,185,255,${alpha})`;
+        ctx.arc(px, py, r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${alpha})`;
         ctx.fill();
       }
-    });
 
-    /* SPINE DOTS — scroll-driven travel (LEFT spine) */
-    const scrollShiftDeg = activeF * degPerEntry;
-    for (let s = 0; s < 300; s++) {
-      const baseDeg = (s / 300) * 360 - 180;
-      const shiftedDeg = baseDeg - scrollShiftDeg;
-      const wrappedDeg = ((shiftedDeg + 180) % 360 + 360) % 360 - 180;
-      const angleRad = wrappedDeg * Math.PI / 180;
-      const px = circleCX + R * Math.cos(angleRad);
-      const py = circleCY + R * Math.sin(angleRad);
-      const iF = activeF + wrappedDeg / degPerEntry;
-      const nearEntryI = Math.round(iF);
-      const nearEntry = Math.abs(iF - nearEntryI);
-      if (nearEntry < 0.08 && nearEntryI >= 0 && nearEntryI < N) continue;
-      const distFromActive = Math.abs(wrappedDeg) / degPerEntry;
-      const onArc = Math.abs(wrappedDeg) <= SPREAD_DEG / 2 + 8;
-      const sizeBoost = nearEntry < 0.25 ? 2.5 : nearEntry < 0.45 ? 1.6 : 1.0;
-      const r = sizeBoost * (onArc ? Math.max(0.4, 1.1 - distFromActive * 0.08) : 0.5);
-      const alpha = onArc ? Math.max(0.06, 0.75 - distFromActive * 0.20) : 0.04;
-      ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255,255,255,${alpha})`; ctx.fill();
-    }
-
-    /* SPINE DOTS — MIRRORED (RIGHT spine, counter-rotating) */
-    const circleCX2 = circleCX + spineOffset;
-    for (let s = 0; s < 300; s++) {
-      const baseDeg = (s / 300) * 360 - 180;
-      const shiftedDeg2 = baseDeg + scrollShiftDeg; // OPPOSITE direction
-      const wrappedDeg2 = ((shiftedDeg2 + 180) % 360 + 360) % 360 - 180;
-      const angleRad2 = wrappedDeg2 * Math.PI / 180;
-      const px2 = circleCX2 + R * Math.cos(angleRad2);
-      const py2 = circleCY + R * Math.sin(angleRad2);
-      const iF2 = activeF + wrappedDeg2 / degPerEntry;
-      const nearEntryI2 = Math.round(iF2);
-      const nearEntry2 = Math.abs(iF2 - nearEntryI2);
-      const distFromActive2 = Math.abs(wrappedDeg2) / degPerEntry;
-      const onArc2 = Math.abs(wrappedDeg2) <= SPREAD_DEG / 2 + 8;
-      const sizeBoost2 = nearEntry2 < 0.25 ? 2.5 : nearEntry2 < 0.45 ? 1.6 : 1.0;
-      const r2 = sizeBoost2 * (onArc2 ? Math.max(0.4, 1.1 - distFromActive2 * 0.08) : 0.5);
-      const alpha2 = onArc2 ? Math.max(0.06, 0.75 - distFromActive2 * 0.20) : 0.04;
-      ctx.beginPath(); ctx.arc(px2, py2, r2, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255,255,255,${alpha2})`; ctx.fill();
-    }
-
-    /* CLUSTER SCATTER */
-    ENTRIES.forEach((_, i) => {
-      const { x: ex, y: ey } = entryPos(i);
-      if (ex < -60 || ex > W + 60 || ey < -60 || ey > H + 60) return;
-      const distFromActive = Math.abs(i - activeF);
-      const rand = seededRand(i * 7919 + 42);
-      const count = Math.round(Math.max(3, 22 - distFromActive * 7));
-      const spreadR = Math.max(14, 48 - distFromActive * 12);
-      for (let k = 0; k < count; k++) {
-        const angle = rand() * Math.PI * 2;
-        const tR = rand();
-        const dist = tR < 0.7 ? rand() * spreadR * 0.55 : spreadR * 0.55 + rand() * spreadR * 0.45;
-        const sx = ex + Math.cos(angle) * dist;
-        const sy = ey + Math.sin(angle) * dist;
-        if (sx < -10 || sx > W + 10 || sy < -10 || sy > H + 10) continue;
-        const sizeT = rand();
-        // Elevate base size and add scroll-driven scaling
-        const dotR = (sizeT > 0.92 ? 3.6 + rand() * 2.2 : sizeT > 0.75 ? 1.8 + rand() * 1.2 : 0.7 + rand() * 0.9) * (1 + scrollPct * 0.5);
-        const falloff = 1 - dist / (spreadR * 1.4);
-        const alpha = Math.min(1, Math.max(0.04, (0.85 - distFromActive * 0.22) * falloff * (sizeT > 0.92 ? 1.1 : 0.85)));
-        ctx.beginPath(); ctx.arc(sx, sy, dotR, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255,${alpha})`; ctx.fill();
-      }
-    });
-
-    /* NODES + YEAR LABELS */
-    ENTRIES.forEach((entry, i) => {
-      const { x: ex, y: ey } = entryPos(i);
-      if (ex < -80 || ex > W + 80 || ey < -80 || ey > H + 80) return;
-      const distFromActive = Math.abs(i - activeF);
-      const isActive = distFromActive < 0.55;
-      const col = hexRgb(entry.color);
-      const colA = (a: number) => `rgba(${col[0]},${col[1]},${col[2]},${a})`;
-
-      if (isActive) {
-        const rg = ctx.createRadialGradient(ex, ey, 0, ex, ey, 38);
-        rg.addColorStop(0, colA(0.28)); rg.addColorStop(0.5, colA(0.10)); rg.addColorStop(1, colA(0));
-        ctx.save(); ctx.fillStyle = rg; ctx.beginPath(); ctx.arc(ex, ey, 38, 0, Math.PI * 2); ctx.fill(); ctx.restore();
-        ctx.save(); ctx.beginPath(); ctx.arc(ex, ey, 17, 0, Math.PI * 2);
-        ctx.strokeStyle = colA(0.4); ctx.lineWidth = 1.5; ctx.shadowBlur = 12; ctx.shadowColor = colA(1); ctx.stroke(); ctx.restore();
-        ctx.save(); ctx.beginPath(); ctx.arc(ex, ey, 10, 0, Math.PI * 2);
-        ctx.fillStyle = entry.color; ctx.shadowBlur = 18; ctx.shadowColor = colA(1); ctx.fill(); ctx.restore();
-        ctx.save(); ctx.beginPath(); ctx.arc(ex, ey, 3.5, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(255,255,255,0.95)"; ctx.shadowBlur = 6; ctx.shadowColor = "#fff"; ctx.fill(); ctx.restore();
-      } else {
-        const r2 = Math.max(4, 8 - distFromActive * 1.8);
-        const alpha = Math.max(0.15, 0.85 - distFromActive * 0.28);
-        ctx.save(); ctx.beginPath(); ctx.arc(ex, ey, r2, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255,${alpha})`; ctx.fill(); ctx.restore();
+      /* SPINE DOTS — MIRRORED */
+      const circleCX2 = circleCX + spineOffset;
+      for (let s = 0; s < 300; s++) {
+        const baseDeg = (s / 300) * 360 - 180;
+        const shiftedDeg2 = baseDeg + scrollShiftDeg;
+        const wrappedDeg2 = ((shiftedDeg2 + 180) % 360 + 360) % 360 - 180;
+        const angleRad2 = (wrappedDeg2 * Math.PI) / 180;
+        const px2 = circleCX2 + R * Math.cos(angleRad2);
+        const py2 = circleCY + R * Math.sin(angleRad2);
+        const iF2 = spineActiveF + wrappedDeg2 / degPerSpine;
+        const nearEntryI2 = Math.round(iF2);
+        const nearEntry2 = Math.abs(iF2 - nearEntryI2);
+        const distFromActive2 = Math.abs(wrappedDeg2) / degPerSpine;
+        const onArc2 = Math.abs(wrappedDeg2) <= SPREAD_DEG / 2 + 8;
+        const sizeBoost2 = nearEntry2 < 0.25 ? 2.5 : nearEntry2 < 0.45 ? 1.6 : 1.0;
+        const r2 = sizeBoost2 * (onArc2 ? Math.max(0.4, 1.1 - distFromActive2 * 0.08) : 0.5);
+        const alpha2 = onArc2 ? Math.max(0.06, 0.75 - distFromActive2 * 0.2) : 0.04;
+        ctx.beginPath();
+        ctx.arc(px2, py2, r2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${alpha2})`;
+        ctx.fill();
       }
 
-      const yearScale = Math.max(0.42, 1 - distFromActive * 0.25);
-      const yearAlpha = Math.max(0.08, 1 - distFromActive * 0.38);
-      const yearSize = Math.round((isActive ? 48 : 28) * yearScale);
-      const yearX = ex - (isActive ? 32 : 22);
-      ctx.save();
-      ctx.font = `${isActive ? 800 : 600} ${yearSize}px 'Outfit', sans-serif`;
-      ctx.textAlign = "right"; ctx.textBaseline = "middle"; ctx.globalAlpha = yearAlpha;
-      ctx.fillStyle = isActive ? entry.color : "rgba(210,225,255,0.75)";
-      if (isActive) { ctx.shadowBlur = 20; ctx.shadowColor = colA(0.7); }
-      ctx.fillText(entry.year, yearX, ey); ctx.restore();
-    });
-  }, [scrollPct, W, H, canvasRef]);
+      /* CLUSTER SCATTER — one scatter bloom per spine slot */
+      uniqueYears.forEach((yr, si) => {
+        const { x: ex, y: ey } = spinePos(si);
+        if (ex < -60 || ex > W + 60 || ey < -60 || ey > H + 60) return;
+        const distFromActive = Math.abs(si - spineActiveF);
+        const rand = seededRand(si * 7919 + 42);
+        const count = Math.round(Math.max(3, 22 - distFromActive * 7));
+        const spreadR = Math.max(14, 48 - distFromActive * 12);
+        for (let k = 0; k < count; k++) {
+          const angle = rand() * Math.PI * 2;
+          const tR = rand();
+          const dist = tR < 0.7 ? rand() * spreadR * 0.55 : spreadR * 0.55 + rand() * spreadR * 0.45;
+          const sx = ex + Math.cos(angle) * dist;
+          const sy = ey + Math.sin(angle) * dist;
+          if (sx < -10 || sx > W + 10 || sy < -10 || sy > H + 10) continue;
+          const sizeT = rand();
+          const dotR =
+            (sizeT > 0.92 ? 3.6 + rand() * 2.2 : sizeT > 0.75 ? 1.8 + rand() * 1.2 : 0.7 + rand() * 0.9) *
+            (1 + scrollPct * 0.5);
+          const falloff = 1 - dist / (spreadR * 1.4);
+          const alpha = Math.min(
+            1,
+            Math.max(0.04, (0.85 - distFromActive * 0.22) * falloff * (sizeT > 0.92 ? 1.1 : 0.85))
+          );
+          ctx.beginPath();
+          ctx.arc(sx, sy, dotR, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+          ctx.fill();
+        }
+      });
+
+      /* NODES + YEAR LABELS
+         One node per unique year. Color is interpolated between the cluster
+         members' colors as activeF moves through the cluster.
+      */
+      uniqueYears.forEach((yr, si) => {
+        const { x: ex, y: ey } = spinePos(si);
+        if (ex < -80 || ex > W + 80 || ey < -80 || ey > H + 80) return;
+
+        const distFromActive = Math.abs(si - spineActiveF);
+        // Wider active zone for smoother transition halo
+        const activeFactor = Math.max(0, 1 - distFromActive * 1.5); // 0..1 smooth falloff
+        const isActive = distFromActive < 0.55;
+
+        // Interpolate color across cluster members
+        const idxs = clusters[yr];
+        const localF = Math.max(0, Math.min(idxs.length - 1, activeF - idxs[0]));
+        const p0 = Math.floor(localF);
+        const p1 = Math.min(idxs.length - 1, p0 + 1);
+        const tFrac = localF - p0;
+        const c0 = hexRgb(ENTRIES[idxs[p0]].color);
+        const c1 = hexRgb(ENTRIES[idxs[p1]].color);
+        const lerp = (a: number, b: number, tt: number) => Math.round(a + (b - a) * tt);
+        const nodeColor = `#${[
+          lerp(c0[0], c1[0], tFrac),
+          lerp(c0[1], c1[1], tFrac),
+          lerp(c0[2], c1[2], tFrac),
+        ].map((v) => v.toString(16).padStart(2, "0")).join("")}`;
+        const col = [lerp(c0[0], c1[0], tFrac), lerp(c0[1], c1[1], tFrac), lerp(c0[2], c1[2], tFrac)];
+        const colA = (a: number) => `rgba(${col[0]},${col[1]},${col[2]},${a})`;
+
+        if (isActive) {
+          const rg = ctx.createRadialGradient(ex, ey, 0, ex, ey, 38);
+          rg.addColorStop(0, colA(0.28));
+          rg.addColorStop(0.5, colA(0.1));
+          rg.addColorStop(1, colA(0));
+          ctx.save(); ctx.fillStyle = rg;
+          ctx.beginPath(); ctx.arc(ex, ey, 38, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+          ctx.save();
+          ctx.beginPath(); ctx.arc(ex, ey, 17, 0, Math.PI * 2);
+          ctx.strokeStyle = colA(0.4); ctx.lineWidth = 1.5;
+          ctx.shadowBlur = 12; ctx.shadowColor = colA(1); ctx.stroke(); ctx.restore();
+          ctx.save();
+          ctx.beginPath(); ctx.arc(ex, ey, 10, 0, Math.PI * 2);
+          ctx.fillStyle = nodeColor; ctx.shadowBlur = 18; ctx.shadowColor = colA(1); ctx.fill(); ctx.restore();
+          ctx.save();
+          ctx.beginPath(); ctx.arc(ex, ey, 3.5, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(255,255,255,0.95)"; ctx.shadowBlur = 6; ctx.shadowColor = "#fff"; ctx.fill(); ctx.restore();
+        } else {
+          const r2 = Math.max(4, 8 - distFromActive * 1.8);
+          const alpha = Math.max(0.15, 0.85 - distFromActive * 0.28);
+          ctx.save();
+          ctx.beginPath(); ctx.arc(ex, ey, r2, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255,255,255,${alpha})`; ctx.fill(); ctx.restore();
+        }
+
+        /* YEAR LABEL */
+        const yearScale = Math.max(0.48, 1 - distFromActive * 0.2);
+        const yearAlpha = Math.max(0.12, 1 - distFromActive * 0.32);
+        const yearSize = Math.round((isActive ? 62 : 36) * yearScale);
+        const yearX = ex - (isActive ? 36 : 24);
+        const isCluster = idxs.length > 1;
+
+        // Smooth color transition using cubic easing for organic feel
+        const colorBlendRaw = Math.max(0, 1 - distFromActive * 0.25);
+        const colorBlend = colorBlendRaw * colorBlendRaw * (3 - 2 * colorBlendRaw); // smoothstep
+        const inactiveBase = [210, 225, 255];
+        const yearColor = isActive
+          ? nodeColor
+          : `rgba(${Math.round(inactiveBase[0] + (col[0] - inactiveBase[0]) * colorBlend)},${Math.round(inactiveBase[1] + (col[1] - inactiveBase[1]) * colorBlend)},${Math.round(inactiveBase[2] + (col[2] - inactiveBase[2]) * colorBlend)},${0.45 + colorBlend * 0.45})`;
+
+        ctx.save();
+        ctx.font = `${isActive ? 800 : 600} ${yearSize}px 'Space Grotesk', 'Outfit', sans-serif`;
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+        ctx.globalAlpha = yearAlpha;
+        ctx.fillStyle = yearColor;
+        if (isActive) {
+          ctx.shadowBlur = 22;
+          ctx.shadowColor = colA(0.65);
+        }
+        // Year stays anchored to the node — pips are drawn below
+        ctx.fillText(yr, yearX, ey);
+        ctx.restore();
+
+        /* PIP TRACK — only for clusters, rendered BELOW the year label */
+        if (isActive && isCluster) {
+          // Measure the year text to position pips right below it
+          ctx.save();
+          ctx.font = `800 ${yearSize}px 'Space Grotesk', 'Outfit', sans-serif`;
+          const yearMetrics = ctx.measureText(yr);
+          const yearTextHeight = yearMetrics.actualBoundingBoxAscent + yearMetrics.actualBoundingBoxDescent;
+          ctx.restore();
+
+          const pipY = ey + Math.round(yearTextHeight / 2) + 10;
+          const pipW = 13;
+          const pipH = 3;
+          const gap = 6;
+          const total = idxs.length;
+          const totalW = total * pipW + (total - 1) * gap;
+          const startX = yearX - totalW;
+
+          // Continuous local position within cluster: 0..total-1
+          const localFClamped = Math.max(0, Math.min(total - 1, activeF - idxs[0]));
+
+          // Draw dim track slots
+          for (let p = 0; p < total; p++) {
+            const px = startX + p * (pipW + gap);
+            const memberCol = hexRgb(ENTRIES[idxs[p]].color);
+            ctx.save();
+            ctx.beginPath();
+            ctx.roundRect(px, pipY, pipW, pipH, 2);
+            ctx.fillStyle = `rgba(${memberCol[0]},${memberCol[1]},${memberCol[2]},0.25)`;
+            ctx.globalAlpha = 0.55;
+            ctx.fill();
+            ctx.restore();
+          }
+
+          // Sliding active pip — moves left to right as scroll increases
+          const cp0 = Math.floor(localFClamped);
+          const cp1 = Math.min(total - 1, cp0 + 1);
+          const cFrac = localFClamped - cp0;
+          const cc0 = hexRgb(ENTRIES[idxs[cp0]].color);
+          const cc1 = hexRgb(ENTRIES[idxs[cp1]].color);
+          const lerpC = (a: number, b: number, tt: number) => Math.round(a + (b - a) * tt);
+          const pipColor = `rgb(${lerpC(cc0[0], cc1[0], cFrac)},${lerpC(cc0[1], cc1[1], cFrac)},${lerpC(cc0[2], cc1[2], cFrac)})`;
+          // Pip x position: interpolates from slot 0 to slot total-1 as localFClamped goes 0→total-1
+          const activeX = startX + localFClamped * (pipW + gap);
+          ctx.save();
+          ctx.beginPath();
+          ctx.roundRect(activeX, pipY, pipW, pipH, 2);
+          ctx.fillStyle = pipColor;
+          ctx.shadowBlur = 9;
+          ctx.shadowColor = pipColor;
+          ctx.globalAlpha = 0.95;
+          ctx.fill();
+          ctx.restore();
+        }
+      });
+    },
+    [scrollPct, W, H, canvasRef]
+  );
 
   useEffect(() => {
-    const loop = (ts: number) => { draw(ts); animRef.current = requestAnimationFrame(loop); };
+    const loop = (ts: number) => {
+      draw(ts);
+      animRef.current = requestAnimationFrame(loop);
+    };
     animRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(animRef.current);
   }, [draw]);
@@ -516,8 +754,16 @@ function TimelineCanvas({ canvasRef, scrollPct, W, H }: {
 /* ================================================================
    VERTICAL PROGRESS
 ================================================================ */
-function VerticalProgress({ scrollPct, activeI, total, activeColor }: {
-  scrollPct: number; activeI: number; total: number; activeColor: string;
+function VerticalProgress({
+  scrollPct,
+  activeI,
+  total,
+  activeColor,
+}: {
+  scrollPct: number;
+  activeI: number;
+  total: number;
+  activeColor: string;
 }) {
   return (
     <div className="vp-wrap">
@@ -527,20 +773,109 @@ function VerticalProgress({ scrollPct, activeI, total, activeColor }: {
         <span className="vp-tot">{String(total).padStart(2, "0")}</span>
       </div>
       <div className="vp-track">
-        <div className="vp-fill" style={{
-          height: `${scrollPct * 100}%`,
-          background: `linear-gradient(180deg, ${activeColor}, #38bdf8)`,
-          boxShadow: `0 0 8px ${activeColor}88`,
-        }} />
+        <div
+          className="vp-fill"
+          style={{
+            height: `${scrollPct * 100}%`,
+            background: `linear-gradient(180deg, ${activeColor}, #38bdf8)`,
+            boxShadow: `0 0 8px ${activeColor}88`,
+          }}
+        />
       </div>
       <div className="vp-dots">
         {Array.from({ length: total }).map((_, i) => (
-          <div key={i} className="vp-dot" style={{
-            background: i === activeI ? activeColor : "rgba(255,255,255,0.18)",
-            boxShadow: i === activeI ? `0 0 6px ${activeColor}` : "none",
-            transform: i === activeI ? "scale(1.5)" : "scale(1)",
-          }} />
+          <div
+            key={i}
+            className="vp-dot"
+            style={{
+              background: i === activeI ? activeColor : "rgba(255,255,255,0.18)",
+              boxShadow: i === activeI ? `0 0 6px ${activeColor}` : "none",
+              transform: i === activeI ? "scale(1.5)" : "scale(1)",
+            }}
+          />
         ))}
+      </div>
+    </div>
+  );
+}
+
+/* ================================================================
+   YEAR TRANSITION BANNER
+================================================================ */
+function YearTransitionBanner({
+  prevEntry,
+  nextEntry,
+  transitionProgress,
+}: {
+  prevEntry: Entry | null;
+  nextEntry: Entry | null;
+  transitionProgress: number;
+}) {
+  if (!prevEntry || !nextEntry || prevEntry.year !== nextEntry.year) return null;
+  return (
+    <div
+      className="ytb-wrap"
+      style={{ opacity: Math.min(transitionProgress * 4, 1, (1 - transitionProgress) * 4) }}
+    >
+      <div
+        className="ytb-inner"
+        style={{
+          borderColor: `rgba(${hexRgb(nextEntry.color).join(",")}, 0.4)`,
+          color: nextEntry.color,
+        }}
+      >
+        <span className="ytb-dot" style={{ background: nextEntry.color }} />
+        <span className="ytb-label">
+          {prevEntry.role} → {nextEntry.role}
+        </span>
+        <span className="ytb-year">{nextEntry.year}</span>
+      </div>
+    </div>
+  );
+}
+
+/* ================================================================
+   GHOST YEAR — smooth cross-fade when year changes
+================================================================ */
+function GhostYear({ year, color }: { year: string; color: string }) {
+  const [state, setState] = useState({ current: year, prev: null as string | null, animKey: 0 });
+  const prevYearRef = useRef(year);
+
+  useEffect(() => {
+    if (year !== prevYearRef.current) {
+      setState((s) => ({ current: year, prev: prevYearRef.current, animKey: s.animKey + 1 }));
+      prevYearRef.current = year;
+    }
+  }, [year]);
+
+  // Clear the exiting year after animation completes
+  useEffect(() => {
+    if (state.prev !== null) {
+      const t = setTimeout(() => setState((s) => ({ ...s, prev: null })), 750);
+      return () => clearTimeout(t);
+    }
+  }, [state.animKey]);
+
+  const rgb = hexRgb(color).join(",");
+
+  return (
+    <div className="tl-ghost-wrap">
+      <div className="tl-ghost" style={{ "--ghost-rgb": rgb } as React.CSSProperties}>
+        {state.current.split("").map((char, i) => {
+          const prevChar = state.prev ? state.prev[i] : null;
+          const isChanging = state.prev && prevChar !== char;
+
+          if (!isChanging) {
+            return <span key={`static-${i}`}>{char}</span>;
+          }
+
+          return (
+            <span key={`dyn-${i}-${state.animKey}`} className="tl-ghost-digit-wrap">
+              <span className="tl-ghost-exit-digit">{prevChar}</span>
+              <span className="tl-ghost-enter-digit">{char}</span>
+            </span>
+          );
+        })}
       </div>
     </div>
   );
@@ -568,13 +903,25 @@ export default function ExperienceSection() {
 
   const N = ENTRIES.length;
   const progress = Math.min(1, scrollPct / 0.8);
-  const activeI = Math.min(Math.round(progress * (N - 1)), N - 1);
+  const activeF = progress * (N - 1);
+  // Bias the index calculation slightly so cards switch earlier on scroll (at 0.35 instead of 0.5)
+  const activeI = Math.min(Math.floor(activeF + 0.65), N - 1);
   const activeEntry = ENTRIES[Math.max(0, activeI)];
+
+  // Ghost year should transition at the exact same time as the active entry
+  const ghostI = Math.min(Math.floor(activeF + 0.65), N - 1);
+  const ghostEntry = ENTRIES[Math.max(0, ghostI)];
+
+  const floorI = Math.floor(activeF);
+  const ceilI = Math.min(floorI + 1, N - 1);
+  const frac = activeF - floorI;
+  const isSameYearTransition =
+    floorI !== ceilI && ENTRIES[floorI].year === ENTRIES[ceilI].year;
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&family=Outfit:wght@400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&family=Outfit:wght@400;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap');
 
         .tl-outer { position: relative; }
         .tl-sticky {
@@ -625,12 +972,11 @@ export default function ExperienceSection() {
         .tl-eyebrow {
           font-size: 10px; letter-spacing: 5px; text-transform: uppercase;
           color: rgba(56, 189, 248, 0.5); margin-bottom: 10px; display: block;
-          position: relative;
         }
         .tl-h1 {
           font-family: var(--font-malinton), 'Syne', sans-serif; font-size: clamp(26px, 3.2vw, 42px);
           font-weight: 800; color: #ffffff; letter-spacing: -1.5px;
-          line-height: 1.05; margin: 0 0 10px; position: relative;
+          line-height: 1.05; margin: 0 0 10px;
         }
         .tl-h1 .tc  { color: #38bdf8; text-shadow: 0 0 20px rgba(56, 189, 248, 0.4); }
         .tl-h1 .tc2 { color: #60a5fa; text-shadow: 0 0 20px rgba(96, 165, 250, 0.3); }
@@ -642,7 +988,6 @@ export default function ExperienceSection() {
           border: 1px solid rgba(56,189,248,0.2);
           border-radius: 999px; padding: 5px 14px;
           letter-spacing: 0.3px; width: fit-content;
-          position: relative;
           box-shadow: 0 0 12px rgba(56, 189, 248, 0.08);
         }
         .tl-version .dot {
@@ -656,11 +1001,49 @@ export default function ExperienceSection() {
           50% { opacity: 1; transform: scale(1.3); }
         }
 
-        /* ══ CARD — FIXED SIZE ══ */
+        /* ══ CARD ══ */
+        .ec-stack { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
         .ec-outer {
-          width: 380px; height: 440px; flex-shrink: 0;
-          cursor: pointer;
+          width: 380px; height: 490px; flex-shrink: 0;
+          cursor: pointer; perspective: 1400px;
         }
+        .ec-enter { animation: ecEnter 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        @keyframes ecEnter {
+          0% { opacity: 0; transform: translateY(28px) scale(0.96) perspective(1400px) rotateX(6deg); filter: blur(6px); }
+          60% { opacity: 1; filter: blur(0px); }
+          100% { opacity: 1; transform: translateY(0) scale(1) perspective(1400px) rotateX(0deg); filter: blur(0px); }
+        }
+        .ec-enter .ec-body > * {
+          animation: ecBodyIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+          animation-delay: calc(0.12s + var(--i, 0) * 0.05s);
+          opacity: 0;
+        }
+        .ec-enter .ec-toprow    { --i: 0; }
+        .ec-enter .ec-org-wrap  { --i: 1; }
+        .ec-enter .ec-role-row  { --i: 2; }
+        .ec-enter .ec-pills     { --i: 3; }
+        .ec-enter .ec-desc-wrap { --i: 4; }
+        .ec-enter .ec-tags      { --i: 5; }
+        @keyframes ecBodyIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .ec-enter .ec-tag {
+          animation: ecTagIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+          animation-delay: calc(0.32s + var(--ti, 0) * 0.04s);
+          opacity: 0;
+        }
+        @keyframes ecTagIn {
+          from { opacity: 0; transform: translateY(6px) scale(0.92); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .ec-enter, .ec-enter .ec-body > *, .ec-enter .ec-tag {
+            animation: none !important; opacity: 1 !important;
+            filter: none !important; transform: none !important;
+          }
+        }
+
         .ec-card {
           position: relative; border-radius: 22px; overflow: hidden;
           width: 100%; height: 100%;
@@ -675,35 +1058,67 @@ export default function ExperienceSection() {
             inset 0 -1px 0 rgba(255, 255, 255, 0.04),
             inset 1px 0 0 rgba(255, 255, 255, 0.06),
             inset -1px 0 0 rgba(255, 255, 255, 0.06);
-          transition: border-color .4s, box-shadow .45s, transform .4s cubic-bezier(0.2, 0.8, 0.2, 1), background .4s;
+          transition: border-color .5s cubic-bezier(0.2,0.8,0.2,1),
+                      box-shadow .6s cubic-bezier(0.2,0.8,0.2,1),
+                      transform .55s cubic-bezier(0.16, 1, 0.3, 1),
+                      background .5s cubic-bezier(0.2,0.8,0.2,1);
           transform-style: preserve-3d;
+          will-change: transform;
         }
         .ec-card.hov {
-          background: linear-gradient(145deg, rgba(200,225,255,0.12) 0%, rgba(150,200,255,0.06) 50%, rgba(100,180,255,0.08) 100%);
-          border-color: rgba(var(--rgb), 0.4);
+          background: linear-gradient(145deg, rgba(214,234,255,0.15) 0%, rgba(150,200,255,0.07) 50%, rgba(100,180,255,0.1) 100%);
+          border-color: rgba(var(--rgb), 0.5);
           box-shadow:
-            0 40px 80px rgba(0, 0, 0, 0.6),
-            0 10px 30px rgba(0, 20, 60, 0.3),
-            inset 0 1px 0 rgba(255, 255, 255, 0.35),
-            0 0 0 1px rgba(var(--rgb), 0.2),
-            0 0 40px rgba(var(--rgb), 0.1);
-          transform: scale(1.015) translateY(-2px)
-            perspective(1000px) rotateX(calc((var(--my) - 0.5) * -3deg)) rotateY(calc((var(--mx) - 0.5) * 3deg));
+            0 50px 100px rgba(0, 0, 0, 0.7),
+            0 16px 44px rgba(0, 20, 60, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.45),
+            0 0 0 1px rgba(var(--rgb), 0.3),
+            0 0 60px rgba(var(--rgb), 0.18),
+            0 0 130px rgba(var(--rgb), 0.09);
+          transform: scale(1.03) translateY(-8px)
+            perspective(1400px) rotateX(calc((var(--my) - 0.5) * -6deg)) rotateY(calc((var(--mx) - 0.5) * 6deg));
         }
 
-        /* Scanline sweep — cyan tint, HUD-style */
+        .ecl-edge {
+          position: absolute; inset: 0; border-radius: inherit;
+          pointer-events: none; z-index: 6; padding: 1px;
+          opacity: 0; transition: opacity .45s ease;
+          background: conic-gradient(from var(--edge-angle, 0deg),
+            transparent 0deg,
+            rgba(var(--rgb), 0.9) 35deg,
+            transparent 90deg,
+            transparent 270deg,
+            rgba(var(--rgb), 0.5) 325deg,
+            transparent 360deg);
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          animation: edgeSpin 5s linear infinite;
+        }
+        .ec-card.hov .ecl-edge { opacity: 1; }
+        @keyframes edgeSpin {
+          from { --edge-angle: 0deg; }
+          to   { --edge-angle: 360deg; }
+        }
+        @property --edge-angle {
+          syntax: '<angle>'; initial-value: 0deg; inherits: false;
+        }
+
+        .ecl-spotlight {
+          position: absolute; inset: 0; border-radius: inherit;
+          pointer-events: none; z-index: 1;
+          opacity: 0; transition: opacity .35s ease;
+          background: radial-gradient(420px circle at calc(var(--mx,0.5) * 100%) calc(var(--my,0.5) * 100%),
+            rgba(255,255,255,0.10), rgba(var(--rgb), 0.07) 40%, transparent 70%);
+        }
+        .ec-card.hov .ecl-spotlight { opacity: 1; }
+
         .ecl-scan {
           position: absolute; inset: 0; pointer-events: none; z-index: 4;
-          background: linear-gradient(
-            180deg,
-            transparent 0%,
-            rgba(56, 189, 248, 0.03) 44%,
-            rgba(56, 189, 248, 0.18) 50%,
-            rgba(56, 189, 248, 0.03) 56%,
-            transparent 100%
-          );
-          background-size: 100% 300%;
-          transition: opacity .35s;
+          background: linear-gradient(180deg,
+            transparent 0%, rgba(56,189,248,0.03) 44%,
+            rgba(56,189,248,0.18) 50%, rgba(56,189,248,0.03) 56%, transparent 100%);
+          background-size: 100% 300%; transition: opacity .35s;
           animation: scan 2.2s ease-in-out infinite;
         }
         @keyframes scan {
@@ -711,101 +1126,48 @@ export default function ExperienceSection() {
           100% { background-position-y: 200%; }
         }
 
-        /* Data grid overlay — appears on hover */
         .ecl-grid {
           position: absolute; inset: 0; pointer-events: none; z-index: 3;
           background-image:
-            linear-gradient(rgba(56, 189, 248, 0.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(56, 189, 248, 0.04) 1px, transparent 1px);
+            linear-gradient(rgba(56,189,248,0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(56,189,248,0.04) 1px, transparent 1px);
           background-size: 24px 24px;
           opacity: 0; transition: opacity .5s;
         }
         .ec-card.hov .ecl-grid { opacity: 1; }
 
-        /* Holographic ribbon — subtle sharp sweep */
-        .ecl-holographic-ribbon {
-          position: absolute; inset: 0; pointer-events: none; z-index: 5;
-          background: linear-gradient(
-            115deg,
-            transparent 0%,
-            transparent 45%,
-            rgba(255, 255, 255, 0.1) 48%,
-            rgba(56, 189, 248, 0.3) 50%,
-            rgba(255, 255, 255, 0.1) 52%,
-            transparent 55%,
-            transparent 100%
-          );
-          background-size: 200% 100%;
-          transition: opacity .4s;
-          animation: hovRibbon 3s infinite;
-        }
-        @keyframes hovRibbon {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-
-        /* Border refine */
         .ecl-border-line {
           position: absolute; inset: 0; border-radius: inherit;
           border: 1px solid rgba(var(--rgb), 0.3); opacity: 0; transition: opacity .4s;
           pointer-events: none; z-index: 6;
         }
         .ec-card.hov .ecl-border-line { opacity: 1; }
-        .ec-card.hov .ecl-border-scan { opacity: 1; }
-        @keyframes borderScan {
-          from { transform: rotate(0deg); }
-          to   { transform: rotate(360deg); }
-        }
 
-        /* Status indicator — bottom left */
-        .ec-status {
-          position: absolute; bottom: 16px; left: 18px; z-index: 7;
-          display: flex; align-items: center; gap: 6px;
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 8.5px; letter-spacing: 2px; text-transform: uppercase;
-          color: rgba(56, 189, 248, 0.7); pointer-events: none;
-          opacity: 0; transition: opacity .4s .15s;
-        }
-        .ec-card.hov .ec-status { opacity: 1; }
-        .ec-status-dot {
-          width: 5px; height: 5px; border-radius: 50%;
-          background: #38bdf8;
-          animation: statusPulse 1.5s ease-in-out infinite;
-          box-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
-        }
-        @keyframes statusPulse {
-          0%, 100% { opacity: 0.5; transform: scale(0.9); }
-          50% { opacity: 1; transform: scale(1.2); }
-        }
-
-        /* Corner brackets — colored glow matching entry */
         .ec-corner {
           position: absolute; width: 16px; height: 16px;
           border-color: var(--cc); border-style: solid;
           pointer-events: none; z-index: 6;
-          animation: cornerIn .22s ease forwards;
+          transition: opacity .25s ease, transform .35s cubic-bezier(0.16, 1, 0.3, 1);
           filter: drop-shadow(0 0 6px var(--cc));
+          transform: scale(0.6);
         }
-        @keyframes cornerIn {
-          from { opacity: 0; transform: scale(0.5); }
-          to   { opacity: 1; transform: scale(1); }
-        }
+        .ec-card.hov .ec-corner { transform: scale(1); }
         .ec-corner-tl { top: 10px; left: 10px; border-width: 1.5px 0 0 1.5px; border-radius: 3px 0 0 0; }
         .ec-corner-tr { top: 10px; right: 10px; border-width: 1.5px 1.5px 0 0; border-radius: 0 3px 0 0; }
         .ec-corner-bl { bottom: 10px; left: 10px; border-width: 0 0 1.5px 1.5px; border-radius: 0 0 0 3px; }
         .ec-corner-br { bottom: 10px; right: 10px; border-width: 0 1.5px 1.5px 0; border-radius: 0 0 3px 0; }
 
-        /* Hover CTA — bottom right */
         .ec-hover-cta {
           position: absolute; bottom: 16px; right: 16px; z-index: 7;
           display: flex; align-items: center; gap: 5px;
           font-family: 'JetBrains Mono', monospace;
           font-size: 9.5px; letter-spacing: 1.5px; text-transform: uppercase;
           color: var(--cc); pointer-events: none;
-          transition: opacity .3s;
+          transition: opacity .3s, transform .3s cubic-bezier(0.16, 1, 0.3, 1);
+          transform: translateX(-4px);
         }
+        .ec-card.hov .ec-hover-cta { transform: translateX(0); }
 
-        /* Glass layer styles */
         .ecl-s {
           position: absolute; inset: 0; pointer-events: none;
           background: linear-gradient(145deg, rgba(180,220,255,0.10) 0%, rgba(255,255,255,0.03) 40%, transparent 70%),
@@ -813,7 +1175,6 @@ export default function ExperienceSection() {
                       radial-gradient(circle at 75% 85%, rgba(100,180,255,0.06) 0%, transparent 50%);
           opacity: 0.85;
         }
-        .ecl-sp { position:absolute;width:280px;height:280px;border-radius:50%;pointer-events:none;z-index:1;transition:opacity .25s;background:radial-gradient(circle,rgba(180,220,255,0.12) 0%,rgba(255,255,255,0.04) 40%,transparent 65%);left:calc(var(--mx,0.5)*100% - 140px);top:calc(var(--my,0.5)*100% - 140px);filter:blur(12px); }
         .ecl-r { position:absolute;top:0;left:5%;right:5%;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(180,220,255,0.3) 20%,rgba(255,255,255,0.6) 45%,rgba(255,255,255,0.7) 55%,rgba(180,220,255,0.3) 80%,transparent 100%);pointer-events:none;z-index:2; }
         .ecl-n {
           position: absolute; inset: 0; border-radius: inherit;
@@ -821,39 +1182,33 @@ export default function ExperienceSection() {
           background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
           mix-blend-mode: overlay;
         }
-        .ecl-g { position:absolute;bottom:-1px;left:5%;right:5%;height:90px;background:radial-gradient(ellipse,rgba(140, 200, 255, 0.10) 0%,rgba(255,255,255,0.04) 40%,transparent 70%);pointer-events:none;transition:opacity .4s; }
+        .ecl-g { position:absolute;bottom:-1px;left:5%;right:5%;height:90px;background:radial-gradient(ellipse,rgba(140,200,255,0.10) 0%,rgba(255,255,255,0.04) 40%,transparent 70%);pointer-events:none;transition:opacity .4s; }
 
-        /* ── LOGO SLOT ── */
+        /* LOGO SLOT */
         .ec-logo-wrap {
           position: absolute; top: 16px; right: 16px;
           z-index: 5; pointer-events: none;
-          width: 56px; height: 56px;
+          width: 64px; height: 64px;
           display: flex; align-items: center; justify-content: center;
           border-radius: 14px;
           border: 1px solid rgba(255,255,255,0.15);
           background: rgba(255,255,255,0.03);
           backdrop-filter: blur(8px);
-          box-shadow: 
-            0 6px 16px rgba(0,0,0,0.25),
-            inset 0 1px 0 rgba(255,255,255,0.1);
+          box-shadow: 0 6px 16px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.1);
           overflow: hidden;
+          transition: transform .4s cubic-bezier(0.16,1,0.3,1), border-color .4s, box-shadow .4s;
+        }
+        .ec-card.hov .ec-logo-wrap {
+          transform: translateY(-2px) scale(1.04);
+          border-color: rgba(var(--rgb), 0.35);
+          box-shadow: 0 10px 22px rgba(0,0,0,0.3), 0 0 24px rgba(var(--rgb),0.18), inset 0 1px 0 rgba(255,255,255,0.15);
         }
         .ec-logo-shimmer {
           position: absolute; inset: 0; z-index: 2;
-          background: linear-gradient(
-            90deg,
-            transparent 0%,
-            rgba(255, 255, 255, 0) 40%,
-            rgba(255, 255, 255, 0.3) 50%,
-            rgba(255, 255, 255, 0) 60%,
-            transparent 100%
-          );
-          transform: translateX(-150%) skewX(-25deg);
-          pointer-events: none;
+          background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0) 40%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 60%, transparent 100%);
+          transform: translateX(-150%) skewX(-25deg); pointer-events: none;
         }
-        .ec-logo-shimmer.active {
-          animation: logoShimmer 1.8s cubic-bezier(0.19, 1, 0.22, 1) infinite;
-        }
+        .ec-logo-shimmer.active { animation: logoShimmer 1.8s cubic-bezier(0.19,1,0.22,1) infinite; }
         @keyframes logoShimmer {
           0%   { transform: translateX(-150%) skewX(-25deg); opacity: 0; }
           20%  { opacity: 1; }
@@ -861,8 +1216,7 @@ export default function ExperienceSection() {
           100% { transform: translateX(150%) skewX(-25deg); opacity: 0; }
         }
         .ec-logo-img {
-          width: 34px; height: 34px;
-          object-fit: contain;
+          width: 34px; height: 34px; object-fit: contain;
           filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
           position: relative; z-index: 1;
         }
@@ -871,20 +1225,9 @@ export default function ExperienceSection() {
           display: flex; align-items: center; justify-content: center;
           font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 800;
           letter-spacing: 0.5px; line-height: 1;
-          background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(var(--rgb), 0.15) 100%);
-          border: 1px solid rgba(var(--rgb), 0.35);
-          backdrop-filter: blur(8px);
-          box-shadow:
-            0 4px 15px rgba(0, 0, 0, 0.3),
-            inset 1.5px 1.5px 0 rgba(255, 255, 255, 0.3),
-            inset -1.5px -1.5px 0 rgba(0, 0, 0, 0.2),
-            0 0 20px rgba(var(--rgb), 0.2);
-          color: #fff;
-          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-          transform: translateZ(5px);
         }
 
-        /* ── CARD BODY ── */
+        /* CARD BODY */
         .ec-body {
           position: relative; z-index: 3;
           padding: 22px 70px 22px 22px;
@@ -893,49 +1236,31 @@ export default function ExperienceSection() {
           gap: 0; overflow: hidden;
         }
 
-        /* Top row */
-        .ec-toprow { display:flex;align-items:center;gap:7px;margin-bottom:18px;flex-wrap:wrap;flex-shrink:0; }
+        /* Top row — hash only */
+        .ec-toprow { display:flex;align-items:center;gap:7px;margin-bottom:18px;flex-shrink:0; }
         .ec-hash {
           font-size: 11px; padding: 3px 10px; border-radius: 6px;
           font-family: 'JetBrains Mono', monospace;
-          background: linear-gradient(135deg, rgba(255, 107, 43, 0.15) 0%, rgba(255, 107, 43, 0.08) 100%);
-          border: 1px solid rgba(255, 107, 43, 0.35);
+          background: linear-gradient(135deg, rgba(255,107,43,0.15) 0%, rgba(255,107,43,0.08) 100%);
+          border: 1px solid rgba(255,107,43,0.35);
           color: #ff8450; letter-spacing: 0.5px;
           backdrop-filter: blur(4px);
-          box-shadow:
-            0 2px 8px rgba(0, 0, 0, 0.2),
-            inset 1px 1px 0 rgba(255, 255, 255, 0.15);
-          transform: translateZ(2px);
-        }
-        .ec-branch {
-          font-size: 10px; padding: 3px 12px; border-radius: 999px;
-          font-family: 'JetBrains Mono', monospace;
-          background: linear-gradient(135deg, rgba(var(--rgb), 0.12) 0%, rgba(var(--rgb), 0.06) 100%);
-          border: 1px solid rgba(var(--rgb), 0.28);
-          color: var(--cc);
-          backdrop-filter: blur(4px);
-          box-shadow:
-            0 2px 8px rgba(0, 0, 0, 0.2),
-            inset 1px 1px 0 rgba(255, 255, 255, 0.1);
-          max-width: 155px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-          transform: translateZ(2px);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.2), inset 1px 1px 0 rgba(255,255,255,0.15);
         }
 
-        /* Role row — single line with kind badge */
+        /* Role row */
         .ec-role-row {
           display: flex; align-items: center; gap: 8px;
-          margin-bottom: 16px; flex-shrink: 0; flex-wrap: nowrap;
-          overflow: hidden;
+          margin-bottom: 16px; flex-shrink: 0; flex-wrap: nowrap; overflow: hidden;
         }
         .ec-kind-badge {
           font-family: 'JetBrains Mono', monospace;
           font-size: 8.5px; font-weight: 700; letter-spacing: 2px;
           text-transform: uppercase; padding: 3.5px 10px; border-radius: 5px;
-          background: linear-gradient(145deg, rgba(var(--rgb), 0.2) 0%, rgba(var(--rgb), 0.1) 100%);
-          border: 1px solid rgba(var(--rgb), 0.4);
+          background: linear-gradient(145deg, rgba(var(--rgb),0.2) 0%, rgba(var(--rgb),0.1) 100%);
+          border: 1px solid rgba(var(--rgb),0.4);
           color: var(--cc); flex-shrink: 0; line-height: 1;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), inset 1px 1px 0 rgba(255, 255, 255, 0.1);
-          transform: translateZ(3px);
+          box-shadow: 0 4px 8px rgba(0,0,0,0.15), inset 1px 1px 0 rgba(255,255,255,0.1);
         }
         .ec-role {
           font-family:'JetBrains Mono',monospace; font-size:11px;
@@ -945,15 +1270,13 @@ export default function ExperienceSection() {
         }
 
         /* Org connector */
-        .ec-org-wrap {
-          display: flex; align-items: stretch;
-          gap: 0; margin: 0 0 14px; flex-shrink: 0;
-        }
+        .ec-org-wrap { display:flex;align-items:stretch;gap:0;margin:0 0 14px;flex-shrink:0; }
         .ec-org-line {
-          width: 1px; margin: 2px 10px 2px 4px; flex-shrink: 0;
-          background: linear-gradient(180deg, var(--cc) 0%, rgba(var(--rgb),0.12) 100%);
-          opacity: 0.6; border-radius: 1px;
+          width:1px;margin:2px 10px 2px 4px;flex-shrink:0;
+          background:linear-gradient(180deg,var(--cc) 0%,rgba(var(--rgb),0.12) 100%);
+          opacity:0.6;border-radius:1px;transition:opacity .4s,box-shadow .4s;
         }
+        .ec-card.hov .ec-org-line { opacity:1;box-shadow:0 0 12px var(--cc); }
         .ec-org-inner { display:flex;flex-direction:column;justify-content:center;gap:2px; }
         .ec-org-label {
           font-family:'JetBrains Mono',monospace;
@@ -961,85 +1284,107 @@ export default function ExperienceSection() {
           color:rgba(var(--rgb),0.55);line-height:1;
         }
         .ec-org-name {
-          font-family: var(--font-malinton), 'Syne', sans-serif;
-          font-size: clamp(17px, 2.1vw, 24px); font-weight: 500;
-          color: #e8f4ff; line-height: 1.15; letter-spacing: 0.1px;
-          margin-top: 4px; white-space: pre-line;
+          font-family:var(--font-malinton),'Syne',sans-serif;
+          font-size:clamp(17px,2.1vw,24px);font-weight:500;
+          color:#e8f4ff;line-height:1.15;letter-spacing:0.1px;
+          margin-top:4px;white-space:pre-line;
         }
+        .ec-org-ai { color:#0055FF;text-shadow:0 0 16px rgba(0,85,255,0.55); }
 
         /* Pills */
         .ec-pills { display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;flex-shrink:0; }
         .ec-pill {
-          font-size: 9.5px; padding: 4px 11px; border-radius: 8px;
-          font-family: 'JetBrains Mono', monospace;
-          background: rgba(255, 255, 255, 0.04);
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          color: rgba(200, 220, 255, 0.6);
-          backdrop-filter: blur(4px);
-          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15), inset 1px 1px 0 rgba(255, 255, 255, 0.08);
-          transform: translateZ(1px);
+          font-size:9.5px;padding:4px 11px;border-radius:8px;
+          font-family:'JetBrains Mono',monospace;
+          background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);
+          color:rgba(200,220,255,0.6);backdrop-filter:blur(4px);
+          box-shadow:0 3px 10px rgba(0,0,0,0.15),inset 1px 1px 0 rgba(255,255,255,0.08);
+          transition:border-color .3s,color .3s,background .3s,box-shadow .3s;
         }
-        .ec-pill-dur {
-          border-color: rgba(var(--rgb), 0.35);
-          color: var(--cc);
-          background: rgba(var(--rgb), 0.08);
-          box-shadow: 0 3px 12px rgba(var(--rgb), 0.12), inset 1px 1px 0 rgba(255, 255, 255, 0.1);
-        }
-        .ec-pill-type {
-          border-color: rgba(56, 189, 248, 0.3);
-          color: rgba(130, 200, 255, 0.85);
-          background: rgba(56, 189, 248, 0.06);
-          box-shadow: 0 3px 12px rgba(56, 189, 248, 0.10), inset 1px 1px 0 rgba(255, 255, 255, 0.1);
-        }
+        .ec-card.hov .ec-pill { border-color:rgba(255,255,255,0.2);color:rgba(220,235,255,0.8); }
+        .ec-pill-dur { border-color:rgba(var(--rgb),0.35);color:var(--cc);background:rgba(var(--rgb),0.08); }
+        .ec-pill-type { border-color:rgba(56,189,248,0.3);color:rgba(130,200,255,0.85);background:rgba(56,189,248,0.06); }
 
         /* Desc */
-        .ec-desc-wrap { padding-left:14px;border-left:2px solid rgba(var(--rgb),0.3);margin-bottom:16px;flex-shrink:0; }
+        .ec-desc-wrap {
+          padding-left:14px;border-left:2px solid rgba(var(--rgb),0.3);margin-bottom:16px;flex-shrink:0;
+          transition:border-color .4s;
+        }
+        .ec-card.hov .ec-desc-wrap { border-left-color:rgba(var(--rgb),0.6); }
         .ec-desc {
           font-size:11.5px;line-height:1.72;color:rgba(180,215,255,0.48);margin:0;
           display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;
+          transition:color .4s;
         }
+        .ec-card.hov .ec-desc { color:rgba(195,222,255,0.62); }
 
         /* Tags */
         .ec-tags { display:flex;flex-wrap:wrap;gap:8px;flex-shrink:0; }
         .ec-tag {
-          font-size: 9.5px; padding: 5px 12px; border-radius: 6px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          background: rgba(255, 255, 255, 0.03);
-          color: rgba(190, 215, 255, 0.5);
-          backdrop-filter: blur(6px);
-          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15), inset 1px 1px 0 rgba(255, 255, 255, 0.05);
-          transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-          cursor: default;
-          transform: translateZ(2px);
+          font-size:9.5px;padding:5px 12px;border-radius:6px;
+          border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);
+          color:rgba(190,215,255,0.5);backdrop-filter:blur(6px);
+          box-shadow:0 3px 10px rgba(0,0,0,0.15),inset 1px 1px 0 rgba(255,255,255,0.05);
+          transition:all 0.25s cubic-bezier(0.2,0.8,0.2,1);cursor:default;
         }
         .ec-tag:hover {
-          border-color: rgba(var(--rgb), 0.5);
-          color: var(--cc);
-          background: rgba(var(--rgb), 0.08);
-          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3), 0 0 15px rgba(var(--rgb), 0.2);
-          transform: translateZ(8px) translateY(-2px) scale(1.05);
+          border-color:rgba(var(--rgb),0.5);color:var(--cc);background:rgba(var(--rgb),0.08);
+          box-shadow:0 8px 16px rgba(0,0,0,0.3),0 0 15px rgba(var(--rgb),0.2);
+          transform:translateY(-2px) scale(1.05);
         }
 
-        /* Bottom diff */
-        .ec-bottom { margin-top:auto;padding-top:14px;flex-shrink:0; }
-        .ec-stat { display:flex;gap:10px;flex-wrap:wrap;font-size:10px;margin-bottom:5px;font-family:'JetBrains Mono',monospace; }
-        .ec-files { color:rgba(200,220,255,0.28); }
-        .ec-adds  { color:#4ade80; }
-        .ec-dels  { color:#f87171; }
-        .ec-diffbar { display:flex;height:4px;border-radius:3px;overflow:hidden;gap:2px; }
+        /* YEAR TRANSITION BANNER */
+        .ytb-wrap {
+          position:absolute;bottom:80px;left:48px;z-index:9;pointer-events:none;
+          transition:opacity 0.25s ease;
+        }
+        .ytb-inner {
+          display:flex;align-items:center;gap:10px;padding:7px 16px 7px 12px;
+          border-radius:999px;border:1px solid;background:rgba(0,0,0,0.6);
+          backdrop-filter:blur(12px);font-family:'JetBrains Mono',monospace;
+          font-size:9.5px;letter-spacing:0.5px;
+        }
+        .ytb-dot { width:6px;height:6px;border-radius:50%;flex-shrink:0;animation:pulse 1.5s ease-in-out infinite; }
+        .ytb-label { color:rgba(200,220,255,0.55);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+        .ytb-year { font-weight:700;font-size:11px;opacity:0.9; }
 
-        /* ══ GHOST YEAR ══ */
+        /* GHOST YEAR — container + animated layers */
+        .tl-ghost-wrap {
+          position:absolute;left:39%;top:55%;transform:translate(-50%,-50%);
+          pointer-events:none;z-index:1;
+        }
         .tl-ghost {
-          position:absolute; left:39%; top:57%; transform:translate(-50%, -50%);
-          font-family: var(--font-malinton), 'Syne', sans-serif; font-size:clamp(100px,14vw,180px);
-          font-weight:800; color:transparent; -webkit-text-stroke:1px rgba(255,255,255,0.04);
-          pointer-events:none; z-index:1; letter-spacing:-6px; user-select:none; transition:opacity .5s;
+          position:relative; display:flex;
+          font-family:var(--font-malinton),'Syne',sans-serif;font-size:clamp(100px,14vw,180px);
+          font-weight:800;color:transparent;
+          -webkit-text-stroke:1px rgba(255,255,255,0.04);
+          letter-spacing:-6px;user-select:none;white-space:nowrap;
+        }
+        .tl-ghost-digit-wrap {
+          position:relative; display:inline-flex; align-items:center; justify-content:center;
+        }
+        .tl-ghost-exit-digit {
+          position:absolute; top:0; left:0; right:0; text-align:center;
+          animation: ghostExit 0.55s cubic-bezier(0.55, 0, 1, 0.45) both;
+        }
+        .tl-ghost-enter-digit {
+          display:inline-block;
+          animation: ghostEnter 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        @keyframes ghostEnter {
+          0%   { opacity: 0; transform: translateY(55px) scale(0.96); filter: blur(8px); }
+          50%  { filter: blur(0px); }
+          100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0px); }
+        }
+        @keyframes ghostExit {
+          0%   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0px); }
+          100% { opacity: 0; transform: translateY(-45px) scale(1.03); filter: blur(6px); }
         }
 
-        /* ══ VERTICAL PROGRESS ══ */
+        /* VERTICAL PROGRESS */
         .vp-wrap {
-          position:absolute; right:28px; top:50%; transform:translateY(-50%);
-          display:flex; flex-direction:column; align-items:center; gap:14px; z-index:10;
+          position:absolute;right:28px;top:50%;transform:translateY(-50%);
+          display:flex;flex-direction:column;align-items:center;gap:14px;z-index:10;
         }
         .vp-counter { display:flex;flex-direction:column;align-items:center;gap:2px;font-family:'JetBrains Mono',monospace; }
         .vp-cur { font-size:13px;font-weight:700;color:rgba(220,235,255,0.75);letter-spacing:1px;line-height:1; }
@@ -1057,13 +1402,21 @@ export default function ExperienceSection() {
         }
       `}</style>
 
-      <section className="tl-outer" ref={outerRef} style={{ height: `${(N + 2.5) * 100}vh` }}>
+      <section
+        className="tl-outer"
+        ref={outerRef}
+        style={{ height: `${(N + 2.5) * 100}vh` }}
+      >
         <div className="tl-sticky" ref={stickyRef}>
           <div className="tl-bg" />
           <div className="tl-stars" />
-          <div className="tl-ghost">{activeEntry.year}</div>
+          <GhostYear year={ghostEntry.year} color={ghostEntry.color} />
 
-          <canvas ref={canvasRef} className="tl-canvas" style={{ width: dims.w, height: dims.h }} />
+          <canvas
+            ref={canvasRef}
+            className="tl-canvas"
+            style={{ width: dims.w, height: dims.h }}
+          />
           <TimelineCanvas canvasRef={canvasRef} scrollPct={scrollPct} W={dims.w} H={dims.h} />
 
           <div className="tl-left">
@@ -1078,8 +1431,10 @@ export default function ExperienceSection() {
                 v{N}.0.0 &nbsp;·&nbsp; {ENTRIES[0].year} — {ENTRIES[N - 1].year}
               </div>
             </div>
-            <EntryCard key={activeEntry.id} entry={activeEntry} />
+            <EntryCard key={activeEntry.id} entry={activeEntry} transitionKey={activeEntry.id} />
           </div>
+
+
 
           <VerticalProgress
             scrollPct={progress}
