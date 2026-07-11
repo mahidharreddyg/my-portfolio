@@ -4,6 +4,7 @@ import Section from "@/components/section";
 import { motion, useScroll, useTransform, useSpring, MotionValue } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 
+
 const technologies = [
   { name: "Python", img: "/icons/blackandwhite/python.svg", hoverImg: "/icons/coloured/python.svg", color: "#3776AB", categories: ["ai-ml", "languages"] },
   { name: "JavaScript", img: "/icons/blackandwhite/js.svg", hoverImg: "/icons/coloured/js.svg", color: "#F7DF1E", categories: ["full-stack", "languages"] },
@@ -49,6 +50,7 @@ const technologies = [
   { name: "n8n", img: "/icons/blackandwhite/n8n.svg", hoverImg: "/icons/coloured/n8n.svg", color: "#FF6D5D", categories: ["devops", "ai-ml"] },
 ];
 
+
 const CATEGORIES = [
   {
     id: "languages",
@@ -80,6 +82,7 @@ const CATEGORIES = [
   },
 ];
 
+
 const layoutPattern = [12, 10, 8, 6, 4, 2];
 let currentIdx = 0;
 const diamondRows = layoutPattern.map(count => {
@@ -87,6 +90,7 @@ const diamondRows = layoutPattern.map(count => {
   currentIdx += count;
   return row;
 });
+
 
 function getTileParallaxOffset(rowIndex: number, colIndex: number, totalCols: number) {
   const center = (totalCols - 1) / 2;
@@ -98,11 +102,13 @@ function getTileParallaxOffset(rowIndex: number, colIndex: number, totalCols: nu
   return { xOffset, yOffset, rotation };
 }
 
+
 /* ─────────────────────────────────────────────────────────────────────────────
-   BACKGROUND
+   BACKGROUND - IMPROVED & CLEANER
 ───────────────────────────────────────────────────────────────────────────── */
 function Background() {
   const ref = useRef<HTMLCanvasElement>(null);
+
 
   useEffect(() => {
     const c = ref.current;
@@ -110,6 +116,8 @@ function Background() {
     const ctx = c.getContext("2d");
     if (!ctx) return;
     let raf: number;
+    let animationTime = 0;
+
 
     const resize = () => {
       const parent = c.parentElement;
@@ -124,38 +132,48 @@ function Background() {
     resize();
     window.addEventListener("resize", resize);
 
-    const lines = Array.from({ length: 45 }, (_, i) => ({
-      x: (i / 45) + (Math.random() * 0.04 - 0.02), // Even distribution with slight jitter
+
+    // Improved lines: smoother distribution, better opacity curve, refined colors
+    const lines = Array.from({ length: 35 }, (_, i) => ({
+      x: (i / 35) * (1 + 0.06) - 0.03 + (Math.random() * 0.02), // Smoother spread
       y: Math.random() * 2 - 1,
-      speed: Math.random() * 0.0015 + 0.0005,
-      len: Math.random() * 0.3 + 0.1,
-      opacity: Math.random() * 0.3 + 0.15,
-      hue: Math.random() > 0.5 ? 210 : 255,
+      speed: Math.random() * 0.0012 + 0.0004, // Slightly slower, more elegant
+      len: Math.random() * 0.25 + 0.08, // Shorter, more refined streaks
+      opacity: Math.random() * 0.25 + 0.1, // Better opacity range
+      hue: Math.random() > 0.5 ? 210 : 255, // Same blue/cyan palette
     }));
+
 
     function frame() {
       if (!c || !ctx) return;
       const W = c.width, H = c.height;
       ctx.clearRect(0, 0, W, H);
 
+
+      // Draw perspective grid - cleaner, more subtle
       ctx.save();
       const horizon = H * 0.45;
-      ctx.strokeStyle = "rgba(56,189,248,0.15)"; // Original subtle look
-      ctx.lineWidth = 0.5;
-      ctx.shadowBlur = 0; // No glow on grid
 
-      for (let i = -14; i <= 14; i++) {
-        const xBase = W / 2 + i * (W * 0.08);
+      // Vertical grid lines (perspective)
+      ctx.strokeStyle = "rgba(56,189,248,0.08)"; // More subtle
+      ctx.lineWidth = 0.4; // Thinner
+      ctx.shadowBlur = 0;
+
+
+      for (let i = -12; i <= 12; i++) {
+        const xBase = W / 2 + i * (W * 0.07);
         ctx.beginPath();
         ctx.moveTo(W / 2, horizon);
         ctx.lineTo(xBase, H);
         ctx.stroke();
       }
 
-      for (let j = 0; j < 15; j++) {
-        const p = (j / 14) ** 2;
+
+      // Horizontal grid lines - smoother fade
+      for (let j = 0; j < 12; j++) {
+        const p = (j / 11) ** 2;
         const y = horizon + (H - horizon) * p;
-        const alpha = 0.15 * (1 - j / 15);
+        const alpha = 0.08 * (1 - j / 12); // More subtle fade
         ctx.strokeStyle = `rgba(56,189,248,${alpha})`;
         ctx.beginPath();
         ctx.moveTo(0, y);
@@ -164,34 +182,46 @@ function Background() {
       }
       ctx.restore();
 
-      const time = Date.now() / 1000;
-      const pulse = (Math.sin(time * Math.PI) + 1) / 2;
+
+      // Animated falling streaks - refined and smoother
+      animationTime += 0.016;
+      const pulse = (Math.sin(animationTime * Math.PI * 0.8) + 1) / 2; // Smoother pulse
+
 
       lines.forEach((l) => {
-        l.y -= l.speed * 2; // Further boosted speed
-        if (l.y < -0.4) l.y = 1.2;
+        l.y -= l.speed * 1.8; // Smoothed speed
+        if (l.y < -0.3) l.y = 1.1;
+
 
         const lx = l.x * W;
         const lyTop = l.y * H;
         const lyBot = (l.y + l.len) * H;
 
+
+        // Better gradient with smoother transitions
         const g = ctx.createLinearGradient(0, lyTop, 0, lyBot);
         g.addColorStop(0, "transparent");
-        g.addColorStop(0.15, `hsla(${l.hue}, 100%, 90%, ${l.opacity * (0.9 + 0.1 * pulse)})`); // Extremely bright "head"
-        g.addColorStop(0.4, `hsla(${l.hue}, 100%, 75%, ${l.opacity * (0.7 + 0.3 * pulse)})`);
-        g.addColorStop(1, "transparent");
+        g.addColorStop(0.1, `hsla(${l.hue}, 90%, 85%, ${l.opacity * (0.85 + 0.15 * pulse)})`);
+        g.addColorStop(0.45, `hsla(${l.hue}, 85%, 70%, ${l.opacity * (0.6 + 0.25 * pulse)})`);
+        g.addColorStop(0.8, "transparent");
 
-        ctx.shadowBlur = 15 + 20 * pulse; // Maximum intensity glow
-        ctx.shadowColor = `hsla(${l.hue}, 100%, 70%, ${l.opacity * pulse})`;
+
+        // Reduced glow for cleaner look
+        ctx.shadowBlur = 8 + 12 * pulse;
+        ctx.shadowColor = `hsla(${l.hue}, 85%, 65%, ${l.opacity * pulse * 0.7})`;
         ctx.fillStyle = g;
-        ctx.fillRect(lx, lyTop, 3, Math.max(1, lyBot - lyTop)); // Thicker and brighter
+        ctx.fillRect(lx, lyTop, 2, Math.max(0.8, lyBot - lyTop));
       });
 
-      const ag = ctx.createRadialGradient(W / 2, horizon, 0, W / 2, horizon, W * 0.7);
-      ag.addColorStop(0, "rgba(10,25,80,0.12)"); // Reduced "blueness" intensity
+
+      // Ambient glow - more refined, less "bluish"
+      const ag = ctx.createRadialGradient(W / 2, horizon, 0, W / 2, horizon, W * 0.6);
+      ag.addColorStop(0, "rgba(10,25,60,0.08)"); // More subtle
+      ag.addColorStop(0.5, "rgba(8,20,50,0.04)");
       ag.addColorStop(1, "transparent");
       ctx.fillStyle = ag;
       ctx.fillRect(0, 0, W, H);
+
 
       raf = requestAnimationFrame(frame);
     }
@@ -201,6 +231,7 @@ function Background() {
       window.removeEventListener("resize", resize);
     };
   }, []);
+
 
   return (
     <canvas
@@ -213,14 +244,16 @@ function Background() {
         width: "100vw",
         height: "100%",
         zIndex: 0,
-        opacity: 0.6,
+        opacity: 0.7, // Slightly brighter
         pointerEvents: "none"
       }}
     />
   );
 }
 
+
 // ─── TechCard ─────────────────────────────────────────────────────────────────
+
 
 const TechCard = ({
   tech,
@@ -241,14 +274,17 @@ const TechCard = ({
 }) => {
   const { xOffset, yOffset, rotation } = getTileParallaxOffset(rowIndex, colIndex, totalCols);
 
+
   const x = useTransform(scrollProgress, [0, 0.75], [xOffset, 0], { ease: (t: number) => 1 - Math.pow(1 - t, 3) });
   const y = useTransform(scrollProgress, [0, 0.75], [yOffset, 0], { ease: (t: number) => 1 - Math.pow(1 - t, 3) });
   const rotate = useTransform(scrollProgress, [0, 0.75], [rotation, 0], { ease: (t: number) => 1 - Math.pow(1 - t, 3) });
   const scale = useTransform(scrollProgress, [0, 0.70], [0.5, 1], { ease: (t: number) => 1 - Math.pow(1 - t, 3) });
   const opacity = useTransform(scrollProgress, [0, 0.60], [0, 1]);
 
+
   const animDelay = `${(rowIndex * 0.05 + colIndex * 0.03).toFixed(2)}s`;
   const dimmed = hasActiveCategory && !isGroupHovered;
+
 
   return (
     <motion.div
@@ -315,6 +351,7 @@ const TechCard = ({
         .tech-card-inner.group-lit .outer-glow       { opacity: 1 !important; }
         .tech-card-inner.group-lit                   { transform: translateY(-4px) scale(1.06) !important; border-color: transparent !important; border-bottom: 2px solid #22d3ee !important; animation: group-hover-pulse 1.5s ease-in-out infinite; }
       `}</style>
+
 
       <div
         className="relative w-full h-full z-20 pointer-events-none"
@@ -386,7 +423,9 @@ const TechCard = ({
   );
 };
 
+
 // ─── Category Label ───────────────────────────────────────────────────────────
+
 
 const CategoryLabel = ({
   category,
@@ -405,6 +444,7 @@ const CategoryLabel = ({
 }) => {
   return (
 
+
     <div
       className="relative flex-1 flex flex-col items-center cursor-pointer select-none"
       style={{ minWidth: 0 }}
@@ -412,6 +452,7 @@ const CategoryLabel = ({
       onMouseLeave={onLeave}
     >
       {/* ── Main label block ── fixed outer size so nothing shifts ── */}
+
 
       <div
         className="relative flex flex-col items-center gap-[4px] px-4 py-[7px] bg-transparent rounded-lg"
@@ -439,6 +480,7 @@ const CategoryLabel = ({
           />
         ))}
 
+
         {/* Label row — constant size, style swaps on hover */}
         <div className="relative flex items-center justify-center" style={{ whiteSpace: 'nowrap', zIndex: 10 }}>
           <span
@@ -446,20 +488,22 @@ const CategoryLabel = ({
             style={{
               fontSize: 'clamp(14px, 1.5vw, 18px)',
 
+
               // Idle state: Transparent text revealed only by a shimmer sweep
               // Hover state: Full colored flicker glow
               WebkitTextFillColor: isHovered ? 'currentcolor' : 'transparent',
               color: isHovered ? category.color : 'transparent',
 
+
               backgroundColor: 'transparent',
               backgroundImage: !isHovered
                 ? `linear-gradient(115deg, 
                     transparent 10%, 
-                    rgba(255,255,255,0.03) 30%, 
-                    rgba(255,255,255,0.15) 42%, 
-                    rgba(255,255,255,0.7) 50%, 
-                    rgba(255,255,255,0.15) 58%, 
-                    rgba(255,255,255,0.03) 70%, 
+                    rgba(255,255,255,0.04) 30%, 
+                    rgba(255,255,255,0.18) 42%, 
+                    rgba(255,255,255,0.85) 50%, 
+                    rgba(255,255,255,0.18) 58%, 
+                    rgba(255,255,255,0.04) 70%, 
                     transparent 90%
                   )`
                 : 'none',
@@ -468,24 +512,28 @@ const CategoryLabel = ({
               WebkitBackgroundClip: !isHovered ? 'text' : 'none',
               backgroundClip: !isHovered ? 'text' : 'none',
 
+
               textShadow: isHovered
                 ? `0 0 10px ${category.glowColor}, 0 0 24px ${category.glowColor}`
                 : 'none',
 
+
               animationName: isHovered
                 ? 'cat-flicker'
                 : (sequenceIndex === 0 || sequenceIndex === 1 ? 'cat-shimmer-sweep-rtl' : 'cat-shimmer-sweep-ltr'),
-              animationDuration: isHovered ? '0.35s' : '10s',
+              animationDuration: isHovered ? '0.35s' : '12s', // Slower, more elegant
               animationTimingFunction: isHovered ? 'steps(1)' : 'linear',
               animationIterationCount: isHovered ? '1' : 'infinite',
               animationFillMode: isHovered ? 'forwards' : 'none',
-              animationDelay: isHovered ? '0s' : `${sequenceIndex * 2.5}s`,
+              animationDelay: isHovered ? '0s' : `${sequenceIndex * 3}s`, // Better spacing
+
 
               letterSpacing: '0.3em',
             }}
           >
             {category.label}
           </span>
+
 
           {/* Underline trace that animates in */}
           <div
@@ -499,6 +547,7 @@ const CategoryLabel = ({
             }}
           />
         </div>
+
 
         {/* Sub-label — always in flow with fixed min-height; hidden when idle */}
         <div style={{ minHeight: '12px', width: '100%', display: 'flex', justifyContent: 'center' }}>
@@ -516,6 +565,7 @@ const CategoryLabel = ({
             {category.subLabel}
           </span>
         </div>
+
 
         {/* Badge row — always in flow, hidden when idle */}
         <div
@@ -539,6 +589,7 @@ const CategoryLabel = ({
           <div className="w-[3px] h-[3px] rounded-full" style={{ background: category.color, boxShadow: `0 0 5px ${category.color}` }} />
         </div>
       </div>
+
 
       {/* ── Bottom connector (mirror) ── */}
       <div className="relative flex items-center justify-center w-full" style={{ height: '10px' }}>
@@ -568,6 +619,7 @@ const CategoryLabel = ({
         />
       </div>
 
+
       {/* Ambient glow — absolutely positioned, zero layout contribution */}
       <div
         className="absolute inset-0 rounded-xl pointer-events-none -z-10 transition-opacity duration-500"
@@ -580,16 +632,20 @@ const CategoryLabel = ({
   );
 };
 
+
 // ─── Main Component ───────────────────────────────────────────────────────────
+
 
 export default function Skills() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
+
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start 77%", "start 8%"],
   });
+
 
   const smoothProgress = useSpring(scrollYProgress, {
     stiffness: 80,
@@ -597,8 +653,10 @@ export default function Skills() {
     restDelta: 0.001,
   });
 
+
   const getCategoryCount = (catId: string) =>
     technologies.filter(t => t.categories.includes(catId)).length;
+
 
   return (
     <Section
@@ -608,6 +666,7 @@ export default function Skills() {
       style={{ background: 'radial-gradient(ellipse at center, #020617 0%, #010414 40%, #000000 75%)' }}
     >
       <style>{`
+        /* Enhanced Tech Stack Title Shimmer - smoother, more elegant */
         .tech-stack-title {
           background: linear-gradient(
             125deg,
@@ -622,31 +681,49 @@ export default function Skills() {
         }
         .tech-stack-shimmer {
           position: absolute; inset: 0;
-          background: linear-gradient(120deg, transparent 0%, transparent 30%, rgba(255,255,255,0.4) 50%, transparent 70%, transparent 100%);
-          background-size: 200% 100%;
+          background: linear-gradient(
+            120deg, 
+            transparent 0%, 
+            transparent 25%, 
+            rgba(255,255,255,0.15) 40%, 
+            rgba(255,255,255,0.55) 50%, 
+            rgba(255,255,255,0.15) 60%, 
+            transparent 75%, 
+            transparent 100%
+          );
+          background-size: 250% 100%;
           -webkit-background-clip: text; background-clip: text;
           -webkit-text-fill-color: transparent;
           opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
         }
         .tech-stack-title:hover .tech-stack-shimmer {
           opacity: 1;
-          animation: shimmer-sweep 1.2s ease-in-out infinite;
+          animation: shimmer-sweep 1.8s ease-in-out infinite;
         }
         @keyframes shimmer-sweep {
-          0%   { background-position: 200% center; }
-          100% { background-position: -200% center; }
+          0%   { background-position: 250% center; }
+          100% { background-position: -150% center; }
         }
 
-        /* Category Label Animations */
+
+        /* Category Label Animations - Enhanced shimmer sweeps */
         @keyframes cat-shimmer-sweep-ltr {
-          0%   { background-position: -150% 0; }
-          35%  { background-position: 150% 0; }
-          100% { background-position: 150% 0; }
+          0%   { background-position: -180% 0; }
+          20%  { opacity: 0.5; }
+          30%  { opacity: 1; }
+          40%  { background-position: 180% 0; }
+          60%  { opacity: 1; }
+          70%  { opacity: 0.5; }
+          100% { background-position: 180% 0; }
         }
         @keyframes cat-shimmer-sweep-rtl {
-          0%   { background-position: 150% 0; }
-          35%  { background-position: -150% 0; }
-          100% { background-position: -150% 0; }
+          0%   { background-position: 180% 0; }
+          20%  { opacity: 0.5; }
+          30%  { opacity: 1; }
+          40%  { background-position: -180% 0; }
+          60%  { opacity: 1; }
+          70%  { opacity: 0.5; }
+          100% { background-position: -180% 0; }
         }
         @keyframes cat-flicker {
           0%, 100% { opacity: 1; }
@@ -661,12 +738,15 @@ export default function Skills() {
         }
       `}</style>
 
+
       <Background />
+
 
       <h2 className="tech-stack-title font-malinton text-5xl md:text-7xl font-bold mb-10 cursor-default select-none text-center">
         Tech Stack
         <span className="tech-stack-shimmer" aria-hidden="true">Tech Stack</span>
       </h2>
+
 
       <div className="relative w-full">
         {/* Background glows */}
@@ -683,6 +763,7 @@ export default function Skills() {
           style={{ background: "radial-gradient(circle, rgba(0,120,255,0.25) 0%, rgba(0,60,200,0.15) 40%, transparent 80%)" }}
         />
 
+
         {/* Active category ambient glow */}
         {activeCategory && (() => {
           const cat = CATEGORIES.find(c => c.id === activeCategory);
@@ -693,6 +774,7 @@ export default function Skills() {
             />
           ) : null;
         })()}
+
 
         {/* ── Category Labels (Absolute Full-Width) ── */}
         <div className="absolute top-[65%] left-0 right-0 z-30 pointer-events-none">
@@ -712,6 +794,7 @@ export default function Skills() {
             ))}
           </div>
 
+
           {/* Right Side Pair */}
           <div className="absolute right-[-200px] top-0 flex flex-col gap-12 items-end text-right pointer-events-auto">
             {CATEGORIES.slice(2).map((cat) => (
@@ -728,6 +811,7 @@ export default function Skills() {
             ))}
           </div>
         </div>
+
 
         <div
           ref={sectionRef}
@@ -755,6 +839,7 @@ export default function Skills() {
               </div>
             ))}
           </div>
+
 
 
         </div>

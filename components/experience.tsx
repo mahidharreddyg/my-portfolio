@@ -38,7 +38,7 @@ const ENTRIES: Entry[] = [
     type: "ICSE Board",
     desc: "Completed ICSE secondary education. Built a strong foundation in science, mathematics, and computer science fundamentals over a decade of schooling.",
     tags: ["Mathematics", "Science", "Computer Science", "English"],
-    color: "#38bdf8",
+    color: "#3b82f6", // blue
     logo: "/icons/skps.svg",
     href: "/experience/sri-kumaran",
     logoScale: 1.3,
@@ -55,7 +55,7 @@ const ENTRIES: Entry[] = [
     type: "CBSE Board",
     desc: "Completed higher secondary education under the CBSE curriculum with a focus on PCM (Physics, Chemistry, Mathematics) and Computer Science.",
     tags: ["Physics", "Chemistry", "Mathematics", "Computer Science"],
-    color: "#f472b6",
+    color: "#ec4899", // pink
     logo: "/icons/nehru.svg",
     href: "/experience/nehru-smaraka",
     logoScale: 1.25,
@@ -72,7 +72,7 @@ const ENTRIES: Entry[] = [
     type: "Undergraduate",
     desc: "Pursuing BTech in Computer Science. Active member of Entrepreneurship Cell VIT and Apple Developer's Group VIT. Focused on software engineering and product development.",
     tags: ["DSA", "OS", "DBMS", "Swift", "Problem Solving"],
-    color: "#a78bfa",
+    color: "#eab308", // yellow
     logo: "/icons/vit.svg",
     href: "/experience/vit",
     logoScale: 1.25,
@@ -89,7 +89,7 @@ const ENTRIES: Entry[] = [
     type: "Internship",
     desc: "On-site internship building production features for real-world software systems. Gained hands-on exposure to professional engineering workflows and collaborative development.",
     tags: ["Software Development", "On-site", "Bengaluru"],
-    color: "#34d399",
+    color: "#a855f7", // purple
     logo: "/icons/Synclovis.svg",
     href: "/experience/synclovis",
   },
@@ -106,7 +106,7 @@ const ENTRIES: Entry[] = [
     type: "Leadership",
     desc: "Led the creative direction for one of VIT's most active student organizations. Drove design, branding, and event experiences for entrepreneurship initiatives across campus.",
     tags: ["Leadership", "Branding", "Design", "Event Management"],
-    color: "#fb923c",
+    color: "#f97316", // orange
     logo: "/icons/ecell vit.svg",
     href: "/experience/ecell-vit",
     logoScale: 1.2,
@@ -115,9 +115,26 @@ const ENTRIES: Entry[] = [
     id: 6,
     kind: "work",
     year: "2026",
+    role: "AI Solutions Intern",
+    org: "Avaamo.ai",
+    period: "May 2026 — Jul 2026",
+    location: "Bengaluru, India",
+    duration: "2m",
+    type: "Internship",
+    desc: "Started at Avaamo as an AI Solutions Intern in the Pre-Sales Strategic Partnerships BU. Built early agentic AI prototypes and multi-agent voice/chat co-pilots for enterprise clients across pharma and other verticals.",
+    tags: ["Agentic AI", "LLM Orchestration", "Pre-Sales", "Voice AI"],
+    color: "#22c55e", // green
+    logo: "/icons/avaamo_logo.svg",
+    href: "/experience/avaamo",
+    logoScale: 1.4,
+  },
+  {
+    id: 7,
+    kind: "work",
+    year: "2026",
     role: "AI Solutions Engineer",
     org: "Avaamo.ai",
-    period: "May 2026 — Present",
+    period: "Jul 2026 — Present",
     location: "Bengaluru, India",
     duration: "ongoing",
     type: "Full-time",
@@ -180,7 +197,11 @@ function useScrollPct(ref: React.RefObject<HTMLElement>) {
       if (!ref.current) return;
       const { top, height } = ref.current.getBoundingClientRect();
       const vh = window.innerHeight;
-      targetRef.current = Math.max(0, Math.min(1, -top / (height - vh)));
+      const scrolled = -top;
+      const revealZone = vh; // Wait 100vh while previous section rolls over
+      const activeScroll = Math.max(0, scrolled - revealZone);
+      const activeTotal = height - vh - revealZone;
+      targetRef.current = activeTotal > 0 ? Math.max(0, Math.min(1, activeScroll / activeTotal)) : 0;
     };
 
     const tick = () => {
@@ -256,7 +277,8 @@ function EntryCard({
   const rgb = hexRgb(entry.color).join(",");
 
   const hashMap: Record<number, string> = {
-    1: "f0a1b2c", 2: "3d8e2f1", 3: "c5b8e3d", 4: "9a3c7f2", 5: "e1d4b90", 6: "a7f3d08",
+    1: "f0a1b2c", 2: "3d8e2f1", 3: "c5b8e3d",
+    4: "9a3c7f2", 5: "e1d4b90", 6: "a7f3d08", 7: "b2e9c14",
   };
 
   const handleClick = () => {
@@ -647,7 +669,7 @@ function TimelineCanvas({
 
         /* YEAR LABEL */
         const yearScale = Math.max(0.48, 1 - distFromActive * 0.2);
-        const yearAlpha = Math.max(0.12, 1 - distFromActive * 0.32);
+        const yearAlpha = Math.max(0.15, 1.0 - distFromActive * 0.3);
         const yearSize = Math.round((isActive ? 62 : 36) * yearScale);
         const yearX = ex - (isActive ? 36 : 24);
         const isCluster = idxs.length > 1;
@@ -656,19 +678,23 @@ function TimelineCanvas({
         const colorBlendRaw = Math.max(0, 1 - distFromActive * 0.25);
         const colorBlend = colorBlendRaw * colorBlendRaw * (3 - 2 * colorBlendRaw); // smoothstep
         const inactiveBase = [210, 225, 255];
-        const yearColor = isActive
-          ? nodeColor
-          : `rgba(${Math.round(inactiveBase[0] + (col[0] - inactiveBase[0]) * colorBlend)},${Math.round(inactiveBase[1] + (col[1] - inactiveBase[1]) * colorBlend)},${Math.round(inactiveBase[2] + (col[2] - inactiveBase[2]) * colorBlend)},${0.45 + colorBlend * 0.45})`;
+        const nodeRgb = [Math.round(inactiveBase[0] + (col[0] - inactiveBase[0]) * colorBlend), Math.round(inactiveBase[1] + (col[1] - inactiveBase[1]) * colorBlend), Math.round(inactiveBase[2] + (col[2] - inactiveBase[2]) * colorBlend)];
+        const colorBase = isActive ? col.join(",") : nodeRgb.join(",");
 
         ctx.save();
         ctx.font = `${isActive ? 800 : 600} ${yearSize}px 'Space Grotesk', 'Outfit', sans-serif`;
         ctx.textAlign = "right";
         ctx.textBaseline = "middle";
         ctx.globalAlpha = yearAlpha;
-        ctx.fillStyle = yearColor;
+
+        const grad = ctx.createLinearGradient(0, ey - yearSize / 2, 0, ey + yearSize / 2);
+        grad.addColorStop(0, `rgba(${colorBase}, 1)`);
+        grad.addColorStop(1, `rgba(${colorBase}, 0.3)`);
+        ctx.fillStyle = grad;
+
         if (isActive) {
-          ctx.shadowBlur = 22;
-          ctx.shadowColor = colA(0.65);
+          ctx.shadowBlur = 15;
+          ctx.shadowColor = colA(0.4);
         }
         // Year stays anchored to the node — pips are drawn below
         ctx.fillText(yr, yearX, ey);
@@ -928,9 +954,8 @@ export default function ExperienceSection() {
           position: sticky; top: 0; height: 100vh; width: 100%;
           overflow: hidden; font-family: 'JetBrains Mono', monospace;
           background: #000; border-top: 1px solid rgba(255,255,255,0.05);
-          border-radius: 3rem 3rem 0 0; box-shadow: 0 20px 100px rgba(0,0,0,0.9);
+          box-shadow: 0 20px 100px rgba(0,0,0,0.9);
         }
-        @media(min-width:768px){ .tl-sticky { border-radius: 4rem 4rem 0 0; } }
 
         .tl-bg {
           position: absolute; inset: 0; z-index: 0;
@@ -1356,9 +1381,14 @@ export default function ExperienceSection() {
         .tl-ghost {
           position:relative; display:flex;
           font-family:var(--font-malinton),'Syne',sans-serif;font-size:clamp(100px,14vw,180px);
-          font-weight:800;color:transparent;
-          -webkit-text-stroke:1px rgba(255,255,255,0.04);
+          font-weight:800;
           letter-spacing:-6px;user-select:none;white-space:nowrap;
+        }
+        .tl-ghost span {
+          background: linear-gradient(180deg, rgba(var(--ghost-rgb), 0.2) 0%, rgba(var(--ghost-rgb), 0) 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          -webkit-text-stroke: 1px rgba(var(--ghost-rgb), 0.1);
         }
         .tl-ghost-digit-wrap {
           position:relative; display:inline-flex; align-items:center; justify-content:center;
@@ -1405,7 +1435,7 @@ export default function ExperienceSection() {
       <section
         className="tl-outer"
         ref={outerRef}
-        style={{ height: `${(N + 2.5) * 100}vh` }}
+        style={{ height: `${(N + 3.5) * 100}vh` }}
       >
         <div className="tl-sticky" ref={stickyRef}>
           <div className="tl-bg" />

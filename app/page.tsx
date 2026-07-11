@@ -11,6 +11,7 @@ import Skills from "@/components/skills";
 import Experience from "@/components/experience";
 import Projects from "@/components/projects";
 import Certifications from "@/components/certifications";
+import AboutMe from "@/components/about-me";
 
 export default function Home() {
   const sectionRef = useRef(null);
@@ -33,10 +34,10 @@ export default function Home() {
 
     function updateClipPath() {
       if (!sectionRef.current) return;
-
+      const el = sectionRef.current as HTMLElement;
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      const sectionHeight = vh * 1.3; // REDUCED from 200vh to 130vh
+      const sectionHeight = Math.max(vh * 1.3, el.scrollHeight); // Use actual content height if taller
       const bandCenterY = 120;
       const angleRad = (12 * Math.PI) / 180;
 
@@ -57,8 +58,8 @@ export default function Home() {
           0% ${leftY}px,
           50% ${centerY}px, 
           100% ${rightY}px,
-          100% ${sectionHeight}px,
-          0% ${sectionHeight}px
+          100% ${sectionHeight + 200}px,
+          0% ${sectionHeight + 200}px
         )
       `.replace(/\s+/g, ' '));
     }
@@ -114,21 +115,20 @@ export default function Home() {
               {/* ABOUT SECTION: Normal Document Flow so it correctly sits beneath Marquee */}
               <div
                 ref={sectionRef}
-                className="relative min-h-[130vh] bg-gradient-to-br from-blue-900 via-black to-black overflow-hidden flex items-center justify-center pointer-events-auto"
-                style={{ clipPath }}
+                className="relative bg-gradient-to-br from-blue-900 via-black to-black overflow-hidden flex items-start justify-center pointer-events-auto rounded-b-[3rem] md:rounded-b-[4rem] z-20"
+                style={{ clipPath, minHeight: "130vh" }}
               >
-                <Section id="about" title="About Me" className="bg-transparent w-full">
-                  <div className="py-4 md:py-12 flex items-center justify-center w-full min-h-[80vh] px-4 md:px-8">
-                    <BentoGridRedesign />
-                  </div>
-                </Section>
+                <div className="w-full flex flex-col items-center justify-start pt-[18rem] md:pt-[24rem] pb-24 px-4 md:px-8">
+                  <BentoGridRedesign />
+                  <AboutMe />
+                </div>
               </div>
 
               {/* =========================================
                   NATIVE CSS STICKY PARALLAX STACKING 
                   (Hardware-accelerated and buttery smooth, no scroll trapping)
                   ========================================= */}
-              <div className="relative w-full bg-black">
+              <div className="relative w-full bg-black z-10 mt-[-100vh]">
 
                 {/* 1. EXPERIENCE - z10 */}
                 <div id="experience" className="relative w-full z-10">
