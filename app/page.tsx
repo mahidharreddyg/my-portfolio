@@ -11,6 +11,7 @@ import Skills from "@/components/skills";
 import Experience from "@/components/experience";
 import Projects from "@/components/projects";
 import Certifications from "@/components/certifications";
+import AboutMe from "@/components/about-me";
 
 export default function Home() {
   const sectionRef = useRef(null);
@@ -33,10 +34,10 @@ export default function Home() {
 
     function updateClipPath() {
       if (!sectionRef.current) return;
-
+      const el = sectionRef.current as HTMLElement;
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      const sectionHeight = vh * 1.3; // REDUCED from 200vh to 130vh
+      const sectionHeight = Math.max(vh * 1.3, el.scrollHeight); // Use actual content height if taller
       const bandCenterY = 120;
       const angleRad = (12 * Math.PI) / 180;
 
@@ -57,8 +58,8 @@ export default function Home() {
           0% ${leftY}px,
           50% ${centerY}px, 
           100% ${rightY}px,
-          100% ${sectionHeight}px,
-          0% ${sectionHeight}px
+          100% ${sectionHeight + 200}px,
+          0% ${sectionHeight + 200}px
         )
       `.replace(/\s+/g, ' '));
     }
@@ -114,21 +115,20 @@ export default function Home() {
               {/* ABOUT SECTION: Normal Document Flow so it correctly sits beneath Marquee */}
               <div
                 ref={sectionRef}
-                className="relative min-h-[130vh] bg-gradient-to-br from-blue-900 via-black to-black overflow-hidden flex items-center justify-center pointer-events-auto"
-                style={{ clipPath }}
+                className="relative bg-gradient-to-br from-blue-900 via-black to-black overflow-hidden flex items-start justify-center pointer-events-auto rounded-b-[3rem] md:rounded-b-[4rem] z-20"
+                style={{ clipPath, minHeight: "130vh" }}
               >
-                <Section id="about" title="About Me" className="bg-transparent w-full">
-                  <div className="py-4 md:py-12 flex items-center justify-center w-full min-h-[80vh] px-4 md:px-8">
-                    <BentoGridRedesign />
-                  </div>
-                </Section>
+                <div className="w-full flex flex-col items-center justify-start pt-[18rem] md:pt-[24rem] pb-24 px-4 md:px-8">
+                  <BentoGridRedesign />
+                  <AboutMe />
+                </div>
               </div>
 
               {/* =========================================
                   NATIVE CSS STICKY PARALLAX STACKING 
                   (Hardware-accelerated and buttery smooth, no scroll trapping)
                   ========================================= */}
-              <div className="relative w-full bg-black">
+              <div className="relative w-full bg-black z-10 mt-[-100vh]">
 
                 {/* 1. EXPERIENCE - z10 */}
                 <div id="experience" className="relative w-full z-10">
@@ -147,21 +147,20 @@ export default function Home() {
                   <Projects />
                 </div>
 
-                {/* 4. CERTIFICATIONS - z40 (Stacks OVER Projects) */}
-                <div className="relative h-[135vh] z-40 mt-[-100vh] bg-black">
-                  <div id="certifications" className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-[3rem] md:rounded-[4rem] bg-zinc-950 shadow-[0_-50px_100px_rgba(0,0,0,0.9)] border-t border-white/5 overflow-hidden">
+                {/* 4. CERTIFICATIONS - z50 (Top Layer, uncovers footer) */}
+                <div className="relative h-[200vh] z-50 mt-[-100vh]">
+                  <div id="certifications" className="sticky top-0 h-screen w-full rounded-[3rem] md:rounded-[4rem] bg-zinc-950 shadow-[0_-50px_100px_rgba(0,0,0,0.9)] border-t border-white/5 overflow-hidden">
                     <Certifications />
                   </div>
                 </div>
 
-                {/* 5. FOOTER - z50 (Stacks OVER Certifications) */}
-                <div className="relative z-50 mt-[-100vh]">
-                  <div id="footer" className="relative h-screen sm:h-[60vh] md:h-[50vh] w-full flex flex-col justify-end bg-black shadow-[0_-20px_100px_rgba(0,0,0,1)] border-t border-white/10">
-                    <div className="w-full h-full overflow-hidden">
-                      <Footer />
-                    </div>
+                {/* 5. FOOTER - z40 (Revealed as Certifications scrolls away from bottom) */}
+                <div className="relative h-[60vh] z-40 mt-[-60vh]">
+                  <div id="footer" className="sticky bottom-0 h-[60vh] w-full bg-black border-t border-white/10">
+                    <Footer />
                   </div>
                 </div>
+
 
               </div>
 
