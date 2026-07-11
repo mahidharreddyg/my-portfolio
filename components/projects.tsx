@@ -5,6 +5,15 @@ import React, { useEffect, useRef, useState, useTransition } from "react";
 /* ─────────────────────────────────────────────────────────────
    GLASS
 ───────────────────────────────────────────────────────────── */
+const BlinkingCursor = () => {
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setTick(t => t + 1), 600);
+    return () => clearInterval(id);
+  }, []);
+  return <>{tick % 2 === 0 ? "█" : " "}</>;
+};
+
 const glass: React.CSSProperties = {
   background: "rgba(255,255,255,0.03)",
   backdropFilter: "blur(3px) saturate(200%)",
@@ -295,7 +304,6 @@ function ProjectCard({ p }: { p: typeof projects[0] }) {
 export default function Projects() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
-  const [tick, setTick] = useState(0);
   const [activeCategory, setActiveCategory] = useState<string>("Full Stack");
   const [, startTransition] = useTransition();
 
@@ -324,6 +332,7 @@ export default function Projects() {
     const tR = tab.getBoundingClientRect();
     setPillLeft(tR.left - wR.left);
     setPillWidth(tR.width);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeCategory]);
 
@@ -349,30 +358,45 @@ export default function Projects() {
   const filteredProjects = projects.filter(p => p.category === activeCategory);
 
   useEffect(() => {
+    let ticking = false;
+    let mounted = true;
+
     const onScroll = () => {
-      const s = sectionRef.current;
-      if (!s) return;
-      const rect = s.getBoundingClientRect();
-      const sectionHeight = s.offsetHeight;
-      const viewportHeight = window.innerHeight;
-      const scrolled = -rect.top;
-      const totalScrollable = sectionHeight - viewportHeight;
-      const revealZone = viewportHeight;
-      const exitZone = viewportHeight;
-      const activeScroll = Math.max(0, scrolled - revealZone);
-      const activeTotal = totalScrollable - revealZone - exitZone;
-      const p = activeTotal > 0 ? Math.min(Math.max(0, activeScroll / activeTotal), 1) : 0;
-      setProgress(p);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          if (!mounted) return;
+          const s = sectionRef.current;
+          if (s) {
+            const rect = s.getBoundingClientRect();
+            const sectionHeight = s.offsetHeight;
+            const viewportHeight = window.innerHeight;
+            const scrolled = -rect.top;
+            const totalScrollable = sectionHeight - viewportHeight;
+            const revealZone = viewportHeight;
+            const exitZone = viewportHeight;
+            const activeScroll = Math.max(0, scrolled - revealZone);
+            const activeTotal = totalScrollable - revealZone - exitZone;
+            const p = activeTotal > 0 ? Math.min(Math.max(0, activeScroll / activeTotal), 1) : 0;
+            setProgress(p);
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
+
     window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
+    // Force initial calculation slightly after paint so refs are populated
+    const t = setTimeout(onScroll, 50);
+
+    return () => {
+      mounted = false;
+      clearTimeout(t);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
-  useEffect(() => {
-    const id = setInterval(() => setTick(t => t + 1), 600);
-    return () => clearInterval(id);
-  }, []);
+
 
   const N = filteredProjects.length;
   const scaled = progress * N;
@@ -388,7 +412,7 @@ export default function Projects() {
   const outOpacity = 1 - slot * 0.55;
   const inY = next ? `${(1 - slot) * 100}vh` : undefined;
 
-  const cursor = tick % 2 === 0 ? "█" : " ";
+
 
   const activeIdx = categories.indexOf(activeCategory);
 
@@ -427,7 +451,7 @@ export default function Projects() {
           <div className="absolute inset-0 bg-black" />
           <div className="absolute inset-0 bg-[#020617]/40" />
 
-          <div className="absolute inset-0 overflow-hidden pointer-events-none transform-gpu will-change-transform">
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <div className="absolute inset-[-15%] opacity-30 nebula-layer" style={{
               background: `radial-gradient(circle at 20% 40%, rgba(30, 58, 138, 0.35) 0%, transparent 60%),
                            radial-gradient(circle at 80% 60%, rgba(15, 23, 42, 0.25) 0%, transparent 70%)`,
@@ -435,12 +459,12 @@ export default function Projects() {
             }} />
           </div>
 
-          <div className="absolute inset-0 opacity-[0.08] pointer-events-none transform-gpu" style={{
+          <div className="absolute inset-0 opacity-[0.08] pointer-events-none" style={{
             backgroundImage: `radial-gradient(rgba(255,255,255,0.05) 1px, transparent 0)`,
             backgroundSize: '48px 48px'
           }} />
 
-          <svg className="absolute inset-0 w-full h-full pointer-events-none transform-gpu opacity-30" style={{ zIndex: 1 }}>
+          <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-30" style={{ zIndex: 1 }}>
             {[25, 75].map((y, i) => (
               <line
                 key={y} x1="0" y1={`${y}%`} x2="100%" y2={`${y}%`}
@@ -454,7 +478,7 @@ export default function Projects() {
             ))}
           </svg>
 
-          <div className="absolute inset-0 pointer-events-none transition-all duration-1000 ease-in-out transform-gpu will-change-transform" style={{
+          <div className="absolute inset-0 pointer-events-none transition-all duration-1000 ease-in-out" style={{
             background: `radial-gradient(circle at 30% 50%, rgba(${project.accentRgb}, 0.15), transparent 70%)`,
             filter: 'blur(80px)',
             opacity: 0.5,
@@ -485,14 +509,13 @@ export default function Projects() {
                   transform: `translateY(${outY}) scale(${outScale})`,
                   opacity: outOpacity,
                   transformOrigin: "bottom center",
-                  willChange: "transform,opacity",
+                  transformOrigin: "bottom center",
                 }}>
                   <ProjectCard p={project} />
                 </div>
                 {next && (
                   <div className="absolute inset-0" style={{
                     transform: `translateY(${inY})`,
-                    willChange: "transform",
                   }}>
                     <ProjectCard p={next} />
                   </div>
@@ -509,7 +532,7 @@ export default function Projects() {
                   value={project.name.toLowerCase().replace(/\s/g, "-")}
                   style={{ color: project.accentColor }}
                 />
-                <span style={{ color: project.accentColor, opacity: 0.7 }}>{cursor}</span>
+                <span style={{ color: project.accentColor, opacity: 0.7 }}><BlinkingCursor /></span>
               </div>
 
               <h2 className="leading-none mb-1 transition-all duration-300" style={{

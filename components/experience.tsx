@@ -198,10 +198,17 @@ function useScrollPct(ref: React.RefObject<HTMLElement>) {
       const { top, height } = ref.current.getBoundingClientRect();
       const vh = window.innerHeight;
       const scrolled = -top;
-      const revealZone = vh; // Wait 100vh while previous section rolls over
+      const revealZone = vh;
       const activeScroll = Math.max(0, scrolled - revealZone);
       const activeTotal = height - vh - revealZone;
-      targetRef.current = activeTotal > 0 ? Math.max(0, Math.min(1, activeScroll / activeTotal)) : 0;
+      const newTarget = activeTotal > 0 ? Math.max(0, Math.min(1, activeScroll / activeTotal)) : 0;
+      
+      if (newTarget !== targetRef.current) {
+        targetRef.current = newTarget;
+        if (!rafRef.current) {
+          rafRef.current = requestAnimationFrame(tick);
+        }
+      }
     };
 
     const tick = () => {
@@ -210,21 +217,23 @@ function useScrollPct(ref: React.RefObject<HTMLElement>) {
       const diff = tgt - cur;
       if (Math.abs(diff) < 0.0003) {
         currentRef.current = tgt;
+        setP(currentRef.current);
+        rafRef.current = 0;
+        return; // stop ticking
       } else {
         currentRef.current = cur + diff * 0.25;
+        setP(currentRef.current);
+        rafRef.current = requestAnimationFrame(tick);
       }
-      setP(currentRef.current);
-      rafRef.current = requestAnimationFrame(tick);
     };
 
     measure();
     window.addEventListener("scroll", measure, { passive: true });
     window.addEventListener("resize", measure);
-    rafRef.current = requestAnimationFrame(tick);
     return () => {
       window.removeEventListener("scroll", measure);
       window.removeEventListener("resize", measure);
-      cancelAnimationFrame(rafRef.current);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, []);
   return p;

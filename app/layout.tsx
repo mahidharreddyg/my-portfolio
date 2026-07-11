@@ -59,7 +59,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning className="overflow-x-hidden">
-      <body className={`min-h-screen bg-background font-sans antialiased overflow-x-hidden ${jakarta.className} ${malinton.variable} ${jetbrainsMono.variable} ${spaceGrotesk.variable} ${dmSans.variable} ${syne.variable} ${outfit.variable}`}>
+      <body className={`relative min-h-screen bg-background font-sans antialiased overflow-x-hidden ${jakarta.className} ${malinton.variable} ${jetbrainsMono.variable} ${spaceGrotesk.variable} ${dmSans.variable} ${syne.variable} ${outfit.variable}`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           {children}
         </ThemeProvider>

@@ -22,7 +22,7 @@ export default function Section({ id, title, children, className = "", style }: 
     <motion.section
       ref={ref}
       id={id}
-      className={`min-h-screen flex items-center justify-center relative overflow-hidden transform-gpu ${className}`}
+      className={`min-h-screen flex items-center justify-center relative overflow-hidden ${className}`}
       style={style}
       initial={{ opacity: 0 }}
       animate={isInView ? { opacity: 1 } : { opacity: 0 }}
@@ -45,10 +45,10 @@ export default function Section({ id, title, children, className = "", style }: 
             ease: [0.25, 0.46, 0.45, 0.94],
             delay: 0,
           }}
-          className="text-center transform-gpu"
+          className="text-center"
         >
           <motion.h2
-            className="text-4xl md:text-6xl font-bold mb-8 bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent transform-gpu"
+            className="text-4xl md:text-6xl font-bold mb-8 bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent"
             whileHover={{
               backgroundImage: "linear-gradient(to right, #3b82f6, #8b5cf6, #06b6d4)",
               scale: 1.05,
@@ -67,7 +67,7 @@ export default function Section({ id, title, children, className = "", style }: 
                 ease: [0.25, 0.46, 0.45, 0.94],
                 delay: 0.05,
               }}
-              className="transform-gpu"
+              className=""
             >
               {children}
             </motion.div>
