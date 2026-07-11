@@ -98,7 +98,7 @@ export default function Home() {
 
       {/* Removing heavy filter style inline wrapper that tanks scrolling performance */}
       <div>
-        <div className="marquee-hero-wrapper transform-gpu will-change-transform bg-black">
+        <div className="marquee-hero-wrapper bg-black">
           <div className="sticky top-0 h-screen z-10">
             <HeroSection onThemeToggle={toggleTheme} />
           </div>
