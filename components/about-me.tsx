@@ -40,8 +40,9 @@ export default function AboutMe() {
 
     let W = 0, H = 0;
     let raf: number;
+    let isVisible = true;
 
-    const pts = Array.from({ length: 55 }, () => ({
+    const pts = Array.from({ length: 30 }, () => ({
       x: Math.random() * 1400,
       y: Math.random() * 900,
       vx: (Math.random() - 0.5) * 0.18,
@@ -58,6 +59,10 @@ export default function AboutMe() {
     window.addEventListener("resize", resize);
 
     const draw = () => {
+      if (!isVisible) {
+        raf = requestAnimationFrame(draw);
+        return;
+      }
       ctx.clearRect(0, 0, W, H);
       pts.forEach((p) => {
         p.x += p.vx;
@@ -90,9 +95,17 @@ export default function AboutMe() {
     };
     draw();
 
+    // Pause canvas when section is off-screen
+    const observer = new IntersectionObserver(
+      ([entry]) => { isVisible = entry.isIntersecting; },
+      { threshold: 0.05 }
+    );
+    if (canvas.parentElement) observer.observe(canvas.parentElement);
+
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
+      observer.disconnect();
     };
   }, []);
 
@@ -136,8 +149,6 @@ export default function AboutMe() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-
         .am-root {
           position: relative;
           background: #080810;
@@ -148,7 +159,7 @@ export default function AboutMe() {
         }
 
         .am-canvas {
-          position: fixed;
+          position: absolute;
           inset: 0;
           width: 100%;
           height: 100%;

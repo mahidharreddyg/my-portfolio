@@ -591,13 +591,13 @@ export default function Projects() {
                   return (
                     <div
                       key={t}
-                      className="relative flex items-center gap-1.5 px-2.5 py-1 rounded-md shrink-0 transition-all duration-300"
+                      className="relative flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg shrink-0 transition-all duration-300 mt-2"
                       style={used ? {
                         ...glass,
-                        background: `rgba(${project.accentRgb},0.12)`,
-                        borderColor: `rgba(${project.accentRgb},0.45)`,
+                        background: `rgba(${project.accentRgb},0.05)`,
+                        borderColor: `rgba(${project.accentRgb},0.3)`,
                         color: project.tagActive.text,
-                        boxShadow: `0 8px 32px rgba(0,0,0,0.1), 0 0 10px rgba(${project.accentRgb},0.1)`,
+                        boxShadow: `0 4px 20px rgba(${project.accentRgb},0.15)`,
                       } : {
                         background: "rgba(255,255,255,0.02)",
                         border: "1px solid rgba(255,255,255,0.06)",
@@ -606,14 +606,22 @@ export default function Projects() {
                     >
                       {used && <GlassHighlight />}
                       <div
-                        className="rounded bg-white/5 p-0.5 flex items-center justify-center shrink-0 border border-white/10"
-                        style={{ width: "20px", height: "20px" }}
+                        className="rounded-md p-1 flex items-center justify-center shrink-0 z-10 transition-all duration-300 relative"
+                        style={{ 
+                          width: "24px", 
+                          height: "24px", 
+                          background: used ? `linear-gradient(135deg, rgba(${project.accentRgb},0.2), rgba(${project.accentRgb},0.05))` : "rgba(255,255,255,0.03)",
+                          backdropFilter: "blur(12px)",
+                          WebkitBackdropFilter: "blur(12px)",
+                          border: used ? `1px solid rgba(${project.accentRgb}, 0.5)` : "1px solid rgba(255,255,255,0.1)",
+                          boxShadow: used ? `0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2)` : "0 4px 12px rgba(0,0,0,0.2)",
+                        }}
                       >
-                        <span style={{ opacity: used ? 1 : 0.25, transform: "scale(0.85)" }}>
+                        <span style={{ opacity: used ? 1 : 0.4, transform: "scale(1)" }}>
                           <TechLogo name={t} />
                         </span>
                       </div>
-                      <span className="text-[10px] font-semibold whitespace-nowrap" style={{ fontFamily: "'JetBrains Mono',monospace", opacity: used ? 0.95 : 0.4 }}>
+                      <span className="text-[11px] font-semibold whitespace-nowrap" style={{ fontFamily: "'JetBrains Mono',monospace", opacity: used ? 1 : 0.4 }}>
                         {t}
                       </span>
                     </div>

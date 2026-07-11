@@ -211,7 +211,7 @@ function useScrollPct(ref: React.RefObject<HTMLElement>) {
       if (Math.abs(diff) < 0.0003) {
         currentRef.current = tgt;
       } else {
-        currentRef.current = cur + diff * 0.18;
+        currentRef.current = cur + diff * 0.25;
       }
       setP(currentRef.current);
       rafRef.current = requestAnimationFrame(tick);
@@ -430,10 +430,23 @@ function TimelineCanvas({
   const timeRef = useRef(0);
   const lastTsRef = useRef<number | null>(null);
 
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => { setIsVisible(entry.isIntersecting); },
+      { threshold: 0.01 }
+    );
+    if (canvasRef.current && canvasRef.current.parentElement) {
+      observer.observe(canvasRef.current.parentElement);
+    }
+    return () => observer.disconnect();
+  }, [canvasRef]);
+
   const draw = useCallback(
     (timestamp?: number) => {
       const canvas = canvasRef.current;
-      if (!canvas || W === 0 || H === 0) return;
+      if (!canvas || W === 0 || H === 0 || !isVisible) return;
       if (timestamp !== undefined) {
         if (lastTsRef.current !== null) timeRef.current += (timestamp - lastTsRef.current) * 0.001;
         lastTsRef.current = timestamp;
@@ -535,8 +548,8 @@ function TimelineCanvas({
 
       /* SPINE DOTS — travel using spine slots */
       const scrollShiftDeg = spineActiveF * degPerSpine;
-      for (let s = 0; s < 300; s++) {
-        const baseDeg = (s / 300) * 360 - 180;
+      for (let s = 0; s < 150; s++) {
+        const baseDeg = (s / 150) * 360 - 180;
         const shiftedDeg = baseDeg - scrollShiftDeg;
         const wrappedDeg = ((shiftedDeg + 180) % 360 + 360) % 360 - 180;
         const angleRad = (wrappedDeg * Math.PI) / 180;
@@ -560,8 +573,8 @@ function TimelineCanvas({
 
       /* SPINE DOTS — MIRRORED */
       const circleCX2 = circleCX + spineOffset;
-      for (let s = 0; s < 300; s++) {
-        const baseDeg = (s / 300) * 360 - 180;
+      for (let s = 0; s < 150; s++) {
+        const baseDeg = (s / 150) * 360 - 180;
         const shiftedDeg2 = baseDeg + scrollShiftDeg;
         const wrappedDeg2 = ((shiftedDeg2 + 180) % 360 + 360) % 360 - 180;
         const angleRad2 = (wrappedDeg2 * Math.PI) / 180;
@@ -755,7 +768,7 @@ function TimelineCanvas({
         }
       });
     },
-    [scrollPct, W, H, canvasRef]
+    [scrollPct, W, H, canvasRef, isVisible]
   );
 
   useEffect(() => {
@@ -947,8 +960,6 @@ export default function ExperienceSection() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&family=Outfit:wght@400;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap');
-
         .tl-outer { position: relative; }
         .tl-sticky {
           position: sticky; top: 0; height: 100vh; width: 100%;

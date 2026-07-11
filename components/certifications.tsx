@@ -77,6 +77,7 @@ function Background() {
     const ctx = c.getContext("2d");
     if (!ctx) return;
     let raf: number;
+    let isVisible = true;
 
     const resize = () => {
       const parent = c.parentElement;
@@ -91,8 +92,8 @@ function Background() {
     resize();
     window.addEventListener("resize", resize);
 
-    const lines = Array.from({ length: 45 }, (_, i) => ({
-      x: (i / 45) + (Math.random() * 0.04 - 0.02), // Even distribution with slight jitter
+    const lines = Array.from({ length: 25 }, (_, i) => ({
+      x: (i / 25) + (Math.random() * 0.04 - 0.02),
       y: Math.random() * 2 - 1,
       speed: Math.random() * 0.0015 + 0.0005,
       len: Math.random() * 0.3 + 0.1,
@@ -102,6 +103,10 @@ function Background() {
 
     function frame() {
       if (!c || !ctx) return;
+      if (!isVisible) {
+        raf = requestAnimationFrame(frame);
+        return;
+      }
       const W = c.width, H = c.height;
       ctx.clearRect(0, 0, W, H);
 
@@ -109,7 +114,6 @@ function Background() {
       const horizon = H * 0.45;
       ctx.strokeStyle = "rgba(56,189,248,0.15)";
       ctx.lineWidth = 0.5;
-      ctx.shadowBlur = 0;
 
       for (let i = -14; i <= 14; i++) {
         const xBase = W / 2 + i * (W * 0.08);
@@ -148,24 +152,27 @@ function Background() {
         g.addColorStop(0.4, `hsla(${l.hue}, 100%, 75%, ${l.opacity * (0.7 + 0.3 * pulse)})`);
         g.addColorStop(1, "transparent");
 
-        ctx.shadowBlur = 15 + 20 * pulse;
+        ctx.shadowBlur = 10 + 15 * pulse;
         ctx.shadowColor = `hsla(${l.hue}, 100%, 70%, ${l.opacity * pulse})`;
         ctx.fillStyle = g;
         ctx.fillRect(lx, lyTop, 3, Math.max(1, lyBot - lyTop));
       });
 
-      const ag = ctx.createRadialGradient(W / 2, horizon, 0, W / 2, horizon, W * 0.7);
-      ag.addColorStop(0, "rgba(20,40,120,0.18)");
-      ag.addColorStop(1, "transparent");
-      ctx.fillStyle = ag;
-      ctx.fillRect(0, 0, W, H);
-
       raf = requestAnimationFrame(frame);
     }
     frame();
+
+    // Pause canvas when section is off-screen
+    const observer = new IntersectionObserver(
+      ([entry]) => { isVisible = entry.isIntersecting; },
+      { threshold: 0.05 }
+    );
+    if (c.parentElement) observer.observe(c.parentElement);
+
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
+      observer.disconnect();
     };
   }, []);
 
