@@ -221,7 +221,7 @@ const TechCard = ({
         }}
       >
         <div
-          className={`tech-card-inner group relative flex flex-col items-center justify-center w-full h-full rounded-[14px] backdrop-blur-xl bg-white/[0.06] transition-all duration-300 ease-out border border-white/10 shadow-lg pointer-events-auto cursor-pointer overflow-hidden hover:z-50 hover:-translate-y-2 hover:scale-110 hover:border-transparent hover:border-b-2 hover:border-b-cyan-400${isGroupHovered ? ' group-lit' : ''}`}
+          className={`tech-card-inner group relative flex flex-col items-center justify-center w-full h-full rounded-[14px] bg-white/[0.08] transition-all duration-300 ease-out border border-white/10 shadow-lg pointer-events-auto cursor-pointer overflow-hidden hover:z-50 hover:-translate-y-2 hover:scale-110 hover:border-transparent hover:border-b-2 hover:border-b-cyan-400${isGroupHovered ? ' group-lit' : ''}`}
           style={{ animationDelay: animDelay }}
         >
           <div
