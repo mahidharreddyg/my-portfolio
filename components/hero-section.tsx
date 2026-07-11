@@ -17,6 +17,7 @@ function RichBackground() {
     if (!ctx) return
 
     let animId: number
+    let isVisible = true
     let W = (canvas.width = window.innerWidth)
     let H = (canvas.height = window.innerHeight)
 
@@ -34,7 +35,7 @@ function RichBackground() {
       "139,92,246",
     ]
 
-    const bokeh: Bokeh[] = Array.from({ length: 28 }, () => ({
+    const bokeh: Bokeh[] = Array.from({ length: 18 }, () => ({
       x: Math.random() * W,
       y: Math.random() * H,
       r: Math.random() * 60 + 20,
@@ -46,7 +47,7 @@ function RichBackground() {
     }))
 
     type Star = { x: number; y: number; r: number; alpha: number; twinkleSpeed: number; phase: number }
-    const stars: Star[] = Array.from({ length: 120 }, () => ({
+    const stars: Star[] = Array.from({ length: 60 }, () => ({
       x: Math.random() * W,
       y: Math.random() * H,
       r: Math.random() * 0.9 + 0.2,
@@ -55,10 +56,11 @@ function RichBackground() {
       phase: Math.random() * Math.PI * 2,
     }))
 
-    let frame = 0
-
     function draw() {
-      if (!ctx) return
+      if (!ctx || !isVisible) {
+        animId = requestAnimationFrame(draw)
+        return
+      }
       ctx.clearRect(0, 0, W, H)
 
       for (const s of stars) {
@@ -90,17 +92,29 @@ function RichBackground() {
         if (b.y > H + b.r) b.y = -b.r
       }
 
-      frame++
       animId = requestAnimationFrame(draw)
     }
 
     draw()
+
     const onResize = () => {
       W = canvas.width = window.innerWidth
       H = canvas.height = window.innerHeight
     }
     window.addEventListener("resize", onResize)
-    return () => { cancelAnimationFrame(animId); window.removeEventListener("resize", onResize) }
+
+    // Pause canvas when hero is scrolled off-screen
+    const observer = new IntersectionObserver(
+      ([entry]) => { isVisible = entry.isIntersecting },
+      { threshold: 0.05 }
+    )
+    if (canvas.parentElement) observer.observe(canvas.parentElement)
+
+    return () => {
+      cancelAnimationFrame(animId)
+      window.removeEventListener("resize", onResize)
+      observer.disconnect()
+    }
   }, [])
 
   return (
