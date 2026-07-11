@@ -7,8 +7,8 @@ import Image from "next/image";
 
 const glassStyle = {
   background: 'rgba(255, 255, 255, 0.03)',
-  backdropFilter: 'blur(3px) saturate(200%)',
-  WebkitBackdropFilter: 'blur(3px) saturate(200%)',
+  backdropFilter: 'blur(3px)',
+  WebkitBackdropFilter: 'blur(3px)',
   border: '1px solid rgba(255, 255, 255, 0.15)',
   boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.05)'
 };
@@ -372,7 +372,7 @@ const PassionateCard = () => {
               className="absolute inset-0 rounded-full"
               style={{
                 background: "rgba(255,255,255,0.08)",
-                backdropFilter: "blur(10px)",
+                backdropFilter: "none",
               }}
             />
 
@@ -461,8 +461,8 @@ function FoldedAvatar({
         transition={{ type: "spring", stiffness: 220, damping: 20 }}
         style={{
           background: 'rgba(10, 15, 30, 0.4)', // Darker tech blue base
-          backdropFilter: 'blur(8px) saturate(150%)',
-          WebkitBackdropFilter: 'blur(8px) saturate(150%)',
+          backdropFilter: 'none',
+          WebkitBackdropFilter: 'none',
           border: '1px solid rgba(56, 189, 248, 0.3)', // Cyan tinted border
           boxShadow: `
             0 8px 32px rgba(0, 0, 0, 0.2),
@@ -673,14 +673,7 @@ function useProfileCard() {
   const cardRef = useRef<HTMLDivElement>(null);
   const [hovered, setHovered] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.35 });
-  const [tick, setTick] = useState(0);
 
-  useEffect(() => {
-    const id = setInterval(() => setTick((t) => t + 1), 50);
-    return () => clearInterval(id);
-  }, []);
-
-  const pulse = 0.55 + 0.45 * Math.sin(tick * 0.055);
 
   const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const r = cardRef.current?.getBoundingClientRect();
@@ -702,14 +695,21 @@ function useProfileCard() {
 
   const onMouseEnter = () => setHovered(true);
 
-  return { cardRef, hovered, mousePos, tick, pulse, onMouseMove, onMouseLeave, onMouseEnter };
+  return { cardRef, hovered, mousePos, onMouseMove, onMouseLeave, onMouseEnter };
 }
 
 export function BentoGridRedesign() {
-  const { cardRef, hovered, mousePos, pulse, onMouseMove: profileMouseMove, onMouseLeave: profileMouseLeave, onMouseEnter: profileMouseEnter } = useProfileCard();
+  const { cardRef, hovered, mousePos, onMouseMove: profileMouseMove, onMouseLeave: profileMouseLeave, onMouseEnter: profileMouseEnter } = useProfileCard();
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 pb-12 pt-24 md:pt-48 group/bento">
+      <style>{`
+        @keyframes bento-pulse-glow {
+          0%, 100% { opacity: 0.55; }
+          50% { opacity: 1; }
+        }
+        .bento-pulse-anim { animation: bento-pulse-glow 2s infinite ease-in-out; }
+      `}</style>
       <div className="relative grid grid-cols-1 md:grid-cols-3 gap-4">
 
         {/* LEFT COLUMN - Fixed Independent Heights */}
@@ -775,11 +775,11 @@ export function BentoGridRedesign() {
                 }}
               />
 
-              {/* Hover Blue Glow State (Fades in on hover) matching Box 5 */}
+              {/* Hover Blue Glow State (Fades in on hover) - Reduced Intensity */}
               <div
-                className="absolute inset-0 pointer-events-none transition-opacity duration-500 rounded-2xl z-0"
+                className={`absolute inset-0 pointer-events-none transition-opacity duration-700 z-10 ${hovered ? "bento-pulse-anim" : ""}`}
                 style={{
-                  background: "radial-gradient(ellipse at center, rgba(41, 141, 238, 0.15), transparent 70%)",
+                  background: "radial-gradient(circle at 50% 100%, rgba(59, 130, 246, 0.15) 0%, transparent 60%)",
                   opacity: hovered ? 1 : 0,
                 }}
               />
@@ -797,14 +797,14 @@ export function BentoGridRedesign() {
               <div className="absolute pointer-events-none rounded-full transition-opacity duration-500" style={{
                 top: -44, left: -44, width: 190, height: 190,
                 background: "radial-gradient(circle, rgba(37,99,235,0.18) 0%, transparent 70%)",
-                filter: "blur(28px)", opacity: hovered ? pulse : 0,
+                filter: "blur(28px)", display: hovered ? "block" : "none",
               }} />
 
               {/* Ambient glow — bottom right */}
               <div className="absolute pointer-events-none rounded-full transition-opacity duration-500" style={{
                 bottom: -30, right: -30, width: 130, height: 130,
                 background: "radial-gradient(circle, rgba(14,165,233,0.1) 0%, transparent 70%)",
-                filter: "blur(20px)", opacity: hovered ? pulse * 0.7 : 0,
+                filter: "blur(20px)", display: hovered ? "block" : "none",
               }} />
 
               {/* HUD bracket — top left */}
@@ -964,8 +964,8 @@ export function BentoGridRedesign() {
               style={{
                 // True Liquid Glass Background - High Transparency, Minimal Blur
                 background: 'rgba(255, 255, 255, 0.03)',
-                backdropFilter: 'blur(3px) saturate(200%)',
-                WebkitBackdropFilter: 'blur(3px) saturate(200%)',
+                backdropFilter: 'none',
+                WebkitBackdropFilter: 'none',
                 border: '1px solid rgba(255, 255, 255, 0.15)',
                 boxShadow: `
                   0 8px 32px rgba(0, 0, 0, 0.08),

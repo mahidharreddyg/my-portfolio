@@ -8,8 +8,7 @@ import {
   useSpring,
   useTransform,
   useVelocity,
-  useMotionValueEvent,
-} from "motion/react";
+} from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -36,12 +35,6 @@ function ParallaxText({
   const scrollVelocity = useVelocity(scrollY);
   const hasInitialized = useRef(false);
 
-  useMotionValueEvent(scrollY, "change", () => {
-    if (!hasInitialized.current) {
-      hasInitialized.current = true;
-      return;
-    }
-  });
 
   // Smooth velocity handling with better spring settings
   const smoothVelocity = useSpring(scrollVelocity, {
@@ -104,7 +97,6 @@ function ParallaxText({
         className="inline-block"
         style={{
           x,
-          willChange: "transform",
           transform: "translate3d(0, 0, 0)",
           display: "flex",
           alignItems: "center",
@@ -164,19 +156,11 @@ export default function XVelocityBandsCorrected({
         }
 
         .matrix-text {
-          text-shadow:
-            0 0 10px rgba(41, 141, 238, 0.8),
-            0 2px 4px rgba(0, 0, 0, 0.8);
-          /* Removed expensive filter: drop-shadow */
+          /* Text shadows on moving marquees kill performance */
         }
 
         @media (max-width: 768px) {
           .matrix-text {
-            text-shadow:
-              0 0 6px rgba(41, 141, 238, 0.6),
-              0 0 12px rgba(41, 141, 238, 0.4),
-              0 1px 2px rgba(0, 0, 0, 0.6);
-            filter: drop-shadow(0 0 4px rgba(41, 141, 238, 0.3));
           }
         }
       `}</style>

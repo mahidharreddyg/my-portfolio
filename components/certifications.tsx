@@ -81,13 +81,15 @@ function Background() {
 
     const resize = () => {
       const parent = c.parentElement;
+      const dpr = window.devicePixelRatio || 1;
       if (parent) {
-        c.width = parent.offsetWidth;
-        c.height = parent.offsetHeight;
+        c.width = parent.offsetWidth * dpr;
+        c.height = parent.offsetHeight * dpr;
       } else {
-        c.width = window.innerWidth;
-        c.height = window.innerHeight;
+        c.width = window.innerWidth * dpr;
+        c.height = window.innerHeight * dpr;
       }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     resize();
     window.addEventListener("resize", resize);
@@ -209,7 +211,7 @@ function Card({ cert, onClick, i, showIds }: { cert: Cert; onClick: () => void; 
         transform: `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(${hov ? -9 : 0}px)`,
         transition: "transform 0.36s cubic-bezier(.34,1.56,.64,1)",
         animation: `cardIn .58s ${i * .07}s both`,
-        willChange: "transform",
+
       }}
     >
       <div style={{
@@ -222,7 +224,7 @@ function Card({ cert, onClick, i, showIds }: { cert: Cert; onClick: () => void; 
       <div style={{
         position: "relative", zIndex: 1, borderRadius: 20,
         background: `linear-gradient(148deg, hsla(${h}, 30%, 20%, 0.15) 0%, rgba(255,255,255,.02) 55%, rgba(0,0,0,.15) 100%)`,
-        backdropFilter: "blur(48px) saturate(160%)",
+        backdropFilter: "none",
         border: `1px solid rgba(255,255,255,${hov ? 0.2 : 0.08})`,
         boxShadow: hov
           ? `inset 0 1px 0 rgba(255,255,255,.2), 0 24px 56px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.04)`
@@ -358,7 +360,7 @@ function Modal({ cert, onClose }: { cert: Cert; onClose: () => void }) {
         display: "flex", alignItems: "center", justifyContent: "center",
         padding: "1.5rem",
         background: "rgba(1,0,8,.88)", // Slightly more opaque to ensure contrast
-        backdropFilter: "blur(24px) saturate(140%)",
+        backdropFilter: "blur(8px)",
         animation: "fadeIn .32s ease both",
       }}
     >
@@ -380,7 +382,7 @@ function Modal({ cert, onClose }: { cert: Cert; onClose: () => void }) {
         <div style={{
           borderRadius: 24, overflow: "hidden",
           background: "linear-gradient(162deg,rgba(9,6,24,.97),rgba(3,2,12,1))",
-          backdropFilter: "blur(60px)",
+          backdropFilter: "none",
           border: "1px solid rgba(255,255,255,.08)",
           maxHeight: "88vh", overflowY: "auto",
         }}>
@@ -606,7 +608,7 @@ export default function Certifications() {
           marginBottom: "2.5rem", padding: "14px 24px", borderRadius: 12,
           background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)",
           display: "flex", justifyContent: "space-between", alignItems: "center",
-          animation: "titleIn .7s ease both", backdropFilter: "blur(20px)"
+          animation: "titleIn .7s ease both", backdropFilter: "blur(4px)"
         }}>
           <div style={{ display: "flex", gap: 32, alignItems: "center" }}>
             <div>

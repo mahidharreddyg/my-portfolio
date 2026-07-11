@@ -147,7 +147,7 @@ const TechCard = ({
 
   return (
     <motion.div
-      style={{ x, y, rotate, scale, opacity, willChange: 'transform, opacity' }}
+      style={{ x, y, rotate, scale, opacity }}
       className="relative w-[60px] h-[72px] sm:w-[68px] sm:h-[80px] lg:w-[76px] lg:h-[88px] origin-center z-10 pointer-events-none"
     >
       <style>{`
@@ -265,12 +265,12 @@ const TechCard = ({
             <img
               src={tech.hoverImg} alt={`${tech.name} colored`}
               className="colored-icon absolute w-full h-full object-contain scale-100 group-hover:scale-[1.2] transition-all duration-500 ease-out opacity-0 group-hover:opacity-100 pointer-events-none"
-              style={{ willChange: "opacity, transform, filter", filter: `drop-shadow(0 0 6px ${tech.color}cc) drop-shadow(0 0 16px ${tech.color}80)`, transitionDelay: '0.05s' }}
+              style={{ filter: `drop-shadow(0 0 6px ${tech.color}cc) drop-shadow(0 0 16px ${tech.color}80)`, transitionDelay: '0.05s' }}
             />
             <img
               src={tech.img} alt={`${tech.name} monochrome`}
               className="bw-icon absolute w-full h-full object-contain scale-100 group-hover:scale-[1.2] transition-all duration-500 ease-out opacity-70 group-hover:opacity-0 pointer-events-none"
-              style={{ willChange: "opacity, transform", transitionDelay: '0.05s' }}
+              style={{ transitionDelay: '0.05s' }}
             />
           </div>
           <span className="glitch-label text-[5px] sm:text-[6px] md:text-[8px] lg:text-[9px] font-mono tracking-widest text-center px-1 leading-tight pointer-events-none text-white group-hover:text-white transition-colors duration-200 z-10 uppercase">
@@ -521,6 +521,7 @@ export default function Skills() {
     <>
       <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
         <Lightfall
+          dpr={1}
           colors={["#A6C8FF", "#5227FF", "#FF9FFC"]}
           backgroundColor="#0A29FF"
           zoom={2}
