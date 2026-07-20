@@ -6,6 +6,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Copy, Mail } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import GlassSurface from "./GlassSurface"
 
 export default function Navbar({ isMonochrome = false }: { isMonochrome?: boolean }) {
   const [isVisible, setIsVisible] = useState(false)
@@ -41,20 +42,14 @@ export default function Navbar({ isMonochrome = false }: { isMonochrome?: boolea
         >
           <div className="max-w-7xl mx-auto">
             <motion.div
-              className="relative rounded-full px-6 py-4 flex items-center justify-between shadow-2xl group transition-all duration-300"
+              className={`relative rounded-full px-6 py-4 flex items-center justify-between shadow-2xl group transition-all duration-300 border border-white/20 ${isMonochrome ? 'grayscale opacity-90' : ''}`}
               style={{
-                // True Liquid Glass Background - Bento Grid Style
-                background: 'rgba(255, 255, 255, 0.03)', 
-                backdropFilter: 'blur(3px) saturate(200%)', 
-                WebkitBackdropFilter: 'blur(3px) saturate(200%)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
+                background: 'rgba(255, 255, 255, 0.08)',
+                backdropFilter: 'blur(8px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(8px) saturate(180%)',
                 boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.05)',
-                // Liquid Glass Shine Effects
                 position: 'relative',
                 overflow: 'hidden',
-                // Monochrome Filter (Subtle Tint)
-                filter: isMonochrome ? 'grayscale(40%) sepia(10%) brightness(105%)' : 'none',
-                transition: 'all 0.3s ease, filter 1s ease-in-out',
               }}
             >
               {/* Liquid Glass Highlight Layer */}
@@ -85,128 +80,133 @@ export default function Navbar({ isMonochrome = false }: { isMonochrome?: boolea
                 }}
               />
 
-              {/* Profile Info - UNCHANGED */}
-              <div className="flex items-center gap-4 relative z-10">
-                <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-gray-700/50">
-                  <Image
-                    src="/profile_pic.PNG"
-                    alt="Profile"
-                    width={48}
-                    height={48}
-                    className="object-cover"
-                  />
-                </div>
-                <div className="flex items-center gap-3">
-                  <h2 className="text-white font-semibold text-lg bg-gradient-to-r from-white to-gray-300 bg-clip-text">
-                    Mahidhar Reddy
-                  </h2>
-                  {/* Perplexity-style dot */}
-                  <motion.div
-                    className="relative flex items-center justify-center"
-                    animate={{
-                      scale: [1, 1.15, 1],
-                      opacity: [0.85, 1, 0.85],
-                    }}
-                    transition={{
-                      duration: 1.5,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                  >
-                    {/* Glowing outer ring */}
-                    <span
-                      className="absolute w-3.5 h-3.5 rounded-full"
-                      style={{
-                        background: "radial-gradient(circle, rgba(0,212,255,0.35) 60%, transparent 100%)",
-                        filter: "blur(2px)",
-                      }}
+              <div className="w-full h-full flex items-center justify-between px-2">
+                {/* Profile Info - UNCHANGED */}
+                <div className="flex items-center gap-4 relative z-10">
+                  <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-gray-700/50">
+                    <Image
+                      src="/profile_pic.PNG"
+                      alt="Profile"
+                      width={48}
+                      height={48}
+                      className="object-cover"
                     />
-                    {/* Solid center dot */}
-                    <span className="relative w-2 h-2 bg-cyan-400 rounded-full border-2 border-cyan-300" />
-                  </motion.div>
-                  <span className="text-gray-400 text-sm font-medium">
-                    Software Developer
-                  </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-white font-semibold text-lg bg-gradient-to-r from-white to-gray-300 bg-clip-text">
+                      Mahidhar Reddy
+                    </h2>
+                    {/* Perplexity-style dot */}
+                    <motion.div
+                      className="relative flex items-center justify-center"
+                      animate={{
+                        scale: [1, 1.15, 1],
+                        opacity: [0.85, 1, 0.85],
+                      }}
+                      transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    >
+                      {/* Glowing turquoise outer ring */}
+                      <span
+                        className="absolute w-3.5 h-3.5 rounded-full"
+                        style={{
+                          background: "radial-gradient(circle, rgba(6,182,212,0.6) 0%, rgba(6,182,212,0.2) 50%, transparent 80%)",
+                          boxShadow: "0 0 10px rgba(6,182,212,0.6)"
+                        }}
+                      />
+                      {/* Inner solid turquoise dot */}
+                      <span className="relative w-2 h-2 rounded-full bg-cyan-400"
+                        style={{
+                          boxShadow: "0 0 8px rgba(34,211,238,0.8), inset 0 0 4px rgba(255,255,255,0.8)"
+                        }} />
+                    </motion.div>
+                    <span className="text-gray-400 text-sm font-medium">
+                      Software Developer
+                    </span>
+                  </div>
                 </div>
-              </div>
 
-              {/* Navigation + Copy Button - UNCHANGED */}
-              <div className="hidden md:flex items-center gap-4 ml-32 relative z-10">
-                <nav className="flex items-center gap-8">
-                  {["About", "Experience", "Skills", "Projects", "Certifications"].map((item) => (
-                    <div key={item} className="relative group/navitem">
-                      <Link
-                        href={`#${item.toLowerCase()}`}
-                        className="text-gray-300 font-medium relative z-10 px-1
+                {/* Navigation + Copy Button - UNCHANGED */}
+                <div className="hidden md:flex items-center gap-4 ml-32 relative z-10">
+                  <nav className="flex items-center gap-8">
+                    {["About", "Experience", "Skills", "Projects", "Certifications"].map((item) => (
+                      <div key={item} className="relative group/navitem">
+                        <Link
+                          href={`#${item.toLowerCase()}`}
+                          className="text-gray-300 font-medium relative z-10 px-1
                            transition-all duration-500 hover:text-transparent
                            hover:bg-clip-text hover:bg-[linear-gradient(90deg,#00f2fe_0%,#4facfe_50%,#00f2fe_100%)]
                            hover:drop-shadow-[0_0_15px_rgba(79,172,254,0.6)]
                            group-hover/navitem:animate-[text-glitch_0.3s_linear_infinite]"
-                      >
-                        {item}
-                      </Link>
+                        >
+                          {item}
+                        </Link>
 
-                      <span
-                        className="absolute left-0 -bottom-1 w-full h-[2px]
+                        <span
+                          className="absolute left-0 -bottom-1 w-full h-[2px]
                           bg-[linear-gradient(90deg,transparent_0%,#4facfe_50%,transparent_100%)]
                           rounded-full scale-x-0 origin-left
                           transition-transform duration-500 shadow-[0_0_25px_-3px] shadow-blue-400/60
                           group-hover/navitem:scale-x-100 
                           group-hover/navitem:animate-[laser-sweep_1.5s_linear_infinite]"
-                      />
+                        />
 
-                      <div
-                        className="absolute -inset-2 rounded-lg bg-[radial-gradient(circle_at_center,#4facfe30_0%,transparent_70%)]
+                        <div
+                          className="absolute -inset-2 rounded-lg bg-[radial-gradient(circle_at_center,#4facfe30_0%,transparent_70%)]
                           opacity-0 blur-[12px] transition-opacity duration-300 -z-10
                           group-hover/navitem:opacity-100 
                           group-hover/navitem:animate-[hologram-pulse_2s_linear_infinite]"
-                      />
-                    </div>
-                  ))}
-                </nav>
+                        />
+                      </div>
+                    ))}
+                  </nav>
 
-                {/* Copy Button - UNCHANGED */}
-                <motion.div className="relative z-10 ml-4">
-                  <Button
-                    onClick={copyEmail}
-                    className="group relative overflow-hidden w-[150px] bg-gray-900/80 hover:bg-gray-800/90
+                  {/* Copy Button - UNCHANGED */}
+                  <motion.div className="relative z-10 ml-4">
+                    <Button
+                      onClick={copyEmail}
+                      className="group relative overflow-hidden w-[150px] bg-gray-900/80 hover:bg-gray-800/90
                       text-cyan-300 hover:text-white border-2 border-cyan-400/30 hover:border-cyan-400/50
                       rounded-full px-7 py-2.5 transition-all duration-300 shadow-[0_0_20px_-5px_#00f2fe30]
                       hover:shadow-[0_0_30px_-5px_#4facfe60]"
-                  >
-                    {/* Grid Overlay */}
-                    <div className="absolute inset-0 bg-[linear-gradient(rgba(79,172,254,0.1)_1px,transparent_1px),
+                    >
+                      {/* Grid Overlay */}
+                      <div className="absolute inset-0 bg-[linear-gradient(rgba(79,172,254,0.1)_1px,transparent_1px),
                       linear-gradient(90deg,rgba(79,172,254,0.1)_1px,transparent_1px)]
                       bg-[size:8px_8px] opacity-0 group-hover:opacity-30 transition-opacity duration-300" />
 
-                    <div className="flex items-center justify-center gap-2 relative z-10">
-                      <motion.div
-                        animate={emailCopied ? {
-                          rotate: [0, 180, 360],
-                          scale: [1, 1.2, 1]
-                        } : {
-                          rotate: 0,
-                          scale: 1
-                        }}
-                        transition={{ duration: 0.7, times: [0, 0.5, 1] }}
-                      >
-                        {emailCopied ? (
-                          <Mail className="h-5 w-5 text-cyan-400 animate-[icon-pulse_1s_ease-in-out_infinite]" />
-                        ) : (
-                          <Copy className="h-5 w-5 text-cyan-300 group-hover:text-cyan-400 transition-colors" />
-                        )}
-                      </motion.div>
-                      <span className="text-sm font-medium bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                        {emailCopied ? "Copied!" : "Copy Email"}
-                      </span>
-                    </div>
+                      <div className="flex items-center justify-center gap-2 relative z-10">
+                        <motion.div
+                          animate={emailCopied ? {
+                            rotate: [0, 180, 360],
+                            scale: [1, 1.2, 1]
+                          } : {
+                            rotate: 0,
+                            scale: 1
+                          }}
+                          transition={{ duration: 0.7, times: [0, 0.5, 1] }}
+                        >
+                          {emailCopied ? (
+                            <Mail className="h-5 w-5 text-cyan-400 animate-[icon-pulse_1s_ease-in-out_infinite]" />
+                          ) : (
+                            <Copy className="h-5 w-5 text-cyan-300 group-hover:text-cyan-400 transition-colors" />
+                          )}
+                        </motion.div>
+                        <span className="text-sm font-medium bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                          {emailCopied ? "Copied!" : "Copy Email"}
+                        </span>
+                      </div>
 
-                    {/* Data Stream Animation */}
-                    <div className="absolute inset-y-0 -left-4 w-12 bg-[linear-gradient(90deg,transparent_0%,#4facfe20_30%,transparent_70%)]
+                      {/* Data Stream Animation */}
+                      <div className="absolute inset-y-0 -left-4 w-12 bg-[linear-gradient(90deg,transparent_0%,#4facfe20_30%,transparent_70%)]
                       skew-x-[30deg] opacity-0 group-hover:opacity-100 group-hover:animate-[data-stream_1s_linear_infinite]
                       transition-opacity duration-300" />
-                  </Button>
-                </motion.div>
+                    </Button>
+                  </motion.div>
+                </div>
               </div>
             </motion.div>
           </div>

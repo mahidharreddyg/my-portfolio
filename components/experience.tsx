@@ -227,15 +227,28 @@ function useScrollPct(ref: React.RefObject<HTMLElement>) {
       }
     };
 
-    measure();
-    window.addEventListener("scroll", measure, { passive: true });
-    window.addEventListener("resize", measure);
+    let io = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        window.addEventListener("scroll", measure, { passive: true });
+        window.addEventListener("resize", measure);
+        measure();
+      } else {
+        window.removeEventListener("scroll", measure);
+        window.removeEventListener("resize", measure);
+      }
+    }, { rootMargin: "100% 0px 100% 0px" });
+
+    if (ref.current) {
+      io.observe(ref.current);
+    }
+
     return () => {
+      io.disconnect();
       window.removeEventListener("scroll", measure);
       window.removeEventListener("resize", measure);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, []);
+  }, [ref]);
   return p;
 }
 
@@ -526,12 +539,12 @@ function TimelineCanvas({
       const easedScroll = 1 - Math.pow(1 - Math.min(scrollPct * 1.6, 1), 2.2);
       const baseR = H * 0.04 + easedScroll * (Math.max(W, H) * 0.88 - H * 0.04);
       const RINGS = [
-        { scale: 0.18, dotCount: 22, rotSpeed: 0.14, dotBaseR: 1.4, alpha: 0.32 },
-        { scale: 0.32, dotCount: 36, rotSpeed: -0.11, dotBaseR: 1.2, alpha: 0.26 },
-        { scale: 0.48, dotCount: 52, rotSpeed: 0.08, dotBaseR: 1.0, alpha: 0.21 },
-        { scale: 0.64, dotCount: 68, rotSpeed: -0.06, dotBaseR: 0.85, alpha: 0.16 },
-        { scale: 0.8, dotCount: 86, rotSpeed: 0.045, dotBaseR: 0.75, alpha: 0.12 },
-        { scale: 0.94, dotCount: 104, rotSpeed: -0.03, dotBaseR: 0.65, alpha: 0.09 },
+        { scale: 0.18, dotCount: 22, rotSpeed: 0.14, dotBaseR: 1.5, alpha: 0.42 },
+        { scale: 0.32, dotCount: 36, rotSpeed: -0.11, dotBaseR: 1.3, alpha: 0.35 },
+        { scale: 0.48, dotCount: 52, rotSpeed: 0.08, dotBaseR: 1.1, alpha: 0.28 },
+        { scale: 0.64, dotCount: 68, rotSpeed: -0.06, dotBaseR: 0.95, alpha: 0.22 },
+        { scale: 0.8, dotCount: 86, rotSpeed: 0.045, dotBaseR: 0.8, alpha: 0.18 },
+        { scale: 0.94, dotCount: 104, rotSpeed: -0.03, dotBaseR: 0.7, alpha: 0.14 },
       ];
       const ringFadeIn = Math.min(1, scrollPct * 8);
       RINGS.forEach((ring) => {
@@ -550,7 +563,7 @@ function TimelineCanvas({
           if (alpha < 0.005) continue;
           ctx.beginPath();
           ctx.arc(dx, dy, Math.max(0.4, dotR), 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(160,185,255,${alpha})`;
+          ctx.fillStyle = `rgba(255,255,255,${alpha})`;
           ctx.fill();
         }
       });
@@ -665,28 +678,125 @@ function TimelineCanvas({
         const colA = (a: number) => `rgba(${col[0]},${col[1]},${col[2]},${a})`;
 
         if (isActive) {
-          const rg = ctx.createRadialGradient(ex, ey, 0, ex, ey, 38);
-          rg.addColorStop(0, colA(0.28));
-          rg.addColorStop(0.5, colA(0.1));
-          rg.addColorStop(1, colA(0));
-          ctx.save(); ctx.fillStyle = rg;
-          ctx.beginPath(); ctx.arc(ex, ey, 38, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+          // ── ACTIVE MARBLE BALL ──
+          const marbleR = 14;
+
+          // 1. Outer colored glow (subsurface scattering)
+          const outerGlow = ctx.createRadialGradient(ex, ey, 0, ex, ey, 42);
+          outerGlow.addColorStop(0, colA(0.22));
+          outerGlow.addColorStop(0.5, colA(0.08));
+          outerGlow.addColorStop(1, colA(0));
+          ctx.save(); ctx.fillStyle = outerGlow;
+          ctx.beginPath(); ctx.arc(ex, ey, 42, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+
+          // 2. Colored orbit ring
           ctx.save();
-          ctx.beginPath(); ctx.arc(ex, ey, 17, 0, Math.PI * 2);
-          ctx.strokeStyle = colA(0.4); ctx.lineWidth = 1.5;
-          ctx.shadowBlur = 12; ctx.shadowColor = colA(1); ctx.stroke(); ctx.restore();
+          ctx.beginPath(); ctx.arc(ex, ey, 20, 0, Math.PI * 2);
+          ctx.strokeStyle = colA(0.35); ctx.lineWidth = 1.2;
+          ctx.shadowBlur = 10; ctx.shadowColor = colA(0.8); ctx.stroke(); ctx.restore();
+
+          // 3. Main marble sphere — multi-layer radial gradient for 3D effect
+          // Shadow side (offset down-right)
+          const shadowGrad = ctx.createRadialGradient(ex + 2, ey + 3, 0, ex, ey, marbleR);
+          shadowGrad.addColorStop(0, "rgba(180,190,210,0.3)");
+          shadowGrad.addColorStop(0.7, "rgba(60,70,90,0.5)");
+          shadowGrad.addColorStop(1, "rgba(20,25,40,0.8)");
           ctx.save();
-          ctx.beginPath(); ctx.arc(ex, ey, 10, 0, Math.PI * 2);
-          ctx.fillStyle = nodeColor; ctx.shadowBlur = 18; ctx.shadowColor = colA(1); ctx.fill(); ctx.restore();
+          ctx.beginPath(); ctx.arc(ex, ey, marbleR, 0, Math.PI * 2);
+          ctx.fillStyle = shadowGrad; ctx.fill(); ctx.restore();
+
+          // Body layer — main marble color (white/grey with color tint)
+          const bodyGrad = ctx.createRadialGradient(ex - 3, ey - 4, 1, ex, ey, marbleR);
+          bodyGrad.addColorStop(0, "rgba(255,255,255,0.98)");
+          bodyGrad.addColorStop(0.25, "rgba(235,240,250,0.95)");
+          bodyGrad.addColorStop(0.5, "rgba(200,210,230,0.85)");
+          bodyGrad.addColorStop(0.75, "rgba(150,165,195,0.7)");
+          bodyGrad.addColorStop(1, "rgba(80,95,130,0.4)");
           ctx.save();
-          ctx.beginPath(); ctx.arc(ex, ey, 3.5, 0, Math.PI * 2);
-          ctx.fillStyle = "rgba(255,255,255,0.95)"; ctx.shadowBlur = 6; ctx.shadowColor = "#fff"; ctx.fill(); ctx.restore();
+          ctx.beginPath(); ctx.arc(ex, ey, marbleR - 0.5, 0, Math.PI * 2);
+          ctx.fillStyle = bodyGrad; ctx.fill(); ctx.restore();
+
+          // Colored subsurface tint
+          const tintGrad = ctx.createRadialGradient(ex, ey + 2, 0, ex, ey, marbleR);
+          tintGrad.addColorStop(0, colA(0.15));
+          tintGrad.addColorStop(0.5, colA(0.08));
+          tintGrad.addColorStop(1, colA(0));
+          ctx.save();
+          ctx.beginPath(); ctx.arc(ex, ey, marbleR, 0, Math.PI * 2);
+          ctx.fillStyle = tintGrad; ctx.fill(); ctx.restore();
+
+          // Specular highlight (top-left bright spot)
+          const specGrad = ctx.createRadialGradient(ex - 4, ey - 5, 0, ex - 4, ey - 5, 7);
+          specGrad.addColorStop(0, "rgba(255,255,255,0.95)");
+          specGrad.addColorStop(0.4, "rgba(255,255,255,0.5)");
+          specGrad.addColorStop(1, "rgba(255,255,255,0)");
+          ctx.save();
+          ctx.beginPath(); ctx.arc(ex - 4, ey - 5, 7, 0, Math.PI * 2);
+          ctx.fillStyle = specGrad; ctx.fill(); ctx.restore();
+
+          // Secondary specular (smaller, sharper)
+          const specGrad2 = ctx.createRadialGradient(ex - 2.5, ey - 3.5, 0, ex - 2.5, ey - 3.5, 3);
+          specGrad2.addColorStop(0, "rgba(255,255,255,1)");
+          specGrad2.addColorStop(1, "rgba(255,255,255,0)");
+          ctx.save();
+          ctx.beginPath(); ctx.arc(ex - 2.5, ey - 3.5, 3, 0, Math.PI * 2);
+          ctx.fillStyle = specGrad2; ctx.fill(); ctx.restore();
+
+          // Edge rim light (bottom-right)
+          const rimGrad = ctx.createRadialGradient(ex + 5, ey + 5, 0, ex + 5, ey + 5, 6);
+          rimGrad.addColorStop(0, "rgba(200,220,255,0.25)");
+          rimGrad.addColorStop(1, "rgba(200,220,255,0)");
+          ctx.save();
+          ctx.beginPath(); ctx.arc(ex + 5, ey + 5, 6, 0, Math.PI * 2);
+          ctx.fillStyle = rimGrad; ctx.fill(); ctx.restore();
+
+          // Marble veining (subtle curved lines)
+          ctx.save();
+          ctx.globalAlpha = 0.08;
+          ctx.strokeStyle = "rgba(120,130,160,1)";
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(ex - 8, ey - 2);
+          ctx.quadraticCurveTo(ex - 2, ey + 4, ex + 6, ey - 1);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(ex - 4, ey + 5);
+          ctx.quadraticCurveTo(ex + 2, ey + 1, ex + 8, ey + 4);
+          ctx.stroke();
+          ctx.restore();
+
         } else {
-          const r2 = Math.max(4, 8 - distFromActive * 1.8);
-          const alpha = Math.max(0.15, 0.85 - distFromActive * 0.28);
+          // ── INACTIVE MARBLE BALL ──
+          const r2 = Math.max(3.5, 7 - distFromActive * 1.5);
+          const alpha = Math.max(0.2, 0.9 - distFromActive * 0.25);
+
+          // Shadow layer
+          const shadowGrad = ctx.createRadialGradient(ex + 1, ey + 1.5, 0, ex, ey, r2);
+          shadowGrad.addColorStop(0, `rgba(180,190,210,${alpha * 0.4})`);
+          shadowGrad.addColorStop(0.7, `rgba(80,90,120,${alpha * 0.5})`);
+          shadowGrad.addColorStop(1, `rgba(30,35,50,${alpha * 0.6})`);
           ctx.save();
           ctx.beginPath(); ctx.arc(ex, ey, r2, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255,255,255,${alpha})`; ctx.fill(); ctx.restore();
+          ctx.fillStyle = shadowGrad; ctx.fill(); ctx.restore();
+
+          // Body marble gradient
+          const bodyGrad = ctx.createRadialGradient(ex - r2 * 0.2, ey - r2 * 0.3, 0, ex, ey, r2);
+          bodyGrad.addColorStop(0, `rgba(255,255,255,${alpha})`);
+          bodyGrad.addColorStop(0.35, `rgba(230,235,245,${alpha * 0.9})`);
+          bodyGrad.addColorStop(0.7, `rgba(180,190,210,${alpha * 0.6})`);
+          bodyGrad.addColorStop(1, `rgba(100,115,145,${alpha * 0.3})`);
+          ctx.save();
+          ctx.beginPath(); ctx.arc(ex, ey, r2 - 0.3, 0, Math.PI * 2);
+          ctx.fillStyle = bodyGrad; ctx.fill(); ctx.restore();
+
+          // Small specular highlight
+          const specR = r2 * 0.35;
+          const specGrad = ctx.createRadialGradient(ex - r2 * 0.2, ey - r2 * 0.25, 0, ex - r2 * 0.2, ey - r2 * 0.25, specR);
+          specGrad.addColorStop(0, `rgba(255,255,255,${alpha * 0.7})`);
+          specGrad.addColorStop(1, `rgba(255,255,255,0)`);
+          ctx.save();
+          ctx.beginPath(); ctx.arc(ex - r2 * 0.2, ey - r2 * 0.25, specR, 0, Math.PI * 2);
+          ctx.fillStyle = specGrad; ctx.fill(); ctx.restore();
         }
 
         /* YEAR LABEL */
@@ -731,27 +841,38 @@ function TimelineCanvas({
           const yearTextHeight = yearMetrics.actualBoundingBoxAscent + yearMetrics.actualBoundingBoxDescent;
           ctx.restore();
 
-          const pipY = ey + Math.round(yearTextHeight / 2) + 10;
-          const pipW = 13;
-          const pipH = 3;
-          const gap = 6;
+          const pipY = ey + Math.round(yearTextHeight / 2) + 12;
+          const pipR = 3.5; // Radius for metallic pip dots
+          const gap = 8;
           const total = idxs.length;
-          const totalW = total * pipW + (total - 1) * gap;
-          const startX = yearX - totalW;
+          const totalW = total * (pipR * 2) + (total - 1) * gap;
+          const startX = yearX - totalW + pipR; // center of first pip
 
           // Continuous local position within cluster: 0..total-1
           const localFClamped = Math.max(0, Math.min(total - 1, activeF - idxs[0]));
 
-          // Draw dim track slots
+          // Draw dim track slots (inactive metallic dots)
           for (let p = 0; p < total; p++) {
-            const px = startX + p * (pipW + gap);
+            const px = startX + p * (pipR * 2 + gap);
             const memberCol = hexRgb(ENTRIES[idxs[p]].color);
             ctx.save();
             ctx.beginPath();
-            ctx.roundRect(px, pipY, pipW, pipH, 2);
-            ctx.fillStyle = `rgba(${memberCol[0]},${memberCol[1]},${memberCol[2]},0.25)`;
-            ctx.globalAlpha = 0.55;
+            ctx.arc(px, pipY, pipR, 0, Math.PI * 2);
+            // Dim metallic gradient
+            const dimGrad = ctx.createRadialGradient(px - pipR*0.3, pipY - pipR*0.3, 0, px, pipY, pipR);
+            dimGrad.addColorStop(0, `rgba(255,255,255,0.4)`);
+            dimGrad.addColorStop(0.5, `rgba(${memberCol[0]},${memberCol[1]},${memberCol[2]},0.3)`);
+            dimGrad.addColorStop(1, `rgba(30,35,50,0.6)`);
+            ctx.fillStyle = dimGrad;
             ctx.fill();
+            
+            // Subtle specular highlight for dim pips
+            const specGrad = ctx.createRadialGradient(px - pipR*0.4, pipY - pipR*0.4, 0, px - pipR*0.4, pipY - pipR*0.4, pipR*0.5);
+            specGrad.addColorStop(0, `rgba(255,255,255,0.5)`);
+            specGrad.addColorStop(1, `rgba(255,255,255,0)`);
+            ctx.beginPath(); ctx.arc(px - pipR*0.4, pipY - pipR*0.4, pipR*0.5, 0, Math.PI * 2);
+            ctx.fillStyle = specGrad; ctx.fill();
+            
             ctx.restore();
           }
 
@@ -763,16 +884,44 @@ function TimelineCanvas({
           const cc1 = hexRgb(ENTRIES[idxs[cp1]].color);
           const lerpC = (a: number, b: number, tt: number) => Math.round(a + (b - a) * tt);
           const pipColor = `rgb(${lerpC(cc0[0], cc1[0], cFrac)},${lerpC(cc0[1], cc1[1], cFrac)},${lerpC(cc0[2], cc1[2], cFrac)})`;
-          // Pip x position: interpolates from slot 0 to slot total-1 as localFClamped goes 0→total-1
-          const activeX = startX + localFClamped * (pipW + gap);
+          
+          // Pip x position: interpolates from slot 0 to slot total-1
+          const activeX = startX + localFClamped * (pipR * 2 + gap);
+          const activeR = 5; // slightly larger active pip
+          
           ctx.save();
-          ctx.beginPath();
-          ctx.roundRect(activeX, pipY, pipW, pipH, 2);
-          ctx.fillStyle = pipColor;
-          ctx.shadowBlur = 9;
-          ctx.shadowColor = pipColor;
-          ctx.globalAlpha = 0.95;
+          // Active pip outer glow
+          ctx.beginPath(); ctx.arc(activeX, pipY, activeR * 2.5, 0, Math.PI * 2);
+          const glowGrad = ctx.createRadialGradient(activeX, pipY, 0, activeX, pipY, activeR * 2.5);
+          glowGrad.addColorStop(0, pipColor);
+          glowGrad.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = glowGrad;
+          ctx.globalAlpha = 0.5;
           ctx.fill();
+          
+          // Active pip metallic body
+          ctx.globalAlpha = 1;
+          ctx.beginPath();
+          ctx.arc(activeX, pipY, activeR, 0, Math.PI * 2);
+          const bodyGrad = ctx.createRadialGradient(activeX - activeR*0.3, pipY - activeR*0.3, 0, activeX, pipY, activeR);
+          bodyGrad.addColorStop(0, '#ffffff');
+          bodyGrad.addColorStop(0.3, '#e2e8f0');
+          bodyGrad.addColorStop(0.7, pipColor);
+          bodyGrad.addColorStop(1, '#0f172a');
+          ctx.fillStyle = bodyGrad;
+          ctx.shadowBlur = 8;
+          ctx.shadowColor = pipColor;
+          ctx.fill();
+          
+          // Active pip bright specular highlight
+          ctx.beginPath(); ctx.arc(activeX - activeR*0.4, pipY - activeR*0.4, activeR*0.4, 0, Math.PI * 2);
+          const activeSpecGrad = ctx.createRadialGradient(activeX - activeR*0.4, pipY - activeR*0.4, 0, activeX - activeR*0.4, pipY - activeR*0.4, activeR*0.4);
+          activeSpecGrad.addColorStop(0, 'rgba(255,255,255,0.9)');
+          activeSpecGrad.addColorStop(1, 'rgba(255,255,255,0)');
+          ctx.fillStyle = activeSpecGrad;
+          ctx.shadowBlur = 0;
+          ctx.fill();
+          
           ctx.restore();
         }
       });
@@ -989,21 +1138,21 @@ export default function ExperienceSection() {
         .tl-stars {
           position: absolute; inset: 0; pointer-events: none; z-index: 0;
           background-image:
-            radial-gradient(1px 1px at 6% 8%, rgba(255,255,255,0.7) 0%,transparent 100%),
-            radial-gradient(1px 1px at 14% 44%, rgba(255,255,255,0.5) 0%,transparent 100%),
-            radial-gradient(1.5px 1.5px at 22% 72%, rgba(255,255,255,0.65) 0%,transparent 100%),
-            radial-gradient(1px 1px at 31% 20%, rgba(255,255,255,0.45) 0%,transparent 100%),
-            radial-gradient(1px 1px at 40% 88%, rgba(255,255,255,0.5) 0%,transparent 100%),
-            radial-gradient(1px 1px at 49% 35%, rgba(255,255,255,0.4) 0%,transparent 100%),
-            radial-gradient(1.5px 1.5px at 57% 60%, rgba(255,255,255,0.6) 0%,transparent 100%),
-            radial-gradient(1px 1px at 66% 14%, rgba(255,255,255,0.5) 0%,transparent 100%),
-            radial-gradient(1px 1px at 74% 80%, rgba(255,255,255,0.4) 0%,transparent 100%),
-            radial-gradient(1px 1px at 82% 40%, rgba(255,255,255,0.55) 0%,transparent 100%),
-            radial-gradient(1px 1px at 90% 65%, rgba(255,255,255,0.45) 0%,transparent 100%),
-            radial-gradient(2px 2px at 95% 22%, rgba(255,255,255,0.6) 0%,transparent 100%),
-            radial-gradient(1px 1px at 10% 95%, rgba(255,255,255,0.35) 0%,transparent 100%),
-            radial-gradient(1px 1px at 45% 55%, rgba(255,255,255,0.3) 0%,transparent 100%),
-            radial-gradient(1px 1px at 78% 10%, rgba(255,255,255,0.5) 0%,transparent 100%);
+            radial-gradient(2px 2px at 6% 8%, rgba(255,255,255,1) 0%,transparent 100%),
+            radial-gradient(2px 2px at 14% 44%, rgba(255,255,255,0.8) 0%,transparent 100%),
+            radial-gradient(2.5px 2.5px at 22% 72%, rgba(255,255,255,0.9) 0%,transparent 100%),
+            radial-gradient(2px 2px at 31% 20%, rgba(255,255,255,0.7) 0%,transparent 100%),
+            radial-gradient(2px 2px at 40% 88%, rgba(255,255,255,0.85) 0%,transparent 100%),
+            radial-gradient(2px 2px at 49% 35%, rgba(255,255,255,0.75) 0%,transparent 100%),
+            radial-gradient(2.5px 2.5px at 57% 60%, rgba(255,255,255,0.95) 0%,transparent 100%),
+            radial-gradient(2px 2px at 66% 14%, rgba(255,255,255,0.8) 0%,transparent 100%),
+            radial-gradient(2px 2px at 74% 80%, rgba(255,255,255,0.7) 0%,transparent 100%),
+            radial-gradient(2px 2px at 82% 40%, rgba(255,255,255,0.85) 0%,transparent 100%),
+            radial-gradient(2px 2px at 90% 65%, rgba(255,255,255,0.75) 0%,transparent 100%),
+            radial-gradient(3px 3px at 95% 22%, rgba(255,255,255,1) 0%,transparent 100%),
+            radial-gradient(2px 2px at 10% 95%, rgba(255,255,255,0.65) 0%,transparent 100%),
+            radial-gradient(2px 2px at 45% 55%, rgba(255,255,255,0.6) 0%,transparent 100%),
+            radial-gradient(2px 2px at 78% 10%, rgba(255,255,255,0.8) 0%,transparent 100%);
         }
         .tl-canvas { position:absolute;top:0;left:0;pointer-events:none;z-index:2;display:block; }
 

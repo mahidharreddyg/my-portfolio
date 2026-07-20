@@ -1,1 +1,25 @@
-{"pages":{},"app":{"/Users/mahidharreddyg/Mahi/My Projects/Web Dev/my-portfolio/app/layout":["static/media/13971731025ec697-s.p.woff2","static/media/bb3ef058b751a6ad-s.p.woff2","static/media/7b0b24f36b1a6d0b-s.p.woff2","static/media/636a5ac981f94f8b-s.p.woff2","static/media/36966cca54120369-s.p.woff2","static/media/8a1d8947e5852e30-s.p.woff2","static/media/eebd8834f6af1796-s.p.otf"]},"appUsingSizeAdjust":true,"pagesUsingSizeAdjust":false}
+{
+  "app": {
+    "[project]/app/_not-found/page": [
+      "static/media/fba5a26ea33df6a3-s.p.18rizl4rsrl42.woff2",
+      "static/media/70bc3e132a0a741e-s.p.3t6q91iet4nsy.woff2",
+      "static/media/0c89a48fa5027cee-s.p.2cyn07wtgehh0.woff2",
+      "static/media/5c285b27cdda1fe8-s.p.2_mbdogr7ni8i.woff2",
+      "static/media/0c795a286deabae8-s.p.3vm0tq4e-zz_5.woff2",
+      "static/media/1b99372b3eaef0c8-s.p.1gsd1jahc5dg_.woff2",
+      "static/media/MalintontrialversionExtbd_5y9Wj-s.p.1zk-ec1h6ekzc.otf"
+    ],
+    "[project]/app/page": [
+      "static/media/fba5a26ea33df6a3-s.p.18rizl4rsrl42.woff2",
+      "static/media/70bc3e132a0a741e-s.p.3t6q91iet4nsy.woff2",
+      "static/media/0c89a48fa5027cee-s.p.2cyn07wtgehh0.woff2",
+      "static/media/5c285b27cdda1fe8-s.p.2_mbdogr7ni8i.woff2",
+      "static/media/0c795a286deabae8-s.p.3vm0tq4e-zz_5.woff2",
+      "static/media/1b99372b3eaef0c8-s.p.1gsd1jahc5dg_.woff2",
+      "static/media/MalintontrialversionExtbd_5y9Wj-s.p.1zk-ec1h6ekzc.otf"
+    ]
+  },
+  "appUsingSizeAdjust": true,
+  "pages": {},
+  "pagesUsingSizeAdjust": false
+}

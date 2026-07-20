@@ -71,12 +71,11 @@
 
 /* ── Performance: prevent scroll-behavior: smooth from causing parallax jank ── */
 html {
-  overflow-x: hidden;
   scroll-behavior: auto;
 }
 
 body {
-  overflow-x: hidden;
+  /* overflow-x handled by the main wrapper to preserve momentum scrolling */
 }
 
 /* ── GPU Compositing Helpers ── */
@@ -116,4 +115,54 @@ body {
 
 .animate-wormhole {
   animation: wormhole 8s linear infinite;
+}
+
+/* ─── R3F Canvas Compositing ─── */
+.r3f-canvas-wrapper {
+  contain: layout style paint;
+  isolation: isolate;
+}
+
+/* ─── GSAP ScrollTrigger Performance ─── */
+.gsap-pin-spacer {
+  will-change: auto !important;
+}
+
+/* Dynamic will-change: on during scroll animation, off after */
+[data-scroll-active="true"] {
+  will-change: transform, opacity;
+}
+
+[data-scroll-active="false"] {
+  will-change: auto;
+}
+
+/* ─── Scroll-linked animation containers ─── */
+.scroll-section-pin {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* ─── Lenis smooth scroll overrides ─── */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
 }

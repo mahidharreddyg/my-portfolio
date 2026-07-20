@@ -26,7 +26,7 @@ export default function Section({ id, title, children, className = "", style }: 
       style={style}
       initial={{ opacity: 0 }}
       animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-      transition={{ duration: 0.4 }}
+      transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
     >
       {/* Static background gradient — no infinite animation */}
       {!className.includes('bg-transparent') && (
@@ -38,12 +38,12 @@ export default function Section({ id, title, children, className = "", style }: 
       {/* Content container */}
       <div className="relative z-10 max-w-6xl mx-auto px-4">
         <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={isInView ? { y: 0, opacity: 1 } : { y: 20, opacity: 0 }}
+          initial={{ y: 60, opacity: 0, scale: 1.05 }}
+          animate={isInView ? { y: 0, opacity: 1, scale: 1 } : { y: 60, opacity: 0, scale: 1.05 }}
           transition={{
-            duration: 0.4,
-            ease: [0.25, 0.46, 0.45, 0.94],
-            delay: 0,
+            duration: 1.4,
+            ease: [0.16, 1, 0.3, 1],
+            delay: 0.1,
           }}
           className="text-center"
         >
@@ -60,12 +60,12 @@ export default function Section({ id, title, children, className = "", style }: 
 
           {children && (
             <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={isInView ? { y: 0, opacity: 1 } : { y: 20, opacity: 0 }}
+              initial={{ y: 40, opacity: 0, scale: 1.02 }}
+              animate={isInView ? { y: 0, opacity: 1, scale: 1 } : { y: 40, opacity: 0, scale: 1.02 }}
               transition={{
-                duration: 0.4,
-                ease: [0.25, 0.46, 0.45, 0.94],
-                delay: 0.05,
+                duration: 1.4,
+                ease: [0.16, 1, 0.3, 1],
+                delay: 0.2,
               }}
               className=""
             >

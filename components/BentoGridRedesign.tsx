@@ -6,9 +6,7 @@ import Image from "next/image";
 
 
 const glassStyle = {
-  background: 'rgba(255, 255, 255, 0.03)',
-  backdropFilter: 'blur(3px)',
-  WebkitBackdropFilter: 'blur(3px)',
+  background: 'rgba(255, 255, 255, 0.05)',
   border: '1px solid rgba(255, 255, 255, 0.15)',
   boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.05)'
 };
@@ -716,10 +714,10 @@ export function BentoGridRedesign() {
         <div className="flex flex-col gap-4">
           {/* 1. Profile Card (Top Left) - Fixed Height 270px */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            initial={{ opacity: 0, x: -100, y: -50 }}
+            whileInView={{ opacity: 1, x: 0, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
             className="h-[270px] rounded-2xl relative"
             style={{ perspective: "1000px" }}
           >
@@ -858,89 +856,360 @@ export function BentoGridRedesign() {
             </div>
           </motion.div>
 
-          {/* 3. Large Vertical Left (Bottom Left) - Fixed Height 502px */}
+          {/* 3. Large Vertical Left (Bottom Left) — Live Code Activity */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            initial={{ opacity: 0, x: -100, y: 50 }}
+            whileInView={{ opacity: 1, x: 0, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.7, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="bento-card h-[502px] rounded-2xl relative overflow-hidden"
             style={glassStyle}
           >
             <GlassHighlight />
 
-            {/* Empty as requested */}
+            {/* Terminal-style background */}
+            <div className="absolute inset-0 pointer-events-none" style={{
+              backgroundImage: 'linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px)',
+              backgroundSize: '16px 16px',
+            }} />
+
+            <div className="absolute inset-0 p-6 flex flex-col z-10">
+              {/* Header */}
+              <div className="flex items-center gap-2 mb-5">
+                <div className="flex gap-1">
+                  <div className="w-2 h-2 rounded-full bg-red-400/80" />
+                  <div className="w-2 h-2 rounded-full bg-yellow-400/80" />
+                  <div className="w-2 h-2 rounded-full bg-green-400/80" />
+                </div>
+                <span className="text-[9px] font-mono text-white/25 ml-2 tracking-wider">~/code/activity</span>
+              </div>
+
+              {/* Commit Heatmap */}
+              <div className="mb-5">
+                <div className="text-[9px] font-mono text-white/30 uppercase tracking-widest mb-3">Contribution Heatmap</div>
+                <div className="grid grid-cols-12 gap-[3px]">
+                  {Array.from({ length: 84 }, (_, i) => {
+                    const intensity = Math.random();
+                    const bg = intensity > 0.8 ? 'bg-blue-400' : intensity > 0.6 ? 'bg-blue-500/70' : intensity > 0.35 ? 'bg-blue-600/40' : 'bg-white/5';
+                    return <div key={i} className={`w-full aspect-square rounded-[2px] ${bg}`} />;
+                  })}
+                </div>
+              </div>
+
+              {/* Stats Row */}
+              <div className="grid grid-cols-2 gap-3 mb-5">
+                <div className="bg-white/[0.03] border border-white/[0.06] rounded-lg p-3">
+                  <div className="text-[9px] font-mono text-white/30 uppercase tracking-wider mb-1">Total Commits</div>
+                  <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 font-mono">2,400+</div>
+                </div>
+                <div className="bg-white/[0.03] border border-white/[0.06] rounded-lg p-3">
+                  <div className="text-[9px] font-mono text-white/30 uppercase tracking-wider mb-1">Active Repos</div>
+                  <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-300 font-mono">15+</div>
+                </div>
+              </div>
+
+              {/* Recent Commits */}
+              <div className="flex-1 flex flex-col gap-2">
+                <div className="text-[9px] font-mono text-white/30 uppercase tracking-widest mb-1">Recent Activity</div>
+                {[
+                  { msg: 'feat: implement agentic AI pipeline', time: '2h ago', color: 'bg-green-400' },
+                  { msg: 'refactor: optimize scroll perf', time: '5h ago', color: 'bg-blue-400' },
+                  { msg: 'fix: resolve hydration mismatch', time: '1d ago', color: 'bg-yellow-400' },
+                  { msg: 'chore: update dependencies', time: '2d ago', color: 'bg-purple-400' },
+                ].map((commit, i) => (
+                  <div key={i} className="flex items-center gap-2 bg-white/[0.02] border border-white/[0.04] rounded-md px-3 py-2">
+                    <div className={`w-1.5 h-1.5 rounded-full ${commit.color} shrink-0`} style={{ boxShadow: '0 0 6px currentColor' }} />
+                    <span className="text-[10px] font-mono text-white/60 truncate flex-1">{commit.msg}</span>
+                    <span className="text-[9px] font-mono text-white/20 shrink-0">{commit.time}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </motion.div>
         </div>
 
         {/* RIGHT COLUMN - Independent Grid */}
         <div className="md:col-span-2 grid grid-cols-2 gap-4 grid-rows-[70px_184px_296px_190px]">
 
-          {/* 2. Top Bar (Top Right) */}
+          {/* 2. Top Bar (Top Right) — Performance Pulse */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="bento-card col-span-2 rounded-2xl relative overflow-hidden"
+            initial={{ opacity: 0, x: 100, y: -50 }}
+            whileInView={{ opacity: 1, x: 0, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.7, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="bento-card col-span-2 rounded-2xl relative overflow-hidden group/topbar"
             style={glassStyle}
           >
             <GlassHighlight />
 
-            {/* Empty as requested */}
+            {/* Animated line sweep on hover */}
+            <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
+              <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-blue-400/60 to-transparent opacity-0 group-hover/topbar:opacity-100 transition-opacity duration-500" />
+            </div>
+
+            <div className="absolute inset-0 flex items-center justify-between px-6 md:px-8 z-10">
+              <div className="flex items-center gap-3">
+                {/* Live pulse metallic orb */}
+                <div className="relative">
+                  <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center relative overflow-hidden"
+                       style={{
+                         background: "radial-gradient(circle at 30% 30%, #ffffff 0%, #e2e8f0 10%, #94a3b8 40%, #334155 80%, #0f172a 100%)",
+                         boxShadow: "inset -2px -2px 6px rgba(0,0,0,0.5), inset 2px 2px 6px rgba(255,255,255,0.8), 0 4px 10px rgba(0,0,0,0.4)"
+                       }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-slate-900 mix-blend-overlay"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    {/* Sharp metallic specular */}
+                    <div className="absolute top-1 left-1.5 w-3 h-2 bg-white/80 rounded-full blur-[1px] rotate-[-45deg]" />
+                  </div>
+                  <motion.div
+                    className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-400 border border-green-200"
+                    animate={{ scale: [1, 1.3, 1], opacity: [0.8, 1, 0.8] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    style={{ boxShadow: '0 0 8px rgba(34,197,94,0.8), inset 1px 1px 2px rgba(255,255,255,0.8)' }}
+                  />
+                </div>
+                <div>
+                  <h3 className="text-white font-semibold text-sm">Systems Online</h3>
+                  <p className="text-[10px] text-white/30 font-mono tracking-wider">ALL SERVICES OPERATIONAL</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="hidden md:flex items-center gap-1.5">
+                  {[0.3, 0.6, 0.8, 0.5, 0.9, 0.7, 0.4, 0.85].map((h, i) => (
+                    <motion.div
+                      key={i}
+                      className="w-1 rounded-full bg-gradient-to-t from-blue-500 to-cyan-400"
+                      initial={{ height: 4 }}
+                      animate={{ height: [4, h * 28, 4] }}
+                      transition={{ duration: 1.5, delay: i * 0.12, repeat: Infinity, ease: "easeInOut" }}
+                      style={{ opacity: 0.6 + h * 0.4 }}
+                    />
+                  ))}
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 font-mono">99.9%</div>
+                  <p className="text-[9px] text-white/20 font-mono tracking-wider">UPTIME</p>
+                </div>
+              </div>
+            </div>
           </motion.div>
 
-          {/* 4. Center Top (Middle Left) */}
+          {/* 4. Center Top (Middle Left) — Glassmorphic Clock */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="bento-card rounded-2xl relative overflow-hidden"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.7, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="bento-card rounded-2xl relative overflow-hidden group/clock"
             style={glassStyle}
           >
             <GlassHighlight />
 
-            {/* Empty as requested */}
+            <div className="absolute inset-0 p-5 flex flex-col justify-between z-10">
+              {/* Clock face */}
+              <div className="relative w-20 h-20 mx-auto">
+                {/* Outer metallic ring */}
+                <motion.div
+                  className="absolute inset-0 rounded-full"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 60, ease: "linear", repeat: Infinity }}
+                  style={{
+                    background: "conic-gradient(from 0deg, #94a3b8, #e2e8f0, #94a3b8, #475569, #94a3b8, #e2e8f0, #94a3b8)",
+                    padding: "2px",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.4)"
+                  }}
+                >
+                  {/* Clock body */}
+                  <div className="w-full h-full rounded-full relative overflow-hidden"
+                       style={{
+                         background: "radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%)",
+                         boxShadow: "inset 0 4px 8px rgba(0,0,0,0.6)"
+                       }}>
+                    
+                    {/* Hour markers */}
+                    {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg, i) => (
+                      <div key={i} className="absolute w-[1.5px] h-1.5 bg-slate-400" style={{
+                        top: '50%', left: '50%',
+                        transform: `translate(-50%, -50%) rotate(${deg}deg) translateY(-28px)`,
+                        height: i % 3 === 0 ? '5px' : '3px',
+                        opacity: i % 3 === 0 ? 0.8 : 0.4,
+                      }} />
+                    ))}
+                    
+                    {/* Hour hand metallic */}
+                    <motion.div
+                      className="absolute w-[2px] h-5 rounded-full origin-bottom"
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 43200, ease: "linear", repeat: Infinity }}
+                      style={{ bottom: '50%', left: 'calc(50% - 1px)', background: "linear-gradient(to top, #64748b, #f8fafc)", boxShadow: "0 2px 4px rgba(0,0,0,0.5)" }}
+                    />
+                    
+                    {/* Minute hand metallic */}
+                    <motion.div
+                      className="absolute w-[1.5px] h-7 rounded-full origin-bottom"
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 3600, ease: "linear", repeat: Infinity }}
+                      style={{ bottom: '50%', left: 'calc(50% - 0.75px)', background: "linear-gradient(to top, #3b82f6, #93c5fd)", boxShadow: "0 2px 4px rgba(0,0,0,0.5)" }}
+                    />
+                    
+                    {/* Center metallic dot */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full"
+                         style={{
+                           background: "radial-gradient(circle at 30% 30%, #ffffff 0%, #94a3b8 50%, #1e293b 100%)",
+                           boxShadow: "0 2px 4px rgba(0,0,0,0.5)"
+                         }} />
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Info */}
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-2 mb-1">
+                  <motion.div
+                    className="w-1.5 h-1.5 rounded-full bg-green-400"
+                    animate={{ scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    style={{ boxShadow: '0 0 6px rgba(34,197,94,0.6)' }}
+                  />
+                  <span className="text-[9px] font-mono text-green-400/70 uppercase tracking-widest">Available</span>
+                </div>
+                <p className="text-lg font-bold text-white font-mono">IST <span className="text-white/20 text-xs">UTC+5:30</span></p>
+                <p className="text-[10px] text-white/25 font-mono mt-0.5">Remote Worldwide</p>
+              </div>
+            </div>
           </motion.div>
 
           <PassionateCard />
 
-          {/* 6. Center Bottom (Middle Left) */}
+          {/* 6. Center Bottom (Middle Left) — Current Focus Areas */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="bento-card rounded-2xl relative overflow-hidden"
+            initial={{ opacity: 0, x: 50, y: 50 }}
+            whileInView={{ opacity: 1, x: 0, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.7, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="bento-card rounded-2xl relative overflow-hidden group/focus"
             style={glassStyle}
           >
             <GlassHighlight />
 
-            {/* Empty as requested */}
+            <div className="absolute inset-0 p-5 flex flex-col z-10">
+              <div className="text-[9px] font-mono text-white/30 uppercase tracking-widest mb-3">Current Focus</div>
+
+              <div className="flex flex-col gap-2.5 flex-1 justify-center">
+                {[
+                  { label: 'Agentic AI', pct: 92, from: '#3b82f6', to: '#06b6d4' },
+                  { label: 'System Design', pct: 85, from: '#8b5cf6', to: '#a78bfa' },
+                  { label: 'Voice AI', pct: 78, from: '#22c55e', to: '#34d399' },
+                  { label: 'Web Perf', pct: 88, from: '#f59e0b', to: '#fbbf24' },
+                ].map((item, i) => (
+                  <div key={i}>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-[10px] font-semibold text-white/70">{item.label}</span>
+                      <span className="text-[9px] font-mono text-white/25">{item.pct}%</span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-white/[0.04] overflow-hidden">
+                      <motion.div
+                        className="h-full rounded-full"
+                        initial={{ width: 0 }}
+                        whileInView={{ width: `${item.pct}%` }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1.2, delay: 0.3 + i * 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        style={{
+                          background: `linear-gradient(90deg, ${item.from}, ${item.to})`,
+                          boxShadow: `0 0 8px ${item.from}40`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-1.5 mt-2">
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                <span className="text-[8px] font-mono text-white/15 uppercase tracking-wider">Always Learning</span>
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+              </div>
+            </div>
           </motion.div>
 
-          {/* 7. Bottom Wide (Bottom) */}
+          {/* 7. Bottom Wide (Bottom) — Let's Create Together */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="bento-card col-span-2 rounded-2xl relative overflow-hidden"
+            initial={{ opacity: 0, y: 100 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.7, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="bento-card col-span-2 rounded-2xl relative overflow-hidden group/cta"
             style={glassStyle}
           >
             <GlassHighlight />
 
-            {/* Empty as requested */}
+            {/* Hover glow sweep */}
+            <div className="absolute inset-0 pointer-events-none transition-opacity duration-700 opacity-0 group-hover/cta:opacity-100" style={{
+              background: 'radial-gradient(ellipse at 30% 50%, rgba(59,130,246,0.12) 0%, transparent 60%)',
+            }} />
+
+            <div className="absolute inset-0 p-6 md:p-8 flex items-center justify-between z-10">
+              <div className="flex-1">
+                {/* Open to work badge */}
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 mb-4">
+                  <motion.div
+                    className="w-1.5 h-1.5 rounded-full bg-green-400"
+                    animate={{ scale: [1, 1.3, 1], opacity: [0.7, 1, 0.7] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                    style={{ boxShadow: '0 0 6px rgba(34,197,94,0.6)' }}
+                  />
+                  <span className="text-[9px] font-mono text-green-400/80 uppercase tracking-widest">Open to Collaborate</span>
+                </div>
+
+                <h3 className="text-xl md:text-2xl font-bold mb-2">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-200 to-blue-400">Let's Create</span>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300"> Together</span>
+                </h3>
+                <p className="text-xs md:text-sm text-white/30 max-w-sm leading-relaxed">Open for engineering roles, freelance opportunities, and exciting collaborations worldwide.</p>
+              </div>
+
+              {/* Animated orbiting element */}
+              <div className="w-24 h-24 md:w-28 md:h-28 relative hidden md:flex items-center justify-center shrink-0">
+                {/* Orbiting rings */}
+                <motion.div
+                  className="absolute inset-0 rounded-full border border-white/[0.06]"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 12, ease: "linear", repeat: Infinity }}
+                >
+                  <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-blue-400/60" style={{ boxShadow: '0 0 8px rgba(59,130,246,0.4)' }} />
+                </motion.div>
+                <motion.div
+                  className="absolute inset-3 rounded-full border border-blue-500/15"
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 8, ease: "linear", repeat: Infinity }}
+                >
+                  <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-cyan-400/60" style={{ boxShadow: '0 0 6px rgba(6,182,212,0.4)' }} />
+                </motion.div>
+
+                {/* Center metallic icon */}
+                <div className="w-12 h-12 rounded-full relative overflow-hidden flex items-center justify-center"
+                     style={{
+                       background: "radial-gradient(circle at 35% 35%, #ffffff 0%, #cbd5e1 15%, #64748b 50%, #1e293b 90%)",
+                       boxShadow: "inset -2px -2px 6px rgba(0,0,0,0.6), inset 2px 2px 6px rgba(255,255,255,0.8), 0 5px 15px rgba(0,0,0,0.5)"
+                     }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-slate-900 mix-blend-overlay">
+                    <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  {/* Sharp metallic specular */}
+                  <div className="absolute top-1.5 left-2.5 w-4 h-2 bg-white/90 rounded-full blur-[1px] rotate-[-45deg]" />
+                </div>
+              </div>
+            </div>
           </motion.div>
         </div>
 
 
-        {/* CENTRAL MR BADGE - Revamped with Micro-Interactions */}
         <div className="absolute left-[33.333%] top-[270px] -translate-x-1/2 -translate-y-1/2 z-20 hidden md:flex items-center justify-center pointer-events-none">
           <motion.div
             className="relative flex items-center justify-center pointer-events-none"
-            initial="initial"
+            initial={{ opacity: 0, scale: 0 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8, delay: 0.5, type: "spring" }}
             whileHover="hover"
           >
             {/* Pulsing Outer Glow (Behind) */}
@@ -979,32 +1248,35 @@ export function BentoGridRedesign() {
                 className="absolute inset-0 rounded-full pointer-events-none"
                 style={{
                   background: `
-                    linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
-                    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.12) 0%, transparent 60%)
+                    linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.25) 0%, transparent 60%)
                   `,
-                  opacity: 0.8,
+                  opacity: 0.9,
+                  boxShadow: "inset 0px 4px 20px rgba(255, 255, 255, 0.2), inset 0px -4px 20px rgba(0, 0, 0, 0.4)",
+                  backdropFilter: "blur(8px)",
                 }}
               />
 
-              {/* Specular Reflection */}
+              {/* Specular Reflection (Soft Glass Curve) */}
               <div
-                className="absolute top-0 left-0 right-0 h-1/2 rounded-t-full pointer-events-none"
+                className="absolute top-[5%] left-[10%] right-[10%] h-[40%] rounded-t-full pointer-events-none"
                 style={{
-                  background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 100%)',
+                  background: 'linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%)',
                 }}
               />
+              
               {/* Rotating Ring 1 (Slow) */}
               <motion.div
                 animate={{ rotate: 360 }}
-                transition={{ duration: 20, ease: "linear", repeat: Infinity }}
+                transition={{ duration: 25, ease: "linear", repeat: Infinity }}
                 className="absolute inset-0 rounded-full border border-white/10 border-t-white/40 border-l-transparent"
               />
 
-              {/* Rotating Ring 2 (Counter-Rotate, Faster on Hover) */}
+              {/* Rotating Ring 2 (Counter-Rotate) */}
               <motion.div
                 animate={{ rotate: -360 }}
-                transition={{ duration: 15, ease: "linear", repeat: Infinity }}
-                className="absolute inset-2 rounded-full border border-white/5 border-b-white/20 border-r-transparent"
+                transition={{ duration: 20, ease: "linear", repeat: Infinity }}
+                className="absolute inset-2 rounded-full border border-white/5 border-b-white/30 border-r-transparent"
               />
 
               {/* Inner Scale Ring */}
@@ -1013,16 +1285,16 @@ export function BentoGridRedesign() {
                   initial: { scale: 1 },
                   hover: { scale: 1.1 },
                 }}
-                className="absolute inset-4 rounded-full border border-white/10"
+                className="absolute inset-4 rounded-full border border-white/10 bg-white/[0.02]"
               />
 
               {/* Text Scale & Glow */}
               <motion.span
                 variants={{
                   initial: { scale: 1, textShadow: "0 0 0px rgba(255,255,255,0)" },
-                  hover: { scale: 1.15, textShadow: "0 0 10px rgba(255,255,255,0.5)" },
+                  hover: { scale: 1.15, textShadow: "0 0 15px rgba(255,255,255,0.7)" },
                 }}
-                className="text-4xl font-black text-white tracking-tighter drop-shadow-lg select-none z-20 relative"
+                className="text-4xl font-black text-white tracking-tighter drop-shadow-xl select-none z-20 relative mix-blend-screen"
               >
                 MR
               </motion.span>

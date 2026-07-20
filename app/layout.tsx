@@ -1,6 +1,8 @@
 import type React from "react"
 import "@/app/globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import Preloader from "@/components/Preloader"
+import SmoothScroll from "@/components/SmoothScroll"
 import { Plus_Jakarta_Sans, JetBrains_Mono, Space_Grotesk, DM_Sans, Syne, Outfit } from "next/font/google"
 import localFont from "next/font/local"
 
@@ -58,10 +60,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className="overflow-x-hidden">
-      <body className={`relative min-h-screen bg-background font-sans antialiased overflow-x-hidden ${jakarta.className} ${malinton.variable} ${jetbrainsMono.variable} ${spaceGrotesk.variable} ${dmSans.variable} ${syne.variable} ${outfit.variable}`}>
+    <html lang="en" className="relative" suppressHydrationWarning>
+      <body className={`relative min-h-screen bg-background font-sans antialiased ${jakarta.className} ${malinton.variable} ${jetbrainsMono.variable} ${spaceGrotesk.variable} ${dmSans.variable} ${syne.variable} ${outfit.variable} selection:bg-blue-500/30 w-full`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          {children}
+          <SmoothScroll>
+            <Preloader />
+            {children}
+          </SmoothScroll>
         </ThemeProvider>
       </body>
     </html>
