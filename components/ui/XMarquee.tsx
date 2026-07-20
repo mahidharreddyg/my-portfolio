@@ -8,6 +8,7 @@ import {
   useSpring,
   useTransform,
   useVelocity,
+  useInView,
 } from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -53,6 +54,7 @@ function ParallaxText({
   const [repetitions, setRepetitions] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(containerRef);
 
   useEffect(() => {
     const calculateRepetitions = () => {
@@ -74,6 +76,8 @@ function ParallaxText({
 
   const directionFactor = React.useRef<number>(1);
   useAnimationFrame((t, delta) => {
+    if (!isInView) return; // Skip DOM updates when off-screen
+
     let moveBy = directionFactor.current * baseVelocity * (delta / 1000);
 
     if (velocityFactor.get() < 0) {

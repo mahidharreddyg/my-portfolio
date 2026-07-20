@@ -3,7 +3,6 @@
 import { useRef, useEffect, useState } from "react";
 import Navbar from "@/components/navbar";
 import HeroSection from "@/components/hero-section";
-import Section from "@/components/section";
 import XMarquee from "@/components/ui/XMarquee";
 import { BentoGridRedesign } from "@/components/BentoGridRedesign";
 import Footer from "@/components/Footer";
@@ -12,6 +11,7 @@ import Experience from "@/components/experience";
 import Projects from "@/components/projects";
 import Certifications from "@/components/certifications";
 import AboutMe from "@/components/about-me";
+import GSAPSection from "@/components/scroll/GSAPSection";
 
 export default function Home() {
   const sectionRef = useRef(null);
@@ -104,7 +104,7 @@ export default function Home() {
           </div>
           <div className="relative z-20">
             <div className="relative min-h-screen">
-              <div className="absolute -top-[50vh] left-0 w-full h-[200vh] overflow-hidden pointer-events-none">
+              <div className="absolute -top-[50vh] left-0 w-full h-[200vh] overflow-hidden pointer-events-none z-30">
                 <div className="relative top-[50vh] w-full h-full">
                   <XMarquee
                     topText="ABOUT EXPERIENCE SKILLS"
@@ -118,7 +118,7 @@ export default function Home() {
                 className="relative bg-gradient-to-br from-blue-900 via-black to-black overflow-hidden flex items-start justify-center pointer-events-auto rounded-b-[3rem] md:rounded-b-[4rem] z-20"
                 style={{ clipPath, minHeight: "130vh" }}
               >
-                <div className="w-full flex flex-col items-center justify-start pt-[18rem] md:pt-[24rem] pb-24 px-4 md:px-8">
+                <div className="w-full flex flex-col items-center justify-start pt-[45vw] md:pt-[25vw] xl:pt-[20vw] pb-24 px-4 md:px-8">
                   <BentoGridRedesign />
                   <AboutMe />
                 </div>
@@ -126,18 +126,25 @@ export default function Home() {
 
               {/* =========================================
                   NATIVE CSS STICKY PARALLAX STACKING 
-                  (Hardware-accelerated and buttery smooth, no scroll trapping)
+                  Enhanced with GSAP ScrollTrigger for
+                  precise control and snap behavior
                   ========================================= */}
-              <div className="relative w-full bg-black z-10 mt-[-100vh]">
+              <div className="relative w-full bg-black z-10 mt-[-100vh] mb-[62vh]">
 
                 {/* 1. EXPERIENCE - z10 */}
-                <div id="experience" className="relative w-full z-10">
+                <GSAPSection
+                  id="experience"
+                  className="relative w-full z-10"
+                  start="top 80%"
+                  animateFrom={{ opacity: 0, y: 40 }}
+                  animateTo={{ opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }}
+                >
                   <Experience />
-                </div>
+                </GSAPSection>
 
                 {/* 2. SKILLS - z30 (Stacks OVER Experience AND covers Projects for reveal) */}
-                <div className="relative h-[200vh] z-30 mt-[-100vh]">
-                  <div id="skills" className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-[3rem] md:rounded-[4rem] bg-[#050505] shadow-[0_20px_100px_rgba(0,0,0,0.9)] border-t border-white/5 overflow-hidden">
+                <div id="skills" className="relative h-[200vh] z-30 mt-[-100vh]">
+                  <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-[3rem] md:rounded-[4rem] bg-[#050505] shadow-[0_20px_100px_rgba(0,0,0,0.9)] border-t border-white/5 overflow-hidden">
                     <Skills />
                   </div>
                 </div>
@@ -147,26 +154,19 @@ export default function Home() {
                   <Projects />
                 </div>
 
-                {/* 4. CERTIFICATIONS - z50 (Top Layer, uncovers footer) */}
-                <div className="relative h-[200vh] z-50 mt-[-100vh]">
-                  <div id="certifications" className="sticky top-0 h-screen w-full rounded-[3rem] md:rounded-[4rem] bg-zinc-950 shadow-[0_-50px_100px_rgba(0,0,0,0.9)] border-t border-white/5 overflow-hidden">
-                    <Certifications />
-                  </div>
+                {/* 4. CERTIFICATIONS - z50 */}
+                <div id="certifications" className="relative z-50 bg-zinc-950 shadow-[0_-50px_100px_rgba(0,0,0,0.9)] border-t border-white/5 overflow-hidden rounded-[3rem] md:rounded-[4rem] mt-[-100vh]">
+                  <Certifications />
                 </div>
-
-                {/* 5. FOOTER - z40 (Revealed as Certifications scrolls away from bottom) */}
-                <div className="relative h-[60vh] z-40 mt-[-60vh]">
-                  <div id="footer" className="sticky bottom-0 h-[60vh] w-full bg-black border-t border-white/10">
-                    <Footer />
-                  </div>
-                </div>
-
-
               </div>
-
             </div>
           </div>
         </div>
+      </div>
+
+      {/* 5. FOOTER - Fixed at bottom, revealed by margin on above container */}
+      <div id="footer" className="fixed bottom-0 left-0 w-full h-[62vh] bg-[#04040c] border-t border-white/10 z-0">
+        <Footer />
       </div>
     </main>
   );

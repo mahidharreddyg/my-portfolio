@@ -360,7 +360,7 @@ function Modal({ cert, onClose }: { cert: Cert; onClose: () => void }) {
         display: "flex", alignItems: "center", justifyContent: "center",
         padding: "1.5rem",
         background: "rgba(1,0,8,.88)", // Slightly more opaque to ensure contrast
-        backdropFilter: "blur(8px)",
+        backdropFilter: 'none',
         animation: "fadeIn .32s ease both",
       }}
     >
@@ -608,7 +608,7 @@ export default function Certifications() {
           marginBottom: "2.5rem", padding: "14px 24px", borderRadius: 12,
           background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)",
           display: "flex", justifyContent: "space-between", alignItems: "center",
-          animation: "titleIn .7s ease both", backdropFilter: "blur(4px)"
+          animation: "titleIn .7s ease both", backdropFilter: 'none'
         }}>
           <div style={{ display: "flex", gap: 32, alignItems: "center" }}>
             <div>

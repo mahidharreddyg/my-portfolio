@@ -5,6 +5,7 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import { motion, useAnimation, AnimatePresence } from "framer-motion"
 import LetsConnectModal from "./letsconnectmodal"
 import { HyperText } from "@/src/components/HyperText/HyperText"
+import GlassSurface from "./GlassSurface"
 
 // ─── Rich Background ───────────────────────────────────────────────────────────
 function RichBackground() {
@@ -221,7 +222,7 @@ function WelcomeBanner({ onThemeToggle, show }: { onThemeToggle?: () => void; sh
             style={{
               background: "rgba(255,255,255,0.06)",
               border: "1px solid rgba(255,255,255,0.2)",
-              backdropFilter: "blur(24px)",
+              backdropFilter: 'none',
               boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1), 0 4px 14px rgba(0,0,0,0.2)",
             }}
           >
@@ -320,11 +321,11 @@ function NameRevealAnimation({ showName }: { showName: boolean }) {
         <defs>
           <linearGradient id="nameGradient" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stopColor="#ffffff" />
-            <stop offset="40%" stopColor="#e2e8f0" />
-            <stop offset="100%" stopColor="#6b7fa3" />
+            <stop offset="50%" stopColor="#f8fafc" />
+            <stop offset="100%" stopColor="#94a3b8" />
           </linearGradient>
           <filter id="nameGlow" x="-15%" y="-15%" width="130%" height="130%">
-            <feGaussianBlur stdDeviation="2" result="blur" />
+            <feGaussianBlur stdDeviation="3" result="blur" />
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
         </defs>
@@ -332,16 +333,16 @@ function NameRevealAnimation({ showName }: { showName: boolean }) {
           ref={textRef}
           x="50%" y="50%" dy=".35em"
           textAnchor="middle"
-          className="uppercase tracking-wider font-extrabold"
+          className="uppercase tracking-widest font-black"
           style={{
             fontFamily: "var(--font-jakarta), system-ui, sans-serif",
-            fontSize: "clamp(36px, 8vw, 90px)",
+            fontSize: "clamp(36px, 9vw, 100px)",
             strokeLinejoin: "round",
             fill: "transparent",
             stroke: "transparent",
             opacity: 0,
             filter: "url(#nameGlow)",
-            letterSpacing: "0.08em",
+            letterSpacing: "0.04em",
           }}
         >
           MAHIDHAR REDDY G
@@ -435,7 +436,7 @@ function LetsConnectButton({
               padding: "9px 12px 9px 26px",
               background: "rgba(255, 255, 255, 0.07)",
               border: "0.5px solid rgba(255, 255, 255, 0.22)",
-              backdropFilter: "blur(35px)",
+              backdropFilter: 'none',
               WebkitBackdropFilter: "blur(35px)",
               borderRadius: "9999px",
             }}
@@ -516,7 +517,7 @@ function LetsConnectButton({
               style={{
                 width: "42px",
                 height: "42px",
-                backdropFilter: "blur(22px)",
+                backdropFilter: 'none',
                 WebkitBackdropFilter: "blur(22px)",
               }}
             >
@@ -598,43 +599,45 @@ function LetsConnectButton({
 
 // ─── Glass Circles (Full Apple Liquid Glass) ──────────────────────────────────
 function GlassCircles({
-  circleConfigs, animationDuration, isIntroComplete, allArrivedGlow, handleHover, handleHoverEnd,
+  circleConfigs, animationDuration, startCircles
 }: {
   circleConfigs: Array<{ size: string; startX: string; startY: string; delay: number; glowControls: ReturnType<typeof useAnimation> }>
   animationDuration: number
-  isIntroComplete: boolean
-  allArrivedGlow: boolean
-  handleHover: (c: any) => void
-  handleHoverEnd: (c: any) => void
+  startCircles: boolean
 }) {
   const rings = [
     {
-      baseOpacity: 0.48,
-      // Apple Liquid Glass: stronger blur + saturation + contrast
-      bg: "rgba(255, 255, 255, 0.06)",
-      border: "0.5px solid rgba(255, 255, 255, 0.28)",
-      backdropFilter: "none",
-      innerTop: "inset 0 3px 8px rgba(255,255,255,0.32)",
-      innerBottom: "inset 0 -2px 6px rgba(0,0,0,0.12)",
-      glow: "0 0 90px rgba(29,115,235,0.55), 0 0 160px rgba(29,115,235,0.28)",
+      baseOpacity: 0.5,
+      bg: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.03) 0%, rgba(30,58,138,0.05) 50%, rgba(0,0,0,0.1) 100%)",
+      border: "1px solid rgba(255, 255, 255, 0.05)",
+      backdropFilter: "blur(16px) saturate(120%)",
+      innerTop: "inset 0 2px 10px rgba(255,255,255,0.1)",
+      innerBottom: "inset 0 -2px 10px rgba(59,130,246,0.15)",
+      glow: "0 0 60px rgba(29,78,216,0.15), inset 0 0 40px rgba(29,78,216,0.1)",
+      dropShadow: "0 40px 80px rgba(2,6,23,0.6), 0 20px 40px rgba(2,6,23,0.8)",
+      ambientPool: "radial-gradient(ellipse at 50% 100%, rgba(59,130,246,0.5) 0%, rgba(59,130,246,0.15) 60%, transparent 85%)",
     },
     {
-      baseOpacity: 0.55,
-      bg: "rgba(255, 255, 255, 0.07)",
-      border: "0.5px solid rgba(255, 255, 255, 0.25)",
-      backdropFilter: "none",
-      innerTop: "inset 0 3px 8px rgba(255,255,255,0.3)",
-      innerBottom: "inset 0 -2px 6px rgba(0,0,0,0.1)",
-      glow: "0 0 75px rgba(29,115,235,0.5), 0 0 140px rgba(29,115,235,0.24)",
+      baseOpacity: 0.65,
+      bg: "radial-gradient(circle at 70% 30%, rgba(255,255,255,0.04) 0%, rgba(30,58,138,0.06) 50%, rgba(0,0,0,0.05) 100%)",
+      border: "1px solid rgba(255, 255, 255, 0.08)",
+      backdropFilter: "blur(10px) saturate(110%)",
+      innerTop: "inset 0 1px 8px rgba(255,255,255,0.15)",
+      innerBottom: "inset 0 -1px 8px rgba(59,130,246,0.2)",
+      glow: "0 0 40px rgba(37,99,235,0.2), inset 0 0 30px rgba(37,99,235,0.15)",
+      dropShadow: "0 40px 80px rgba(2,6,23,0.7), 0 20px 40px rgba(2,6,23,0.8)",
+      ambientPool: "radial-gradient(ellipse at 50% 100%, rgba(59,130,246,0.4) 0%, rgba(59,130,246,0.1) 50%, transparent 75%)",
     },
     {
-      baseOpacity: 0.62,
-      bg: "rgba(255, 255, 255, 0.08)",
-      border: "0.5px solid rgba(255, 255, 255, 0.22)",
-      backdropFilter: "none",
-      innerTop: "inset 0 2px 7px rgba(255,255,255,0.28)",
-      innerBottom: "inset 0 -2px 5px rgba(0,0,0,0.09)",
-      glow: "0 0 60px rgba(29,115,235,0.45), 0 0 120px rgba(29,115,235,0.2)",
+      baseOpacity: 0.8,
+      bg: "radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 0%, rgba(30,58,138,0.08) 100%)",
+      border: "1px solid rgba(255, 255, 255, 0.12)",
+      backdropFilter: "blur(6px) saturate(100%)",
+      innerTop: "inset 0 1px 5px rgba(255,255,255,0.2)",
+      innerBottom: "inset 0 -1px 5px rgba(59,130,246,0.25)",
+      glow: "0 0 30px rgba(59,130,246,0.25), inset 0 0 20px rgba(59,130,246,0.2)",
+      dropShadow: "0 50px 100px rgba(2,6,23,0.8), 0 25px 50px rgba(2,6,23,0.9)",
+      ambientPool: "radial-gradient(ellipse at 50% 100%, rgba(59,130,246,0.3) 0%, transparent 50%)",
     },
   ]
 
@@ -647,46 +650,72 @@ function GlassCircles({
           <motion.div
             key={i}
             className="absolute top-1/2 left-1/2 rounded-full"
-            style={{
-              width: config.size,
-              height: config.size,
-              background: ring.bg,
-
-              border: ring.border,
-              boxShadow: `${ring.glow}, ${ring.innerTop}, ${ring.innerBottom}`,
-              opacity: ring.baseOpacity,
-              willChange: "transform, box-shadow",
-            }}
-            initial={{ x: config.startX, y: config.startY, scale: 0.75, rotate: 360, opacity: 0 }}
-            animate={{
+            style={{ width: config.size, height: config.size, willChange: "transform" }}
+            initial={{ x: config.startX, y: config.startY, scale: 0.75 }}
+            animate={startCircles ? {
               x: [config.startX, "0%", "-50%"],
               y: [config.startY, "0%", "-50%"],
               scale: [0.75, 1.35, 1],
-              rotate: [360, 180, 0],
-              opacity: [0, ring.baseOpacity * 0.7, ring.baseOpacity],
               transition: { duration: animationDuration, delay: config.delay, times: [0, 0.5, 1], ease: [0.25, 0.46, 0.45, 0.94] },
-            }}
-            onHoverStart={() => handleHover(config.glowControls)}
-            onHoverEnd={() => handleHoverEnd(config.glowControls)}
+            } : {}}
           >
-            {/* Top-left specular highlight - Apple Liquid Glass */}
-            <div className="absolute inset-0 rounded-full pointer-events-none"
+            {/* Top-left specular highlight - Stays static relative to light source */}
+            <div className="absolute inset-0 rounded-full pointer-events-none border border-white/20"
               style={{
                 background: "radial-gradient(ellipse at 26% 16%, rgba(230,245,255,0.18) 0%, rgba(190,235,255,0.08) 20%, transparent 45%)",
+                zIndex: 2,
               }} />
 
-            {/* Bottom ambient pool */}
-            <div className="absolute rounded-full pointer-events-none"
+            {/* Bottom ambient pool - Stays static relative to light source */}
+            <div className="absolute inset-0 rounded-full pointer-events-none"
               style={{
-                bottom: 0,
-                left: "8%",
-                right: "8%",
-                height: "28%",
-                background: "radial-gradient(ellipse at 50% 100%, rgba(29,115,235,0.09) 0%, transparent 70%)",
+                background: ring.ambientPool,
+                zIndex: 2,
               }} />
+            <motion.div
+              className="absolute inset-0 rounded-full"
+              style={{
+                background: ring.bg,
+                border: ring.border,
+                boxShadow: `${ring.glow}, ${ring.innerTop}, ${ring.innerBottom}, ${ring.dropShadow}`,
+                backdropFilter: ring.backdropFilter,
+                WebkitBackdropFilter: ring.backdropFilter,
+                opacity: ring.baseOpacity,
+                willChange: "transform, opacity",
+              }}
+              initial="initial"
+              animate={startCircles ? {
+                rotate: [360, 180, 0],
+                opacity: [0, ring.baseOpacity * 0.7, ring.baseOpacity],
+                transition: { duration: animationDuration, delay: config.delay, times: [0, 0.5, 1], ease: [0.25, 0.46, 0.45, 0.94] },
+              } : {}}
+              whileHover="hover"
+            >
 
-            {/* Hover glow target */}
-            <motion.div className="absolute inset-0 rounded-full pointer-events-none" animate={config.glowControls} />
+            {/* Animation glow target - Driven by intro sequence */}
+            <motion.div 
+              className="absolute inset-0 rounded-full pointer-events-none mix-blend-screen" 
+              initial={{ opacity: 0 }}
+              animate={config.glowControls} 
+              style={{
+                boxShadow: "0 0 150px rgba(37,99,235,0.7), 0 0 120px rgba(29,78,216,0.8), 0 0 180px rgba(30,58,138,0.7), 0 0 250px rgba(15,23,42,0.6)",
+              }}
+            />
+
+            {/* Hover glow target - Decoupled for instant interactivity */}
+            <motion.div 
+              className="absolute inset-0 rounded-full pointer-events-none mix-blend-screen" 
+              variants={{
+                initial: { opacity: 0 },
+                hover: { opacity: 1, transition: { duration: 0.05, ease: "easeOut" } }
+              }}
+              style={{
+                boxShadow: "inset 0 0 150px rgba(37,99,235,0.7), 0 0 140px rgba(29,78,216,0.8), 0 0 220px rgba(30,58,138,0.7), 0 0 350px rgba(15,23,42,0.6)",
+                background: "radial-gradient(circle at 50% 50%, rgba(37,99,235,0.5) 0%, transparent 95%)",
+                backdropFilter: "saturate(250%) contrast(150%)",
+              }}
+            />
+            </motion.div>
           </motion.div>
         )
       })}
@@ -762,6 +791,7 @@ export default function HeroSection({ onThemeToggle }: { onThemeToggle?: () => v
   const [showName, setShowName] = useState(false)
   const [showRoles, setShowRoles] = useState(false)
   const [showButton, setShowButton] = useState(false)
+  const [startCircles, setStartCircles] = useState(false)
   const [isIntroComplete, setIsIntroComplete] = useState(false)
   const [allArrivedGlow, setAllArrivedGlow] = useState(false)
   const [showConnectModal, setShowConnectModal] = useState(false)
@@ -778,68 +808,82 @@ export default function HeroSection({ onThemeToggle }: { onThemeToggle?: () => v
 
   const animationDuration = 4
 
-  const handleHover = useCallback((controls: any) => {
-    if (isIntroComplete && !allArrivedGlow) {
-      controls.start({
-        boxShadow: "0 0 100px rgba(29,115,235,0.75), 0 0 180px rgba(29,115,235,0.4), 0 0 260px rgba(41,141,238,0.18), inset 0 3px 10px rgba(255,255,255,0.35)",
-        transition: { duration: 0.3 },
-      })
-    }
-  }, [allArrivedGlow, isIntroComplete])
 
-  const handleHoverEnd = useCallback((controls: any) => {
-    if (isIntroComplete && !allArrivedGlow) {
-      controls.start({ boxShadow: "none", transition: { duration: 0.45 } })
-    }
-  }, [allArrivedGlow, isIntroComplete])
 
   useEffect(() => {
-    const timers = [
-      setTimeout(() => setShowBanner(true), 2600),
-      setTimeout(() => setShowGreeting(true), 2750),
-      setTimeout(() => setShowName(true), 2650),
-      setTimeout(() => setShowRoles(true), 5100),
-      setTimeout(() => setShowButton(true), 5900),
-    ]
+    let isMounted = true
+    let timers: NodeJS.Timeout[] = []
+    let glowTimer: NodeJS.Timeout
 
-    const glowTimer = setTimeout(async () => {
-      setAllArrivedGlow(true)
+    let hasStarted = false
 
-      const pulse = {
-        boxShadow: [
-          "0 0 40px rgba(29,115,235,0.3), 0 0 80px rgba(29,115,235,0.15)",
-          "0 0 90px rgba(29,115,235,0.85), 0 0 165px rgba(29,115,235,0.48), 0 0 250px rgba(41,141,238,0.18)",
-          "0 0 40px rgba(29,115,235,0.3), 0 0 80px rgba(29,115,235,0.15)",
-        ],
-        transition: { duration: 0.85, times: [0, 0.5, 1] },
+    const startAnimations = () => {
+      if (hasStarted) return
+      hasStarted = true
+      
+      setStartCircles(true)
+      timers = [
+        setTimeout(() => isMounted && setShowBanner(true), 700),
+        setTimeout(() => isMounted && setShowGreeting(true), 850),
+        setTimeout(() => isMounted && setShowName(true), 750),
+        setTimeout(() => isMounted && setShowRoles(true), 3200),
+        setTimeout(() => isMounted && setShowButton(true), 4000),
+      ]
+
+      glowTimer = setTimeout(async () => {
+        if (!isMounted) return
+        setAllArrivedGlow(true)
+
+        const pulse: any = {
+          opacity: [0, 1, 0],
+          scale: 1,
+          transition: { duration: 1.5, ease: "easeInOut" },
+        }
+
+        glowControls3.start(pulse)
+        await new Promise<void>((r) => setTimeout(r, 350))
+        if (!isMounted) return
+        
+        glowControls2.start(pulse)
+        await new Promise<void>((r) => setTimeout(r, 350))
+        if (!isMounted) return
+        
+        await glowControls1.start(pulse)
+        if (!isMounted) return
+
+        const finalPulse: any = {
+          opacity: [0, 1, 0],
+          scale: 1,
+          transition: { duration: 2.0, ease: "easeInOut" },
+        }
+        await Promise.all([
+          glowControls1.start(finalPulse),
+          glowControls2.start(finalPulse),
+          glowControls3.start(finalPulse),
+        ])
+
+        if (!isMounted) return
+        setAllArrivedGlow(false)
+        setIsIntroComplete(true)
+      }, (animationDuration + 0.3) * 1000)
+    }
+
+    if (typeof window !== "undefined") {
+      if (window.sessionStorage.getItem("preloaderComplete") === "true") {
+        startAnimations()
+      } else {
+        window.addEventListener("preloaderDone", startAnimations)
       }
+    }
 
-      glowControls3.start(pulse)
-      await new Promise<void>((r) => setTimeout(r, 145))
-      glowControls2.start(pulse)
-      await new Promise<void>((r) => setTimeout(r, 145))
-      await glowControls1.start(pulse)
-      await new Promise<void>((r) => setTimeout(r, 280))
-
-      const finalPulse = {
-        boxShadow: [
-          "0 0 40px rgba(29,115,235,0.3), 0 0 80px rgba(29,115,235,0.15)",
-          "0 0 95px rgba(29,115,235,0.9), 0 0 175px rgba(29,115,235,0.52), 0 0 260px rgba(41,141,238,0.22)",
-          "0 0 40px rgba(29,115,235,0.3), 0 0 80px rgba(29,115,235,0.15)",
-        ],
-        transition: { duration: 2.5, times: [0, 0.5, 1] },
+    return () => {
+      isMounted = false
+      timers.forEach(clearTimeout)
+      clearTimeout(glowTimer)
+      if (typeof window !== "undefined") {
+        window.removeEventListener("preloaderDone", startAnimations)
       }
-      await Promise.all([
-        glowControls1.start(finalPulse),
-        glowControls2.start(finalPulse),
-        glowControls3.start(finalPulse),
-      ])
-
-      setAllArrivedGlow(false)
-      setIsIntroComplete(true)
-    }, animationDuration * 1000)
-
-    return () => { timers.forEach(clearTimeout); clearTimeout(glowTimer) }
+    }
   }, [glowControls1, glowControls2, glowControls3, animationDuration])
 
   return (
@@ -855,10 +899,7 @@ export default function HeroSection({ onThemeToggle }: { onThemeToggle?: () => v
         <GlassCircles
           circleConfigs={circleConfigs}
           animationDuration={animationDuration}
-          isIntroComplete={isIntroComplete}
-          allArrivedGlow={allArrivedGlow}
-          handleHover={handleHover}
-          handleHoverEnd={handleHoverEnd}
+          startCircles={startCircles}
         />
 
         <div className="relative z-20 text-center flex flex-col items-center"

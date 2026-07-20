@@ -75,6 +75,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$fr
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$framer$2d$motion$40$12$2e$18$2e$1_$40$emotion$2b$is$2d$prop$2d$valid$40$1$2e$3$2e$1_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$spring$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/.pnpm/framer-motion@12.18.1_@emotion+is-prop-valid@1.3.1_react-dom@19.1.0_react@19.1.0__react@19.1.0/node_modules/framer-motion/dist/es/value/use-spring.mjs [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$framer$2d$motion$40$12$2e$18$2e$1_$40$emotion$2b$is$2d$prop$2d$valid$40$1$2e$3$2e$1_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$transform$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/.pnpm/framer-motion@12.18.1_@emotion+is-prop-valid@1.3.1_react-dom@19.1.0_react@19.1.0__react@19.1.0/node_modules/framer-motion/dist/es/value/use-transform.mjs [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$framer$2d$motion$40$12$2e$18$2e$1_$40$emotion$2b$is$2d$prop$2d$valid$40$1$2e$3$2e$1_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$velocity$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/.pnpm/framer-motion@12.18.1_@emotion+is-prop-valid@1.3.1_react-dom@19.1.0_react@19.1.0__react@19.1.0/node_modules/framer-motion/dist/es/value/use-velocity.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$framer$2d$motion$40$12$2e$18$2e$1_$40$emotion$2b$is$2d$prop$2d$valid$40$1$2e$3$2e$1_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$utils$2f$use$2d$in$2d$view$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/.pnpm/framer-motion@12.18.1_@emotion+is-prop-valid@1.3.1_react-dom@19.1.0_react@19.1.0__react@19.1.0/node_modules/framer-motion/dist/es/utils/use-in-view.mjs [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/.pnpm/next@16.2.10_@babel+core@7.29.0_react-dom@19.1.0_react@19.1.0__react@19.1.0/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/utils.ts [app-ssr] (ecmascript)");
 "use client";
@@ -111,6 +112,7 @@ function ParallaxText({ children, baseVelocity = 1.2, className, ...props }) {
     const [repetitions, setRepetitions] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(1);
     const containerRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
     const textRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const isInView = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$framer$2d$motion$40$12$2e$18$2e$1_$40$emotion$2b$is$2d$prop$2d$valid$40$1$2e$3$2e$1_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$utils$2f$use$2d$in$2d$view$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useInView"])(containerRef);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         const calculateRepetitions = ()=>{
             if (containerRef.current && textRef.current) {
@@ -129,6 +131,7 @@ function ParallaxText({ children, baseVelocity = 1.2, className, ...props }) {
     const x = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$framer$2d$motion$40$12$2e$18$2e$1_$40$emotion$2b$is$2d$prop$2d$valid$40$1$2e$3$2e$1_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$transform$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useTransform"])(baseX, (v)=>`${wrap(-100 / repetitions, 0, v)}%`);
     const directionFactor = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"].useRef(1);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$framer$2d$motion$40$12$2e$18$2e$1_$40$emotion$2b$is$2d$prop$2d$valid$40$1$2e$3$2e$1_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$utils$2f$use$2d$animation$2d$frame$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useAnimationFrame"])((t, delta)=>{
+        if (!isInView) return; // Skip DOM updates when off-screen
         let moveBy = directionFactor.current * baseVelocity * (delta / 1000);
         if (velocityFactor.get() < 0) {
             directionFactor.current = -1;
@@ -165,17 +168,17 @@ function ParallaxText({ children, baseVelocity = 1.2, className, ...props }) {
                     children: children
                 }, i, false, {
                     fileName: "[project]/components/ui/XMarquee.tsx",
-                    lineNumber: 108,
+                    lineNumber: 112,
                     columnNumber: 11
                 }, this))
         }, void 0, false, {
             fileName: "[project]/components/ui/XMarquee.tsx",
-            lineNumber: 96,
+            lineNumber: 100,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/ui/XMarquee.tsx",
-        lineNumber: 91,
+        lineNumber: 95,
         columnNumber: 5
     }, this);
 }
@@ -203,12 +206,12 @@ function XVelocityBandsCorrected({ topText = TOP_BAND_TEXT, bottomText = BOTTOM_
                     children: topText
                 }, void 0, false, {
                     fileName: "[project]/components/ui/XMarquee.tsx",
-                    lineNumber: 181,
+                    lineNumber: 185,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/ui/XMarquee.tsx",
-                lineNumber: 169,
+                lineNumber: 173,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -228,12 +231,12 @@ function XVelocityBandsCorrected({ topText = TOP_BAND_TEXT, bottomText = BOTTOM_
                     children: bottomText
                 }, void 0, false, {
                     fileName: "[project]/components/ui/XMarquee.tsx",
-                    lineNumber: 202,
+                    lineNumber: 206,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/ui/XMarquee.tsx",
-                lineNumber: 190,
+                lineNumber: 194,
                 columnNumber: 7
             }, this)
         ]
@@ -1699,7 +1702,7 @@ function LetsConnectButton({ onClick, show }) {
     }, this);
 }
 // ─── Glass Circles (Full Apple Liquid Glass) ──────────────────────────────────
-function GlassCircles({ circleConfigs, animationDuration, isIntroComplete, allArrivedGlow, handleHover, handleHoverEnd }) {
+function GlassCircles({ circleConfigs, animationDuration, isIntroComplete, allArrivedGlow, handleHover, handleHoverEnd, startCircles }) {
     const rings = [
         {
             baseOpacity: 0.48,
@@ -1755,7 +1758,7 @@ function GlassCircles({ circleConfigs, animationDuration, isIntroComplete, allAr
                     rotate: 360,
                     opacity: 0
                 },
-                animate: {
+                animate: startCircles ? {
                     x: [
                         config.startX,
                         "0%",
@@ -1796,7 +1799,7 @@ function GlassCircles({ circleConfigs, animationDuration, isIntroComplete, allAr
                             0.94
                         ]
                     }
-                },
+                } : {},
                 onHoverStart: ()=>handleHover(config.glowControls),
                 onHoverEnd: ()=>handleHoverEnd(config.glowControls),
                 children: [
@@ -1807,7 +1810,7 @@ function GlassCircles({ circleConfigs, animationDuration, isIntroComplete, allAr
                         }
                     }, void 0, false, {
                         fileName: "[project]/components/hero-section.tsx",
-                        lineNumber: 673,
+                        lineNumber: 674,
                         columnNumber: 13
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1821,27 +1824,33 @@ function GlassCircles({ circleConfigs, animationDuration, isIntroComplete, allAr
                         }
                     }, void 0, false, {
                         fileName: "[project]/components/hero-section.tsx",
-                        lineNumber: 679,
+                        lineNumber: 680,
                         columnNumber: 13
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$framer$2d$motion$40$12$2e$18$2e$1_$40$emotion$2b$is$2d$prop$2d$valid$40$1$2e$3$2e$1_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].div, {
                         className: "absolute inset-0 rounded-full pointer-events-none",
-                        animate: config.glowControls
+                        initial: {
+                            opacity: 0
+                        },
+                        animate: config.glowControls,
+                        style: {
+                            boxShadow: "0 0 95px rgba(29,115,235,0.9), 0 0 175px rgba(29,115,235,0.52), 0 0 260px rgba(41,141,238,0.22)"
+                        }
                     }, void 0, false, {
                         fileName: "[project]/components/hero-section.tsx",
-                        lineNumber: 689,
+                        lineNumber: 690,
                         columnNumber: 13
                     }, this)
                 ]
             }, i, true, {
                 fileName: "[project]/components/hero-section.tsx",
-                lineNumber: 647,
+                lineNumber: 648,
                 columnNumber: 11
             }, this);
         })
     }, void 0, false, {
         fileName: "[project]/components/hero-section.tsx",
-        lineNumber: 642,
+        lineNumber: 643,
         columnNumber: 5
     }, this);
 }
@@ -1879,7 +1888,7 @@ function StatusBar() {
                 children: "MRG"
             }, void 0, false, {
                 fileName: "[project]/components/hero-section.tsx",
-                lineNumber: 717,
+                lineNumber: 725,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1907,12 +1916,12 @@ function StatusBar() {
                         }
                     }, i, false, {
                         fileName: "[project]/components/hero-section.tsx",
-                        lineNumber: 720,
+                        lineNumber: 728,
                         columnNumber: 11
                     }, this))
             }, void 0, false, {
                 fileName: "[project]/components/hero-section.tsx",
-                lineNumber: 718,
+                lineNumber: 726,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1920,13 +1929,13 @@ function StatusBar() {
                 children: time
             }, void 0, false, {
                 fileName: "[project]/components/hero-section.tsx",
-                lineNumber: 727,
+                lineNumber: 735,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/hero-section.tsx",
-        lineNumber: 711,
+        lineNumber: 719,
         columnNumber: 5
     }, this);
 }
@@ -1950,22 +1959,22 @@ function CornerMarquees() {
                                 children: t
                             }, i, false, {
                                 fileName: "[project]/components/hero-section.tsx",
-                                lineNumber: 740,
+                                lineNumber: 748,
                                 columnNumber: 15
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/components/hero-section.tsx",
-                        lineNumber: 738,
+                        lineNumber: 746,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/hero-section.tsx",
-                    lineNumber: 737,
+                    lineNumber: 745,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/hero-section.tsx",
-                lineNumber: 736,
+                lineNumber: 744,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1984,22 +1993,22 @@ function CornerMarquees() {
                                 children: t
                             }, i, false, {
                                 fileName: "[project]/components/hero-section.tsx",
-                                lineNumber: 749,
+                                lineNumber: 757,
                                 columnNumber: 15
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/components/hero-section.tsx",
-                        lineNumber: 747,
+                        lineNumber: 755,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/hero-section.tsx",
-                    lineNumber: 746,
+                    lineNumber: 754,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/hero-section.tsx",
-                lineNumber: 745,
+                lineNumber: 753,
                 columnNumber: 7
             }, this)
         ]
@@ -2011,12 +2020,51 @@ function HeroSection({ onThemeToggle }) {
     const [showName, setShowName] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [showRoles, setShowRoles] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [showButton, setShowButton] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [startCircles, setStartCircles] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [isIntroComplete, setIsIntroComplete] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [allArrivedGlow, setAllArrivedGlow] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [showConnectModal, setShowConnectModal] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const glowControls1 = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$framer$2d$motion$40$12$2e$18$2e$1_$40$emotion$2b$is$2d$prop$2d$valid$40$1$2e$3$2e$1_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$animation$2f$hooks$2f$use$2d$animation$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useAnimation"])();
     const glowControls2 = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$framer$2d$motion$40$12$2e$18$2e$1_$40$emotion$2b$is$2d$prop$2d$valid$40$1$2e$3$2e$1_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$animation$2f$hooks$2f$use$2d$animation$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useAnimation"])();
     const glowControls3 = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$framer$2d$motion$40$12$2e$18$2e$1_$40$emotion$2b$is$2d$prop$2d$valid$40$1$2e$3$2e$1_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$animation$2f$hooks$2f$use$2d$animation$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useAnimation"])();
+    const handleHover = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useCallback"])((controls)=>{
+        if (isIntroComplete && !allArrivedGlow) {
+            controls.start({
+                opacity: [
+                    0.4,
+                    1,
+                    0.4
+                ],
+                scale: [
+                    1,
+                    1.02,
+                    1
+                ],
+                transition: {
+                    duration: 1.5,
+                    repeat: Number.POSITIVE_INFINITY,
+                    ease: "easeInOut"
+                }
+            });
+        }
+    }, [
+        allArrivedGlow,
+        isIntroComplete
+    ]);
+    const handleHoverEnd = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useCallback"])((controls)=>{
+        if (isIntroComplete && !allArrivedGlow) {
+            controls.start({
+                opacity: 0,
+                scale: 1,
+                transition: {
+                    duration: 0.45
+                }
+            });
+        }
+    }, [
+        allArrivedGlow,
+        isIntroComplete
+    ]);
     const circleConfigs = [
         {
             size: "130vmin",
@@ -2041,89 +2089,82 @@ function HeroSection({ onThemeToggle }) {
         }
     ];
     const animationDuration = 4;
-    const handleHover = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useCallback"])((controls)=>{
-        if (isIntroComplete && !allArrivedGlow) {
-            controls.start({
-                boxShadow: "0 0 100px rgba(29,115,235,0.75), 0 0 180px rgba(29,115,235,0.4), 0 0 260px rgba(41,141,238,0.18), inset 0 3px 10px rgba(255,255,255,0.35)",
-                transition: {
-                    duration: 0.3
-                }
-            });
-        }
-    }, [
-        allArrivedGlow,
-        isIntroComplete
-    ]);
-    const handleHoverEnd = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useCallback"])((controls)=>{
-        if (isIntroComplete && !allArrivedGlow) {
-            controls.start({
-                boxShadow: "none",
-                transition: {
-                    duration: 0.45
-                }
-            });
-        }
-    }, [
-        allArrivedGlow,
-        isIntroComplete
-    ]);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
-        const timers = [
-            setTimeout(()=>setShowBanner(true), 2600),
-            setTimeout(()=>setShowGreeting(true), 2750),
-            setTimeout(()=>setShowName(true), 2650),
-            setTimeout(()=>setShowRoles(true), 5100),
-            setTimeout(()=>setShowButton(true), 5900)
-        ];
-        const glowTimer = setTimeout(async ()=>{
-            setAllArrivedGlow(true);
-            const pulse = {
-                boxShadow: [
-                    "0 0 40px rgba(29,115,235,0.3), 0 0 80px rgba(29,115,235,0.15)",
-                    "0 0 90px rgba(29,115,235,0.85), 0 0 165px rgba(29,115,235,0.48), 0 0 250px rgba(41,141,238,0.18)",
-                    "0 0 40px rgba(29,115,235,0.3), 0 0 80px rgba(29,115,235,0.15)"
-                ],
-                transition: {
-                    duration: 0.85,
-                    times: [
+        let timers = [];
+        let glowTimer;
+        const startAnimations = ()=>{
+            setStartCircles(true);
+            timers = [
+                setTimeout(()=>setShowBanner(true), 100),
+                setTimeout(()=>setShowGreeting(true), 250),
+                setTimeout(()=>setShowName(true), 150),
+                setTimeout(()=>setShowRoles(true), 2600),
+                setTimeout(()=>setShowButton(true), 3400)
+            ];
+            glowTimer = setTimeout(async ()=>{
+                setAllArrivedGlow(true);
+                const pulse = {
+                    opacity: [
                         0,
-                        0.5,
+                        1,
+                        0
+                    ],
+                    scale: [
+                        1,
+                        1.02,
                         1
-                    ]
-                }
-            };
-            glowControls3.start(pulse);
-            await new Promise((r)=>setTimeout(r, 145));
-            glowControls2.start(pulse);
-            await new Promise((r)=>setTimeout(r, 145));
-            await glowControls1.start(pulse);
-            await new Promise((r)=>setTimeout(r, 280));
-            const finalPulse = {
-                boxShadow: [
-                    "0 0 40px rgba(29,115,235,0.3), 0 0 80px rgba(29,115,235,0.15)",
-                    "0 0 95px rgba(29,115,235,0.9), 0 0 175px rgba(29,115,235,0.52), 0 0 260px rgba(41,141,238,0.22)",
-                    "0 0 40px rgba(29,115,235,0.3), 0 0 80px rgba(29,115,235,0.15)"
-                ],
-                transition: {
-                    duration: 2.5,
-                    times: [
+                    ],
+                    transition: {
+                        duration: 0.85,
+                        times: [
+                            0,
+                            0.5,
+                            1
+                        ]
+                    }
+                };
+                glowControls3.start(pulse);
+                await new Promise((r)=>setTimeout(r, 145));
+                glowControls2.start(pulse);
+                await new Promise((r)=>setTimeout(r, 145));
+                await glowControls1.start(pulse);
+                await new Promise((r)=>setTimeout(r, 280));
+                const finalPulse = {
+                    opacity: [
                         0,
-                        0.5,
+                        1,
+                        0
+                    ],
+                    scale: [
+                        1,
+                        1.03,
                         1
-                    ]
-                }
-            };
-            await Promise.all([
-                glowControls1.start(finalPulse),
-                glowControls2.start(finalPulse),
-                glowControls3.start(finalPulse)
-            ]);
-            setAllArrivedGlow(false);
-            setIsIntroComplete(true);
-        }, animationDuration * 1000);
+                    ],
+                    transition: {
+                        duration: 2.5,
+                        times: [
+                            0,
+                            0.5,
+                            1
+                        ]
+                    }
+                };
+                await Promise.all([
+                    glowControls1.start(finalPulse),
+                    glowControls2.start(finalPulse),
+                    glowControls3.start(finalPulse)
+                ]);
+                setAllArrivedGlow(false);
+                setIsIntroComplete(true);
+            }, (animationDuration + 0.3) * 1000);
+        };
+        if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+        ;
         return ()=>{
             timers.forEach(clearTimeout);
             clearTimeout(glowTimer);
+            if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+            ;
         };
     }, [
         glowControls1,
@@ -2142,17 +2183,17 @@ function HeroSection({ onThemeToggle }) {
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(RichBackground, {}, void 0, false, {
                         fileName: "[project]/components/hero-section.tsx",
-                        lineNumber: 851,
+                        lineNumber: 877,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(StatusBar, {}, void 0, false, {
                         fileName: "[project]/components/hero-section.tsx",
-                        lineNumber: 852,
+                        lineNumber: 878,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(CornerMarquees, {}, void 0, false, {
                         fileName: "[project]/components/hero-section.tsx",
-                        lineNumber: 853,
+                        lineNumber: 879,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(GlassCircles, {
@@ -2161,10 +2202,11 @@ function HeroSection({ onThemeToggle }) {
                         isIntroComplete: isIntroComplete,
                         allArrivedGlow: allArrivedGlow,
                         handleHover: handleHover,
-                        handleHoverEnd: handleHoverEnd
+                        handleHoverEnd: handleHoverEnd,
+                        startCircles: startCircles
                     }, void 0, false, {
                         fileName: "[project]/components/hero-section.tsx",
-                        lineNumber: 855,
+                        lineNumber: 881,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2178,28 +2220,28 @@ function HeroSection({ onThemeToggle }) {
                                 onThemeToggle: onThemeToggle
                             }, void 0, false, {
                                 fileName: "[project]/components/hero-section.tsx",
-                                lineNumber: 866,
+                                lineNumber: 893,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(StaticHello, {
                                 show: showGreeting
                             }, void 0, false, {
                                 fileName: "[project]/components/hero-section.tsx",
-                                lineNumber: 867,
+                                lineNumber: 894,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(NameRevealAnimation, {
                                 showName: showName
                             }, void 0, false, {
                                 fileName: "[project]/components/hero-section.tsx",
-                                lineNumber: 868,
+                                lineNumber: 895,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(RolesDecryption, {
                                 showRoles: showRoles
                             }, void 0, false, {
                                 fileName: "[project]/components/hero-section.tsx",
-                                lineNumber: 869,
+                                lineNumber: 896,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2209,24 +2251,24 @@ function HeroSection({ onThemeToggle }) {
                                     onClick: ()=>setShowConnectModal(true)
                                 }, void 0, false, {
                                     fileName: "[project]/components/hero-section.tsx",
-                                    lineNumber: 871,
+                                    lineNumber: 898,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/hero-section.tsx",
-                                lineNumber: 870,
+                                lineNumber: 897,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/hero-section.tsx",
-                        lineNumber: 864,
+                        lineNumber: 891,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/hero-section.tsx",
-                lineNumber: 847,
+                lineNumber: 873,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$letsconnectmodal$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -2234,7 +2276,7 @@ function HeroSection({ onThemeToggle }) {
                 onClose: ()=>setShowConnectModal(false)
             }, void 0, false, {
                 fileName: "[project]/components/hero-section.tsx",
-                lineNumber: 876,
+                lineNumber: 903,
                 columnNumber: 7
             }, this)
         ]
@@ -3068,8 +3110,16 @@ const Lightfall = ({ className, dpr, paused = false, colors = [
         if (mouseInteraction) {
             canvas.addEventListener('pointermove', onPointerMove);
         }
+        let isVisible = true;
+        const io = new IntersectionObserver((entries)=>{
+            isVisible = entries[0].isIntersecting;
+        }, {
+            threshold: 0
+        });
+        io.observe(container);
         const loop = (t)=>{
             rafRef.current = requestAnimationFrame(loop);
+            if (!isVisible) return; // Skip heavy WebGL render when off-screen
             uniforms.iTime.value = t * 0.001;
             if (mouseDampening > 0) {
                 if (!lastTimeRef.current) lastTimeRef.current = t;
@@ -3100,6 +3150,7 @@ const Lightfall = ({ className, dpr, paused = false, colors = [
             if (rafRef.current) cancelAnimationFrame(rafRef.current);
             if (mouseInteraction) canvas.removeEventListener('pointermove', onPointerMove);
             ro.disconnect();
+            io.disconnect();
             if (canvas.parentElement === container) {
                 container.removeChild(canvas);
             }
@@ -3148,7 +3199,7 @@ const Lightfall = ({ className, dpr, paused = false, colors = [
         }
     }, void 0, false, {
         fileName: "[project]/components/Lightfall.tsx",
-        lineNumber: 378,
+        lineNumber: 387,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
@@ -3679,7 +3730,8 @@ const TechCard = ({ tech, rowIndex, colIndex, totalCols, scrollProgress, isGroup
             y,
             rotate,
             scale,
-            opacity
+            opacity,
+            willChange: "transform, opacity"
         },
         className: "relative w-[60px] h-[72px] sm:w-[68px] sm:h-[80px] lg:w-[76px] lg:h-[88px] origin-center z-10 pointer-events-none",
         children: [
@@ -3720,15 +3772,15 @@ const TechCard = ({ tech, rowIndex, colIndex, totalCols, scrollProgress, isGroup
           50%  { box-shadow: 0 0 0 2px rgba(99,179,237,0.2); }
           100% { box-shadow: 0 0 0 0px transparent; }
         }
-        .tech-card-inner:hover { animation: idle-pulse 1.5s ease-in-out infinite; }
-        .tech-card-inner:hover .scan-line        { animation: scan-sweep 0.55s ease-in-out forwards; }
-        .tech-card-inner:hover .corner-tl,
-        .tech-card-inner:hover .corner-tr,
-        .tech-card-inner:hover .corner-bl,
-        .tech-card-inner:hover .corner-br        { animation: corner-ping 0.4s ease-out forwards; }
-        .tech-card-inner:hover .circuit-svg path { animation: circuit-trace 0.5s ease-out forwards; }
-        .tech-card-inner:hover .glitch-label     { animation: glitch-flicker 0.4s steps(1) forwards; }
-        .tech-card-inner:hover .glow-bg          { animation: glow-breathe 1.2s ease-in-out infinite; }
+        .group:hover .tech-card-inner { animation: idle-pulse 1.5s ease-in-out infinite; }
+        .group:hover .scan-line        { animation: scan-sweep 0.55s ease-in-out forwards; }
+        .group:hover .corner-tl,
+        .group:hover .corner-tr,
+        .group:hover .corner-bl,
+        .group:hover .corner-br        { animation: corner-ping 0.4s ease-out forwards; }
+        .group:hover .circuit-svg path { animation: circuit-trace 0.5s ease-out forwards; }
+        .group:hover .glitch-label     { animation: glitch-flicker 0.4s steps(1) forwards; }
+        .group:hover .glow-bg          { animation: glow-breathe 1.2s ease-in-out infinite; }
         .tech-card-inner.group-lit .scan-line        { animation: scan-sweep 0.55s ease-in-out forwards; }
         .tech-card-inner.group-lit .corner-tl,
         .tech-card-inner.group-lit .corner-tr,
@@ -3750,16 +3802,17 @@ const TechCard = ({ tech, rowIndex, colIndex, totalCols, scrollProgress, isGroup
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "relative w-full h-full z-20 pointer-events-none",
+                className: "group relative w-full h-full z-20 pointer-events-auto",
                 style: {
                     opacity: dimmed ? 0.15 : 1,
                     filter: dimmed ? 'grayscale(70%)' : 'none',
                     transition: 'opacity 0.35s ease, filter 0.35s ease'
                 },
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: `tech-card-inner group relative flex flex-col items-center justify-center w-full h-full rounded-[14px] bg-white/[0.08] transition-all duration-300 ease-out border border-white/10 shadow-lg pointer-events-auto cursor-pointer overflow-hidden hover:z-50 hover:-translate-y-2 hover:scale-110 hover:border-transparent hover:border-b-2 hover:border-b-cyan-400${isGroupHovered ? ' group-lit' : ''}`,
+                    className: `tech-card-inner relative flex flex-col items-center justify-center w-full h-full rounded-[14px] bg-white/[0.08] transition-all duration-300 ease-out border border-white/10 shadow-lg overflow-hidden group-hover:z-50 group-hover:-translate-y-2 group-hover:scale-110 group-hover:border-transparent group-hover:border-b-2 group-hover:border-b-cyan-400${isGroupHovered ? ' group-lit' : ''}`,
                     style: {
-                        animationDelay: animDelay
+                        animationDelay: animDelay,
+                        pointerEvents: 'none'
                     },
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4207,7 +4260,6 @@ function Skills() {
                 className: "absolute inset-0 w-full h-full z-0 pointer-events-none",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$Lightfall$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
-                        dpr: 1,
                         colors: [
                             "#A6C8FF",
                             "#5227FF",
@@ -4227,7 +4279,7 @@ function Skills() {
                         className: "absolute inset-0 bg-black/50 pointer-events-none"
                     }, void 0, false, {
                         fileName: "[project]/components/skills.tsx",
-                        lineNumber: 533,
+                        lineNumber: 532,
                         columnNumber: 9
                     }, this)
                 ]
@@ -4316,7 +4368,7 @@ function Skills() {
         `
                     }, void 0, false, {
                         fileName: "[project]/components/skills.tsx",
-                        lineNumber: 541,
+                        lineNumber: 540,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4330,7 +4382,7 @@ function Skills() {
                                 children: "// expertises"
                             }, void 0, false, {
                                 fileName: "[project]/components/skills.tsx",
-                                lineNumber: 616,
+                                lineNumber: 615,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -4344,20 +4396,20 @@ function Skills() {
                                         children: "Tech"
                                     }, void 0, false, {
                                         fileName: "[project]/components/skills.tsx",
-                                        lineNumber: 618,
+                                        lineNumber: 617,
                                         columnNumber: 13
                                     }, this),
                                     " Stack"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/skills.tsx",
-                                lineNumber: 617,
+                                lineNumber: 616,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/skills.tsx",
-                        lineNumber: 615,
+                        lineNumber: 614,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4379,17 +4431,17 @@ function Skills() {
                                                     sequenceIndex: cat.id === 'languages' ? 0 : 3
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/skills.tsx",
-                                                    lineNumber: 630,
+                                                    lineNumber: 629,
                                                     columnNumber: 19
                                                 }, this)
                                             }, cat.id, false, {
                                                 fileName: "[project]/components/skills.tsx",
-                                                lineNumber: 629,
+                                                lineNumber: 628,
                                                 columnNumber: 17
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/components/skills.tsx",
-                                        lineNumber: 627,
+                                        lineNumber: 626,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4405,23 +4457,23 @@ function Skills() {
                                                     sequenceIndex: cat.id === 'devops' ? 1 : 2
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/skills.tsx",
-                                                    lineNumber: 647,
+                                                    lineNumber: 646,
                                                     columnNumber: 19
                                                 }, this)
                                             }, cat.id, false, {
                                                 fileName: "[project]/components/skills.tsx",
-                                                lineNumber: 646,
+                                                lineNumber: 645,
                                                 columnNumber: 17
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/components/skills.tsx",
-                                        lineNumber: 644,
+                                        lineNumber: 643,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/skills.tsx",
-                                lineNumber: 625,
+                                lineNumber: 624,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$10_$40$babel$2b$core$40$7$2e$29$2e$0_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4441,34 +4493,34 @@ function Skills() {
                                                     hasActiveCategory: activeCategory !== null
                                                 }, tech.name, false, {
                                                     fileName: "[project]/components/skills.tsx",
-                                                    lineNumber: 673,
+                                                    lineNumber: 672,
                                                     columnNumber: 21
                                                 }, this))
                                         }, `row-${rowIndex}`, false, {
                                             fileName: "[project]/components/skills.tsx",
-                                            lineNumber: 668,
+                                            lineNumber: 667,
                                             columnNumber: 17
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/components/skills.tsx",
-                                    lineNumber: 666,
+                                    lineNumber: 665,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/skills.tsx",
-                                lineNumber: 661,
+                                lineNumber: 660,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/skills.tsx",
-                        lineNumber: 623,
+                        lineNumber: 622,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/skills.tsx",
-                lineNumber: 536,
+                lineNumber: 535,
                 columnNumber: 7
             }, this)
         ]

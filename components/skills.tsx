@@ -147,7 +147,7 @@ const TechCard = ({
 
   return (
     <motion.div
-      style={{ x, y, rotate, scale, opacity }}
+      style={{ x, y, rotate, scale, opacity, willChange: "transform, opacity" }}
       className="relative w-[60px] h-[72px] sm:w-[68px] sm:h-[80px] lg:w-[76px] lg:h-[88px] origin-center z-10 pointer-events-none"
     >
       <style>{`
@@ -186,15 +186,15 @@ const TechCard = ({
           50%  { box-shadow: 0 0 0 2px rgba(99,179,237,0.2); }
           100% { box-shadow: 0 0 0 0px transparent; }
         }
-        .tech-card-inner:hover { animation: idle-pulse 1.5s ease-in-out infinite; }
-        .tech-card-inner:hover .scan-line        { animation: scan-sweep 0.55s ease-in-out forwards; }
-        .tech-card-inner:hover .corner-tl,
-        .tech-card-inner:hover .corner-tr,
-        .tech-card-inner:hover .corner-bl,
-        .tech-card-inner:hover .corner-br        { animation: corner-ping 0.4s ease-out forwards; }
-        .tech-card-inner:hover .circuit-svg path { animation: circuit-trace 0.5s ease-out forwards; }
-        .tech-card-inner:hover .glitch-label     { animation: glitch-flicker 0.4s steps(1) forwards; }
-        .tech-card-inner:hover .glow-bg          { animation: glow-breathe 1.2s ease-in-out infinite; }
+        .group:hover .tech-card-inner { animation: idle-pulse 1.5s ease-in-out infinite; }
+        .group:hover .scan-line        { animation: scan-sweep 0.55s ease-in-out forwards; }
+        .group:hover .corner-tl,
+        .group:hover .corner-tr,
+        .group:hover .corner-bl,
+        .group:hover .corner-br        { animation: corner-ping 0.4s ease-out forwards; }
+        .group:hover .circuit-svg path { animation: circuit-trace 0.5s ease-out forwards; }
+        .group:hover .glitch-label     { animation: glitch-flicker 0.4s steps(1) forwards; }
+        .group:hover .glow-bg          { animation: glow-breathe 1.2s ease-in-out infinite; }
         .tech-card-inner.group-lit .scan-line        { animation: scan-sweep 0.55s ease-in-out forwards; }
         .tech-card-inner.group-lit .corner-tl,
         .tech-card-inner.group-lit .corner-tr,
@@ -213,7 +213,7 @@ const TechCard = ({
 
 
       <div
-        className="relative w-full h-full z-20 pointer-events-none"
+        className="group relative w-full h-full z-20 pointer-events-auto"
         style={{
           opacity: dimmed ? 0.15 : 1,
           filter: dimmed ? 'grayscale(70%)' : 'none',
@@ -221,8 +221,8 @@ const TechCard = ({
         }}
       >
         <div
-          className={`tech-card-inner group relative flex flex-col items-center justify-center w-full h-full rounded-[14px] bg-white/[0.08] transition-all duration-300 ease-out border border-white/10 shadow-lg pointer-events-auto cursor-pointer overflow-hidden hover:z-50 hover:-translate-y-2 hover:scale-110 hover:border-transparent hover:border-b-2 hover:border-b-cyan-400${isGroupHovered ? ' group-lit' : ''}`}
-          style={{ animationDelay: animDelay }}
+          className={`tech-card-inner relative flex flex-col items-center justify-center w-full h-full rounded-[14px] bg-white/[0.08] transition-all duration-300 ease-out border border-white/10 shadow-lg overflow-hidden group-hover:z-50 group-hover:-translate-y-2 group-hover:scale-110 group-hover:border-transparent group-hover:border-b-2 group-hover:border-b-cyan-400${isGroupHovered ? ' group-lit' : ''}`}
+          style={{ animationDelay: animDelay, pointerEvents: 'none' }}
         >
           <div
             className="glow-bg absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-[14px] pointer-events-none"
@@ -521,7 +521,7 @@ export default function Skills() {
     <>
       <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
         <Lightfall
-          dpr={1}
+          dpr={typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 1.5) : 1.5}
           colors={["#A6C8FF", "#5227FF", "#FF9FFC"]}
           backgroundColor="#0A29FF"
           zoom={2}

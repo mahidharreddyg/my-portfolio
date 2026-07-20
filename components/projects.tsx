@@ -16,7 +16,7 @@ const BlinkingCursor = () => {
 
 const glass: React.CSSProperties = {
   background: "rgba(255,255,255,0.03)",
-  backdropFilter: "blur(3px) saturate(200%)",
+  backdropFilter: 'none',
   WebkitBackdropFilter: "blur(3px) saturate(200%)",
   border: "1px solid rgba(255,255,255,0.15)",
   boxShadow: "0 8px 32px rgba(0,0,0,0.08),inset 0 1px 0 rgba(255,255,255,0.2),inset 0 -1px 0 rgba(255,255,255,0.05)",
@@ -213,7 +213,7 @@ function ProjectCard({ p }: { p: typeof projects[0] }) {
       {/* Top status bar */}
       <div className="absolute top-0 left-0 right-0 h-8 z-30 flex items-center justify-between px-4" style={{
         background: "rgba(0,0,0,0.55)", borderBottom: `1px solid rgba(${p.accentRgb},0.18)`,
-        backdropFilter: "blur(4px)",
+        backdropFilter: 'none',
       }}>
         <div className="flex items-center gap-3">
           <span className="text-[9px] tracking-[0.25em]" style={{ color: `rgba(${p.accentRgb},0.7)`, fontFamily: "'JetBrains Mono',monospace" }}>
@@ -385,13 +385,23 @@ export default function Projects() {
       }
     };
 
-    window.addEventListener("scroll", onScroll, { passive: true });
-    // Force initial calculation slightly after paint so refs are populated
-    const t = setTimeout(onScroll, 50);
+    let io = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        window.addEventListener("scroll", onScroll, { passive: true });
+        // Force initial calculation
+        setTimeout(onScroll, 50);
+      } else {
+        window.removeEventListener("scroll", onScroll);
+      }
+    }, { rootMargin: "100% 0px 100% 0px" });
+
+    if (sectionRef.current) {
+      io.observe(sectionRef.current);
+    }
 
     return () => {
       mounted = false;
-      clearTimeout(t);
+      io.disconnect();
       window.removeEventListener("scroll", onScroll);
     };
   }, []);
@@ -632,7 +642,7 @@ export default function Projects() {
                           width: "24px", 
                           height: "24px", 
                           background: used ? `linear-gradient(135deg, rgba(${project.accentRgb},0.2), rgba(${project.accentRgb},0.05))` : "rgba(255,255,255,0.03)",
-                          backdropFilter: "blur(12px)",
+                          backdropFilter: 'none',
                           WebkitBackdropFilter: "blur(12px)",
                           border: used ? `1px solid rgba(${project.accentRgb}, 0.5)` : "1px solid rgba(255,255,255,0.1)",
                           boxShadow: used ? `0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2)` : "0 4px 12px rgba(0,0,0,0.2)",
@@ -682,7 +692,7 @@ export default function Projects() {
                     background: "linear-gradient(175deg,rgba(255,255,255,0.22) 0%,rgba(255,255,255,0.08) 40%,rgba(255,255,255,0.04) 65%,rgba(255,255,255,0.14) 100%)",
                     border: "1px solid rgba(255,255,255,0.3)",
                     boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5),inset 0 -1px 0 rgba(0,0,0,0.3),inset 1px 0 0 rgba(255,255,255,0.1),inset -1px 0 0 rgba(255,255,255,0.1),0 6px 28px rgba(0,0,0,0.45),0 2px 6px rgba(0,0,0,0.3)",
-                    backdropFilter: "blur(28px)",
+                    backdropFilter: 'none',
                     WebkitBackdropFilter: "blur(28px)",
                     transition: "left 0.4s cubic-bezier(0.34,1.44,0.64,1),width 0.4s cubic-bezier(0.34,1.44,0.64,1)",
                     animation: "pillSqueeze 0.4s cubic-bezier(0.34,1.44,0.64,1)",
@@ -786,7 +796,7 @@ export default function Projects() {
           {/* ── Bottom terminal bar ── */}
           <div className="absolute bottom-0 left-0 right-0 h-10 flex items-center px-8 gap-6 z-50" style={{
             background: "linear-gradient(to top, rgba(0,0,0,0.4), transparent)",
-            backdropFilter: "blur(2px)",
+            backdropFilter: 'none',
           }}>
             <span className="text-[9px]" style={{ color: `rgba(${project.accentRgb},0.7)`, fontFamily: "monospace" }}>
               PROJECTS.TSX // {activeCategory.toUpperCase()}
