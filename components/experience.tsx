@@ -289,12 +289,23 @@ function EntryCard({
   transitionKey: number | string;
 }) {
   const [hov, setHov] = useState(false);
-  const [mx, setMx] = useState(0.5);
-  const [my, setMy] = useState(0.5);
+  const outerRef = useRef<HTMLDivElement>(null);
+  const moveRaf = useRef<number | null>(null);
   const onMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    setMx((e.clientX - r.left) / r.width);
-    setMy((e.clientY - r.top) / r.height);
+    const el = outerRef.current;
+    if (!el) return;
+    const clientX = e.clientX;
+    const clientY = e.clientY;
+    if (moveRaf.current !== null) return;
+    moveRaf.current = requestAnimationFrame(() => {
+      moveRaf.current = null;
+      const r = el.getBoundingClientRect();
+      el.style.setProperty("--mx", `${(clientX - r.left) / r.width}`);
+      el.style.setProperty("--my", `${(clientY - r.top) / r.height}`);
+    });
+  }, []);
+  useEffect(() => () => {
+    if (moveRaf.current !== null) cancelAnimationFrame(moveRaf.current);
   }, []);
   const rgb = hexRgb(entry.color).join(",");
 
@@ -311,8 +322,9 @@ function EntryCard({
     <div className="ec-stack">
       <div
         key={transitionKey}
+        ref={outerRef}
         className="ec-outer ec-enter"
-        style={{ "--cc": entry.color, "--rgb": rgb, "--mx": mx, "--my": my } as React.CSSProperties}
+        style={{ "--cc": entry.color, "--rgb": rgb, "--mx": 0.5, "--my": 0.5 } as React.CSSProperties}
         onMouseEnter={() => setHov(true)}
         onMouseLeave={() => setHov(false)}
         onMouseMove={onMove}
@@ -929,21 +941,33 @@ function TimelineCanvas({
     [scrollPct, W, H, canvasRef, isVisible]
   );
 
+  // `draw` is recreated whenever scrollPct changes (i.e. every scroll frame).
+  // Keep the rAF loop itself mounted once and read the latest `draw` via a
+  // ref, otherwise the loop would be torn down and restarted on every
+  // scroll tick, causing a visible stutter synced to scrolling.
+  const drawRef = useRef(draw);
+  useEffect(() => {
+    drawRef.current = draw;
+  }, [draw]);
+
   useEffect(() => {
     const loop = (ts: number) => {
-      draw(ts);
+      drawRef.current(ts);
       animRef.current = requestAnimationFrame(loop);
     };
     animRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(animRef.current);
-  }, [draw]);
+  }, []);
 
   useEffect(() => {
     const resize = () => { lastTsRef.current = null; };
     window.addEventListener("resize", resize);
-    setTimeout(() => draw(), 100);
-    return () => window.removeEventListener("resize", resize);
-  }, [draw]);
+    const t = setTimeout(() => drawRef.current(), 100);
+    return () => {
+      window.removeEventListener("resize", resize);
+      clearTimeout(t);
+    };
+  }, []);
 
   return null;
 }
@@ -973,7 +997,8 @@ function VerticalProgress({
         <div
           className="vp-fill"
           style={{
-            height: `${scrollPct * 100}%`,
+            height: "100%",
+            transform: `scaleY(${scrollPct})`,
             background: `linear-gradient(180deg, ${activeColor}, #38bdf8)`,
             boxShadow: `0 0 8px ${activeColor}88`,
           }}
@@ -1121,7 +1146,7 @@ export default function ExperienceSection() {
         .tl-outer { position: relative; }
         .tl-sticky {
           position: sticky; top: 0; height: 100vh; width: 100%;
-          overflow: hidden; font-family: 'JetBrains Mono', monospace;
+          overflow: hidden; font-family: var(--font-jetbrains-mono), monospace;
           background: #000; border-top: 1px solid rgba(255,255,255,0.05);
           box-shadow: 0 20px 100px rgba(0,0,0,0.9);
         }
@@ -1165,30 +1190,30 @@ export default function ExperienceSection() {
         .tl-heading { margin-bottom: 24px; }
         .tl-eyebrow {
           font-size: 10px; letter-spacing: 5px; text-transform: uppercase;
-          color: rgba(56, 189, 248, 0.5); margin-bottom: 10px; display: block;
+          color: rgba(var(--tc2-rgb), 0.5); margin-bottom: 10px; display: block;
         }
         .tl-h1 {
-          font-family: var(--font-malinton), 'Syne', sans-serif; font-size: clamp(26px, 3.2vw, 42px);
+          font-family: var(--font-malinton), sans-serif; font-size: clamp(26px, 3.2vw, 42px);
           font-weight: 800; color: #ffffff; letter-spacing: -1.5px;
           line-height: 1.05; margin: 0 0 10px;
         }
-        .tl-h1 .tc  { color: #38bdf8; text-shadow: 0 0 20px rgba(56, 189, 248, 0.4); }
-        .tl-h1 .tc2 { color: #60a5fa; text-shadow: 0 0 20px rgba(96, 165, 250, 0.3); }
+        .tl-h1 .tc  { color: #38bdf8; text-shadow: 0 0 20px rgba(var(--tc2-rgb), 0.4); }
+        .tl-h1 .tc2 { color: #60a5fa; text-shadow: 0 0 20px rgba(var(--tc10-rgb), 0.3); }
         .tl-version {
           display: inline-flex; align-items: center; gap: 8px;
-          font-family: 'JetBrains Mono', monospace;
+          font-family: var(--font-jetbrains-mono), monospace;
           font-size: 10px; color: rgba(100,180,255,0.45);
-          background: rgba(56,189,248,0.08);
-          border: 1px solid rgba(56,189,248,0.2);
+          background: rgba(var(--tc2-rgb),0.08);
+          border: 1px solid rgba(var(--tc2-rgb),0.2);
           border-radius: 999px; padding: 5px 14px;
           letter-spacing: 0.3px; width: fit-content;
-          box-shadow: 0 0 12px rgba(56, 189, 248, 0.08);
+          box-shadow: 0 0 12px rgba(var(--tc2-rgb), 0.08);
         }
         .tl-version .dot {
           width: 6px; height: 6px; border-radius: 50%;
           background: #38bdf8; opacity: 0.7;
           animation: pulse 2s ease-in-out infinite;
-          box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+          box-shadow: 0 0 8px rgba(var(--tc2-rgb), 0.5);
         }
         @keyframes pulse {
           0%,100% { opacity: 0.4; transform: scale(1); }
@@ -1243,8 +1268,13 @@ export default function ExperienceSection() {
           width: 100%; height: 100%;
           background: linear-gradient(145deg, rgba(200,225,255,0.06) 0%, rgba(150,200,255,0.02) 50%, rgba(100,180,255,0.04) 100%);
           border: 1px solid rgba(180,220,255,0.14);
-          backdrop-filter: blur(40px) saturate(180%) brightness(1.08);
-          -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.08);
+          /* was blur(40px) saturate(180%) brightness(1.08) — this card sits in
+             front of a continuously-redrawing canvas for the entire (longest)
+             section of the page, so a heavy compound backdrop-filter here was
+             recomputed on every single frame. A lighter single-property blur
+             is dramatically cheaper and visually near-identical. */
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
           box-shadow:
             0 25px 60px rgba(0, 0, 0, 0.5),
             0 8px 24px rgba(0, 20, 60, 0.3),
@@ -1310,8 +1340,8 @@ export default function ExperienceSection() {
         .ecl-scan {
           position: absolute; inset: 0; pointer-events: none; z-index: 4;
           background: linear-gradient(180deg,
-            transparent 0%, rgba(56,189,248,0.03) 44%,
-            rgba(56,189,248,0.18) 50%, rgba(56,189,248,0.03) 56%, transparent 100%);
+            transparent 0%, rgba(var(--tc2-rgb),0.03) 44%,
+            rgba(var(--tc2-rgb),0.18) 50%, rgba(var(--tc2-rgb),0.03) 56%, transparent 100%);
           background-size: 100% 300%; transition: opacity .35s;
           animation: scan 2.2s ease-in-out infinite;
         }
@@ -1323,8 +1353,8 @@ export default function ExperienceSection() {
         .ecl-grid {
           position: absolute; inset: 0; pointer-events: none; z-index: 3;
           background-image:
-            linear-gradient(rgba(56,189,248,0.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(56,189,248,0.04) 1px, transparent 1px);
+            linear-gradient(rgba(var(--tc2-rgb),0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(var(--tc2-rgb),0.04) 1px, transparent 1px);
           background-size: 24px 24px;
           opacity: 0; transition: opacity .5s;
         }
@@ -1354,7 +1384,7 @@ export default function ExperienceSection() {
         .ec-hover-cta {
           position: absolute; bottom: 16px; right: 16px; z-index: 7;
           display: flex; align-items: center; gap: 5px;
-          font-family: 'JetBrains Mono', monospace;
+          font-family: var(--font-jetbrains-mono), monospace;
           font-size: 9.5px; letter-spacing: 1.5px; text-transform: uppercase;
           color: var(--cc); pointer-events: none;
           transition: opacity .3s, transform .3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -1417,7 +1447,7 @@ export default function ExperienceSection() {
         .ec-logo-ph {
           width: 34px; height: 34px; border-radius: 10px;
           display: flex; align-items: center; justify-content: center;
-          font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 800;
+          font-family: var(--font-malinton), sans-serif; font-size: 11px; font-weight: 800;
           letter-spacing: 0.5px; line-height: 1;
         }
 
@@ -1434,7 +1464,7 @@ export default function ExperienceSection() {
         .ec-toprow { display:flex;align-items:center;gap:7px;margin-bottom:18px;flex-shrink:0; }
         .ec-hash {
           font-size: 11px; padding: 3px 10px; border-radius: 6px;
-          font-family: 'JetBrains Mono', monospace;
+          font-family: var(--font-jetbrains-mono), monospace;
           background: linear-gradient(135deg, rgba(255,107,43,0.15) 0%, rgba(255,107,43,0.08) 100%);
           border: 1px solid rgba(255,107,43,0.35);
           color: #ff8450; letter-spacing: 0.5px;
@@ -1448,7 +1478,7 @@ export default function ExperienceSection() {
           margin-bottom: 16px; flex-shrink: 0; flex-wrap: nowrap; overflow: hidden;
         }
         .ec-kind-badge {
-          font-family: 'JetBrains Mono', monospace;
+          font-family: var(--font-jetbrains-mono), monospace;
           font-size: 8.5px; font-weight: 700; letter-spacing: 2px;
           text-transform: uppercase; padding: 3.5px 10px; border-radius: 5px;
           background: linear-gradient(145deg, rgba(var(--rgb),0.2) 0%, rgba(var(--rgb),0.1) 100%);
@@ -1457,7 +1487,7 @@ export default function ExperienceSection() {
           box-shadow: 0 4px 8px rgba(0,0,0,0.15), inset 1px 1px 0 rgba(255,255,255,0.1);
         }
         .ec-role {
-          font-family:'JetBrains Mono',monospace; font-size:11px;
+          font-family:var(--font-jetbrains-mono),monospace; font-size:11px;
           font-weight:500; color:rgba(255,255,255,0.95); margin:0; line-height:1.2;
           white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
           flex:1; min-width:0; letter-spacing:0.1px;
@@ -1473,12 +1503,12 @@ export default function ExperienceSection() {
         .ec-card.hov .ec-org-line { opacity:1;box-shadow:0 0 12px var(--cc); }
         .ec-org-inner { display:flex;flex-direction:column;justify-content:center;gap:2px; }
         .ec-org-label {
-          font-family:'JetBrains Mono',monospace;
+          font-family:var(--font-jetbrains-mono),monospace;
           font-size:9px;font-weight:400;letter-spacing:3px;text-transform:uppercase;
           color:rgba(var(--rgb),0.55);line-height:1;
         }
         .ec-org-name {
-          font-family:var(--font-malinton),'Syne',sans-serif;
+          font-family:var(--font-malinton),sans-serif;
           font-size:clamp(17px,2.1vw,24px);font-weight:500;
           color:#e8f4ff;line-height:1.15;letter-spacing:0.1px;
           margin-top:4px;white-space:pre-line;
@@ -1489,7 +1519,7 @@ export default function ExperienceSection() {
         .ec-pills { display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;flex-shrink:0; }
         .ec-pill {
           font-size:9.5px;padding:4px 11px;border-radius:8px;
-          font-family:'JetBrains Mono',monospace;
+          font-family:var(--font-jetbrains-mono),monospace;
           background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);
           color:rgba(200,220,255,0.6);backdrop-filter:blur(4px);
           box-shadow:0 3px 10px rgba(0,0,0,0.15),inset 1px 1px 0 rgba(255,255,255,0.08);
@@ -1497,7 +1527,7 @@ export default function ExperienceSection() {
         }
         .ec-card.hov .ec-pill { border-color:rgba(255,255,255,0.2);color:rgba(220,235,255,0.8); }
         .ec-pill-dur { border-color:rgba(var(--rgb),0.35);color:var(--cc);background:rgba(var(--rgb),0.08); }
-        .ec-pill-type { border-color:rgba(56,189,248,0.3);color:rgba(130,200,255,0.85);background:rgba(56,189,248,0.06); }
+        .ec-pill-type { border-color:rgba(var(--tc2-rgb),0.3);color:rgba(130,200,255,0.85);background:rgba(var(--tc2-rgb),0.06); }
 
         /* Desc */
         .ec-desc-wrap {
@@ -1535,7 +1565,7 @@ export default function ExperienceSection() {
         .ytb-inner {
           display:flex;align-items:center;gap:10px;padding:7px 16px 7px 12px;
           border-radius:999px;border:1px solid;background:rgba(0,0,0,0.6);
-          backdrop-filter:blur(12px);font-family:'JetBrains Mono',monospace;
+          backdrop-filter:blur(12px);font-family:var(--font-jetbrains-mono),monospace;
           font-size:9.5px;letter-spacing:0.5px;
         }
         .ytb-dot { width:6px;height:6px;border-radius:50%;flex-shrink:0;animation:pulse 1.5s ease-in-out infinite; }
@@ -1549,7 +1579,7 @@ export default function ExperienceSection() {
         }
         .tl-ghost {
           position:relative; display:flex;
-          font-family:var(--font-malinton),'Syne',sans-serif;font-size:clamp(100px,14vw,180px);
+          font-family:var(--font-malinton),sans-serif;font-size:clamp(100px,14vw,180px);
           font-weight:800;
           letter-spacing:-6px;user-select:none;white-space:nowrap;
         }
@@ -1585,12 +1615,12 @@ export default function ExperienceSection() {
           position:absolute;right:28px;top:50%;transform:translateY(-50%);
           display:flex;flex-direction:column;align-items:center;gap:14px;z-index:10;
         }
-        .vp-counter { display:flex;flex-direction:column;align-items:center;gap:2px;font-family:'JetBrains Mono',monospace; }
+        .vp-counter { display:flex;flex-direction:column;align-items:center;gap:2px;font-family:var(--font-jetbrains-mono),monospace; }
         .vp-cur { font-size:13px;font-weight:700;color:rgba(220,235,255,0.75);letter-spacing:1px;line-height:1; }
         .vp-sep { font-size:9px;color:rgba(180,200,255,0.25);line-height:1; }
         .vp-tot { font-size:11px;font-weight:400;color:rgba(180,200,255,0.28);letter-spacing:1px;line-height:1; }
         .vp-track { width:2px;height:100px;background:rgba(255,255,255,0.07);border-radius:1px;overflow:hidden;position:relative; }
-        .vp-fill { width:100%;position:absolute;top:0;left:0;border-radius:1px;transition:height .08s linear; }
+        .vp-fill { width:100%;position:absolute;top:0;left:0;border-radius:1px;transform-origin:top;transition:transform .08s linear; }
         .vp-dots { display:flex;flex-direction:column;align-items:center;gap:8px; }
         .vp-dot { width:5px;height:5px;border-radius:50%;transition:transform .25s,background .25s,box-shadow .25s; }
 

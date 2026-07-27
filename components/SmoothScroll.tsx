@@ -68,8 +68,8 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
     <ReactLenis
       root
       options={{
-        lerp: 0.03,
-        wheelMultiplier: 4.0,
+        lerp: 0.1,
+        wheelMultiplier: 1.0,
         smoothWheel: true,
         autoRaf: false, // We drive RAF from GSAP's ticker
       }}

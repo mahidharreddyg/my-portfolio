@@ -5,14 +5,9 @@ import React, { useEffect, useRef, useState, useTransition } from "react";
 /* ─────────────────────────────────────────────────────────────
    GLASS
 ───────────────────────────────────────────────────────────── */
-const BlinkingCursor = () => {
-  const [tick, setTick] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => setTick(t => t + 1), 600);
-    return () => clearInterval(id);
-  }, []);
-  return <>{tick % 2 === 0 ? "█" : " "}</>;
-};
+const BlinkingCursor = () => (
+  <span style={{ animation: "blink-cursor 1.2s steps(1, end) infinite" }}>█</span>
+);
 
 const glass: React.CSSProperties = {
   background: "rgba(255,255,255,0.03)",
@@ -71,7 +66,7 @@ const TechLogo = ({ name }: { name: string }) => {
 
   const fileName = map[name];
   if (!fileName) {
-    return <span style={{ fontSize: 9, color: "white", fontFamily: "'JetBrains Mono',monospace", fontWeight: "bold" }}>{name.slice(0, 2).toUpperCase()}</span>;
+    return <span style={{ fontSize: 9, color: "white", fontFamily: "var(--font-jetbrains-mono),monospace", fontWeight: "bold" }}>{name.slice(0, 2).toUpperCase()}</span>;
   }
 
   return (
@@ -121,8 +116,8 @@ const projects = [
     description: "Real-time EEG data processing dashboard. Visualizing neural pathways and cognitive load using advanced signal processing and deep learning.",
     bullets: ["Real-time data streaming from OpenBCI hardware", "Cognitive state classification using CNN-LSTM", "Interactive 3D brain map visualization"],
     usedTech: ["Python", "PyTorch", "OpenCV", "MySQL", "React", "TypeScript", "Framer Motion"],
-    accentColor: "#0ea5e9", accentRgb: "14,165,233", bgGlow: "rgba(14,165,233,0.12)",
-    tagActive: { bg: "rgba(14,165,233,0.15)", border: "rgba(14,165,233,0.5)", text: "#7dd3fc" },
+    accentColor: "#0ea5e9", accentRgb: "14,165,233", bgGlow: "rgba(var(--tc7-rgb),0.12)",
+    tagActive: { bg: "rgba(var(--tc7-rgb),0.15)", border: "rgba(var(--tc7-rgb),0.5)", text: "#7dd3fc" },
     cardGrad: "linear-gradient(145deg,#00081a 0%,#001e4a 45%,#074d91 75%,#0ea5e9 100%)",
     hexCoord: "0x9E2D",
   },
@@ -132,8 +127,8 @@ const projects = [
     description: "Multi-vendor marketplace with real-time inventory sync and AI-generated product descriptions. High-performance storefront with localized experience.",
     bullets: ["End-to-end encryption for secure transactions", "Real-time inventory management with Redis", "Scalable microservices architecture via AWS"],
     usedTech: ["Next.js", "Express.js", "Node.js", "PostgreSQL", "Redis", "AWS", "Framer Motion"],
-    accentColor: "#8b5cf6", accentRgb: "139,92,246", bgGlow: "rgba(139,92,246,0.15)",
-    tagActive: { bg: "rgba(139,92,246,0.15)", border: "rgba(139,92,246,0.5)", text: "#c084fc" },
+    accentColor: "#8b5cf6", accentRgb: "139,92,246", bgGlow: "rgba(var(--tc13-rgb),0.15)",
+    tagActive: { bg: "rgba(var(--tc13-rgb),0.15)", border: "rgba(var(--tc13-rgb),0.5)", text: "#c084fc" },
     cardGrad: "linear-gradient(145deg,#0a011a 0%,#2e1065 45%,#5b21b6 75%,#8b5cf6 100%)",
     hexCoord: "0xFC3A",
   },
@@ -143,8 +138,8 @@ const projects = [
     description: "Ultra-minimalist meditation app focusing on spatial soundscapes and haptic feedback. A masterclass in whitespace and motion design.",
     bullets: ["Neumorphic UI components with glass textures", "Generative audio environments", "Custom interactions designed in Figma"],
     usedTech: ["Figma", "React", "Framer Motion", "Tailwind CSS"],
-    accentColor: "#a855f7", accentRgb: "168,85,247", bgGlow: "rgba(168,85,247,0.15)",
-    tagActive: { bg: "rgba(168,85,247,0.15)", border: "rgba(168,85,247,0.5)", text: "#d8b4fe" },
+    accentColor: "#a855f7", accentRgb: "168,85,247", bgGlow: "rgba(var(--tc12-rgb),0.15)",
+    tagActive: { bg: "rgba(var(--tc12-rgb),0.15)", border: "rgba(var(--tc12-rgb),0.5)", text: "#d8b4fe" },
     cardGrad: "linear-gradient(145deg,#05010a 0%,#2a0d45 45%,#6b21a8 75%,#a855f7 100%)",
     hexCoord: "0xA8F7",
   },
@@ -216,11 +211,11 @@ function ProjectCard({ p }: { p: typeof projects[0] }) {
         backdropFilter: 'none',
       }}>
         <div className="flex items-center gap-3">
-          <span className="text-[9px] tracking-[0.25em]" style={{ color: `rgba(${p.accentRgb},0.7)`, fontFamily: "'JetBrains Mono',monospace" }}>
+          <span className="text-[9px] tracking-[0.25em]" style={{ color: `rgba(${p.accentRgb},0.7)`, fontFamily: "var(--font-jetbrains-mono),monospace" }}>
             {p.hexCoord}
           </span>
           <span className="text-[9px]" style={{ color: "rgba(255,255,255,0.2)", fontFamily: "monospace" }}>|</span>
-          <span className="text-[9px] tracking-[0.2em]" style={{ color: p.accentColor, fontFamily: "'JetBrains Mono',monospace" }}>
+          <span className="text-[9px] tracking-[0.2em]" style={{ color: p.accentColor, fontFamily: "var(--font-jetbrains-mono),monospace" }}>
             ● {p.status}
           </span>
         </div>
@@ -258,7 +253,7 @@ function ProjectCard({ p }: { p: typeof projects[0] }) {
             {/* Terminal-style name */}
             <div className="flex items-center gap-2">
               <span style={{ color: p.accentColor, fontFamily: "monospace", fontSize: 11 }}>$</span>
-              <span className="text-lg font-black tracking-tight" style={{ color: "white", fontFamily: "'JetBrains Mono','Courier New',monospace", textShadow: `0 0 20px rgba(${p.accentRgb},0.6)` }}>
+              <span className="text-lg font-black tracking-tight" style={{ color: "white", fontFamily: "var(--font-jetbrains-mono),monospace", textShadow: `0 0 20px rgba(${p.accentRgb},0.6)` }}>
                 {p.name}
               </span>
             </div>
@@ -444,8 +439,12 @@ export default function Projects() {
               0%, 100% { opacity: 0.03; stroke-width: 0.5; }
               50% { opacity: 0.08; stroke-width: 1.2; }
             }
+            @keyframes blink-cursor {
+              0%, 49% { opacity: 1; }
+              50%, 100% { opacity: 0; }
+            }
             .nebula-layer {
-              filter: blur(120px);
+              filter: blur(70px);
               mix-blend-mode: screen;
             }
             @keyframes pillSqueeze {
@@ -463,7 +462,7 @@ export default function Projects() {
 
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <div className="absolute inset-[-15%] opacity-30 nebula-layer" style={{
-              background: `radial-gradient(circle at 20% 40%, rgba(30, 58, 138, 0.35) 0%, transparent 60%),
+              background: `radial-gradient(circle at 20% 40%, rgba(var(--tc4-rgb), 0.35) 0%, transparent 60%),
                            radial-gradient(circle at 80% 60%, rgba(15, 23, 42, 0.25) 0%, transparent 70%)`,
               animation: 'nebula-float 35s infinite ease-in-out alternate'
             }} />
@@ -490,7 +489,7 @@ export default function Projects() {
 
           <div className="absolute inset-0 pointer-events-none transition-all duration-1000 ease-in-out" style={{
             background: `radial-gradient(circle at 30% 50%, rgba(${project.accentRgb}, 0.15), transparent 70%)`,
-            filter: 'blur(80px)',
+            filter: 'blur(50px)',
             opacity: 0.5,
             zIndex: 1
           }} />
@@ -504,7 +503,7 @@ export default function Projects() {
               <div className="flex items-center gap-3 mb-1">
                 <div className="flex items-center gap-1.5">
                   <div className="w-1.5 h-1.5 rounded-full" style={{ background: project.accentColor, boxShadow: `0 0 6px ${project.accentColor}` }} />
-                  <span className="text-[10px] tracking-[0.4em]" style={{ color: project.accentColor, fontFamily: "'JetBrains Mono',monospace" }}>
+                  <span className="text-[10px] tracking-[0.4em]" style={{ color: project.accentColor, fontFamily: "var(--font-jetbrains-mono),monospace" }}>
                     PROJECTS
                   </span>
                 </div>
@@ -518,7 +517,6 @@ export default function Projects() {
                 <div className="absolute inset-0" style={{
                   transform: `translateY(${outY}) scale(${outScale})`,
                   opacity: outOpacity,
-                  transformOrigin: "bottom center",
                   transformOrigin: "bottom center",
                 }}>
                   <ProjectCard p={project} />
@@ -536,7 +534,7 @@ export default function Projects() {
             {/* ── RIGHT: info panel ── */}
             <div className="flex-1 flex flex-col gap-0 self-center">
 
-              <div className="flex items-center gap-2 mb-5 text-[10px]" style={{ fontFamily: "'JetBrains Mono',monospace", color: "rgba(255,255,255,0.2)" }}>
+              <div className="flex items-center gap-2 mb-5 text-[10px]" style={{ fontFamily: "var(--font-jetbrains-mono),monospace", color: "rgba(255,255,255,0.2)" }}>
                 <span>~/projects/</span>
                 <GlitchText
                   value={project.name.toLowerCase().replace(/\s/g, "-")}
@@ -548,7 +546,7 @@ export default function Projects() {
               <h2 className="leading-none mb-1 transition-all duration-300" style={{
                 fontSize: "clamp(2.2rem,4.5vw,4rem)",
                 color: "white",
-                fontFamily: "'Syne','JetBrains Mono',monospace",
+                fontFamily: "var(--font-malinton),var(--font-jetbrains-mono),monospace",
                 fontWeight: 800,
                 letterSpacing: "-0.03em",
                 textShadow: `0 0 40px rgba(${project.accentRgb},0.3)`,
@@ -558,7 +556,7 @@ export default function Projects() {
 
               <div className="flex items-center gap-3 mb-5">
                 <div className="h-px flex-1" style={{ maxWidth: 32, background: project.accentColor }} />
-                <span className="text-[11px] tracking-[0.2em]" style={{ color: "rgba(255,255,255,0.28)", fontFamily: "'JetBrains Mono',monospace" }}>
+                <span className="text-[11px] tracking-[0.2em]" style={{ color: "rgba(255,255,255,0.28)", fontFamily: "var(--font-jetbrains-mono),monospace" }}>
                   {project.subtitle}
                 </span>
               </div>
@@ -567,7 +565,7 @@ export default function Projects() {
               <div className="min-h-[220px]">
                 <p className="text-sm leading-relaxed mb-5" style={{
                   color: "rgba(255,255,255,0.48)",
-                  fontFamily: "system-ui,sans-serif",
+                  fontFamily: "var(--font-space-grotesk),system-ui,sans-serif",
                   maxWidth: "36ch",
                 }}>
                   {project.description}
@@ -575,7 +573,7 @@ export default function Projects() {
 
                 <div className="mb-6 flex flex-col gap-1.5">
                   {project.bullets.map((b, i) => (
-                    <div key={i} className="flex items-start gap-2 text-[12px]" style={{ color: "rgba(255,255,255,0.5)", fontFamily: "system-ui,sans-serif" }}>
+                    <div key={i} className="flex items-start gap-2 text-[12px]" style={{ color: "rgba(255,255,255,0.5)", fontFamily: "var(--font-space-grotesk),system-ui,sans-serif" }}>
                       <span className="mt-0.5 text-[10px]" style={{ color: project.accentColor, fontFamily: "monospace", flexShrink: 0 }}>▸</span>
                       {b}
                     </div>
@@ -607,7 +605,7 @@ export default function Projects() {
               </div>
 
               <div className="flex items-center gap-3 mb-3">
-                <span className="text-[9px] tracking-[0.3em]" style={{ color: "rgba(255,255,255,0.18)", fontFamily: "'JetBrains Mono',monospace" }}>
+                <span className="text-[9px] tracking-[0.3em]" style={{ color: "rgba(255,255,255,0.18)", fontFamily: "var(--font-jetbrains-mono),monospace" }}>
                   STACK
                 </span>
                 <div className="flex-1 h-px" style={{ background: "linear-gradient(90deg,rgba(255,255,255,0.07),transparent)" }} />
@@ -652,7 +650,7 @@ export default function Projects() {
                           <TechLogo name={t} />
                         </span>
                       </div>
-                      <span className="text-[11px] font-semibold whitespace-nowrap" style={{ fontFamily: "'JetBrains Mono',monospace", opacity: used ? 1 : 0.4 }}>
+                      <span className="text-[11px] font-semibold whitespace-nowrap" style={{ fontFamily: "var(--font-jetbrains-mono),monospace", opacity: used ? 1 : 0.4 }}>
                         {t}
                       </span>
                     </div>
@@ -694,8 +692,8 @@ export default function Projects() {
                     boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5),inset 0 -1px 0 rgba(0,0,0,0.3),inset 1px 0 0 rgba(255,255,255,0.1),inset -1px 0 0 rgba(255,255,255,0.1),0 6px 28px rgba(0,0,0,0.45),0 2px 6px rgba(0,0,0,0.3)",
                     backdropFilter: 'none',
                     WebkitBackdropFilter: "blur(28px)",
-                    transition: "left 0.4s cubic-bezier(0.34,1.44,0.64,1),width 0.4s cubic-bezier(0.34,1.44,0.64,1)",
-                    animation: "pillSqueeze 0.4s cubic-bezier(0.34,1.44,0.64,1)",
+                    transition: "left 0.4s cubic-bezier(0.22,1,0.36,1),width 0.4s cubic-bezier(0.22,1,0.36,1)",
+                    animation: "pillSqueeze 0.4s cubic-bezier(0.22,1,0.36,1)",
                   }}
                 >
                   {/* Pill inner top gleam */}
@@ -752,7 +750,7 @@ export default function Projects() {
                           flex: 1,
                           minWidth: 150,
                           height: 38,
-                          fontFamily: "'JetBrains Mono',monospace",
+                          fontFamily: "var(--font-jetbrains-mono),monospace",
                           fontSize: 11,
                           fontWeight: 700,
                           letterSpacing: "0.18em",
@@ -809,8 +807,8 @@ export default function Projects() {
               UTF-8 · TSX · {Math.round(progress * 100)}%
             </span>
             <div className="w-20 h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
-              <div className="h-full rounded-full transition-all duration-300" style={{
-                width: `${progress * 100}%`,
+              <div className="h-full w-full rounded-full origin-left transition-transform duration-300" style={{
+                transform: `scaleX(${progress})`,
                 background: `linear-gradient(90deg,${project.accentColor},rgba(${project.accentRgb},0.4))`,
               }} />
             </div>

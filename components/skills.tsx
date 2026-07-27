@@ -147,71 +147,9 @@ const TechCard = ({
 
   return (
     <motion.div
-      style={{ x, y, rotate, scale, opacity, willChange: "transform, opacity" }}
-      className="relative w-[60px] h-[72px] sm:w-[68px] sm:h-[80px] lg:w-[76px] lg:h-[88px] origin-center z-10 pointer-events-none"
+      style={{ x, y, rotate, scale, opacity }}
+      className="relative w-[60px] h-[72px] sm:w-[68px] sm:h-[80px] lg:w-[76px] lg:h-[88px] origin-center z-10 pointer-events-none transform-gpu"
     >
-      <style>{`
-        @keyframes scan-sweep {
-          0%   { transform: translateY(-100%); opacity: 0; }
-          10%  { opacity: 1; }
-          90%  { opacity: 1; }
-          100% { transform: translateY(300%); opacity: 0; }
-        }
-        @keyframes corner-ping {
-          0%   { opacity: 1; transform: scale(0.6); }
-          60%  { opacity: 0.6; transform: scale(1.4); }
-          100% { opacity: 0; transform: scale(1.8); }
-        }
-        @keyframes circuit-trace {
-          0%   { stroke-dashoffset: 320; }
-          100% { stroke-dashoffset: 0; }
-        }
-        @keyframes glitch-flicker {
-          0%,100% { opacity: 1; transform: skewX(0deg) translateX(0); }
-          20%  { opacity: 0.8; transform: skewX(-4deg) translateX(-2px); }
-          40%  { opacity: 1;   transform: skewX(0deg) translateX(0); }
-          60%  { opacity: 0.7; transform: skewX(3deg)  translateX(1px); }
-          80%  { opacity: 1;   transform: skewX(0deg) translateX(0); }
-        }
-        @keyframes glow-breathe {
-          0%,100% { opacity: 0.85; }
-          50%      { opacity: 1; }
-        }
-        @keyframes idle-pulse {
-          0%,100% { box-shadow: 0 0 0 0px transparent; }
-          50%      { box-shadow: 0 0 0 3px rgba(99,179,237,0.12); }
-        }
-        @keyframes group-hover-pulse {
-          0%   { box-shadow: 0 0 0 0px transparent; }
-          50%  { box-shadow: 0 0 0 2px rgba(99,179,237,0.2); }
-          100% { box-shadow: 0 0 0 0px transparent; }
-        }
-        .group:hover .tech-card-inner { animation: idle-pulse 1.5s ease-in-out infinite; }
-        .group:hover .scan-line        { animation: scan-sweep 0.55s ease-in-out forwards; }
-        .group:hover .corner-tl,
-        .group:hover .corner-tr,
-        .group:hover .corner-bl,
-        .group:hover .corner-br        { animation: corner-ping 0.4s ease-out forwards; }
-        .group:hover .circuit-svg path { animation: circuit-trace 0.5s ease-out forwards; }
-        .group:hover .glitch-label     { animation: glitch-flicker 0.4s steps(1) forwards; }
-        .group:hover .glow-bg          { animation: glow-breathe 1.2s ease-in-out infinite; }
-        .tech-card-inner.group-lit .scan-line        { animation: scan-sweep 0.55s ease-in-out forwards; }
-        .tech-card-inner.group-lit .corner-tl,
-        .tech-card-inner.group-lit .corner-tr,
-        .tech-card-inner.group-lit .corner-bl,
-        .tech-card-inner.group-lit .corner-br        { opacity: 1 !important; }
-        .tech-card-inner.group-lit .circuit-svg      { opacity: 1 !important; }
-        .tech-card-inner.group-lit .circuit-svg path { stroke-dashoffset: 0 !important; }
-        .tech-card-inner.group-lit .glitch-label     { animation: glitch-flicker 0.4s steps(1) forwards; }
-        .tech-card-inner.group-lit .glow-bg          { opacity: 1 !important; animation: glow-breathe 1.2s ease-in-out infinite; }
-        .tech-card-inner.group-lit .colored-icon     { opacity: 1 !important; transform: scale(1.2) !important; }
-        .tech-card-inner.group-lit .bw-icon          { opacity: 0 !important; }
-        .tech-card-inner.group-lit .bottom-bar       { opacity: 1 !important; }
-        .tech-card-inner.group-lit .outer-glow       { opacity: 1 !important; }
-        .tech-card-inner.group-lit                   { transform: translateY(-4px) scale(1.06) !important; border-color: transparent !important; border-bottom: 2px solid #22d3ee !important; animation: group-hover-pulse 1.5s ease-in-out infinite; }
-      `}</style>
-
-
       <div
         className="group relative w-full h-full z-20 pointer-events-auto"
         style={{
@@ -221,7 +159,7 @@ const TechCard = ({
         }}
       >
         <div
-          className={`tech-card-inner relative flex flex-col items-center justify-center w-full h-full rounded-[14px] bg-white/[0.08] transition-all duration-300 ease-out border border-white/10 shadow-lg overflow-hidden group-hover:z-50 group-hover:-translate-y-2 group-hover:scale-110 group-hover:border-transparent group-hover:border-b-2 group-hover:border-b-cyan-400${isGroupHovered ? ' group-lit' : ''}`}
+          className={`tech-card-inner relative flex flex-col items-center justify-center w-full h-full rounded-[14px] bg-white/[0.08] transition-all duration-300 ease-out border border-white/10 shadow-lg overflow-hidden group-hover:z-50 group-hover:-translate-y-2 group-hover:scale-110 group-hover:border-cyan-400/40${isGroupHovered ? ' group-lit' : ''}`}
           style={{ animationDelay: animDelay, pointerEvents: 'none' }}
         >
           <div
@@ -613,9 +551,9 @@ export default function Skills() {
 
 
         <div className="flex flex-col items-center justify-center mb-10 text-center mt-[-40px]">
-          <span className="text-[10px] tracking-[5px] uppercase text-sky-400/50 mb-3 block font-mono" style={{ textShadow: "0 0 10px rgba(56,189,248,0.2)" }}>// expertises</span>
+          <span className="text-[10px] tracking-[5px] uppercase text-sky-400/50 mb-3 block font-mono" style={{ textShadow: "0 0 10px rgba(var(--tc2-rgb),0.2)" }}>// expertises</span>
           <h2 className="font-malinton font-bold text-white tracking-[-1.5px] leading-[1.05] mb-4" style={{ fontSize: "clamp(42px, 6vw, 72px)" }}>
-            <span className="text-sky-400 drop-shadow-[0_0_20px_rgba(56,189,248,0.4)]">Tech</span> Stack
+            <span className="text-sky-400 drop-shadow-[0_0_20px_rgba(var(--tc2-rgb),0.4)]">Tech</span> Stack
           </h2>
         </div>
 
@@ -663,6 +601,66 @@ export default function Skills() {
             className="relative z-10 w-full max-w-[1400px] mx-auto px-2 sm:px-4 flex flex-col items-center justify-center"
           >
             {/* Tile grid */}
+            <style>{`
+              @keyframes scan-sweep {
+                0%   { transform: translateY(-100%); opacity: 0; }
+                10%  { opacity: 1; }
+                90%  { opacity: 1; }
+                100% { transform: translateY(300%); opacity: 0; }
+              }
+              @keyframes corner-ping {
+                0%   { opacity: 1; transform: scale(0.6); }
+                60%  { opacity: 0.6; transform: scale(1.4); }
+                100% { opacity: 0; transform: scale(1.8); }
+              }
+              @keyframes circuit-trace {
+                0%   { stroke-dashoffset: 320; }
+                100% { stroke-dashoffset: 0; }
+              }
+              @keyframes glitch-flicker {
+                0%,100% { opacity: 1; transform: skewX(0deg) translateX(0); }
+                20%  { opacity: 0.8; transform: skewX(-4deg) translateX(-2px); }
+                40%  { opacity: 1;   transform: skewX(0deg) translateX(0); }
+                60%  { opacity: 0.7; transform: skewX(3deg)  translateX(1px); }
+                80%  { opacity: 1;   transform: skewX(0deg) translateX(0); }
+              }
+              @keyframes glow-breathe {
+                0%,100% { opacity: 0.85; }
+                50%      { opacity: 1; }
+              }
+              @keyframes idle-pulse {
+                0%,100% { box-shadow: 0 0 0 0px transparent; }
+                50%      { box-shadow: 0 0 0 3px rgba(99,179,237,0.12); }
+              }
+              @keyframes group-hover-pulse {
+                0%   { box-shadow: 0 0 0 0px transparent; }
+                50%  { box-shadow: 0 0 0 2px rgba(99,179,237,0.2); }
+                100% { box-shadow: 0 0 0 0px transparent; }
+              }
+              .group:hover .tech-card-inner { animation: idle-pulse 1.5s ease-in-out infinite; }
+              .group:hover .scan-line        { animation: scan-sweep 0.55s ease-in-out forwards; }
+              .group:hover .corner-tl,
+              .group:hover .corner-tr,
+              .group:hover .corner-bl,
+              .group:hover .corner-br        { animation: corner-ping 0.4s ease-out forwards; }
+              .group:hover .circuit-svg path { animation: circuit-trace 0.5s ease-out forwards; }
+              .group:hover .glitch-label     { animation: glitch-flicker 0.4s steps(1) forwards; }
+              .group:hover .glow-bg          { animation: glow-breathe 1.2s ease-in-out infinite; }
+              .tech-card-inner.group-lit .scan-line        { animation: scan-sweep 0.55s ease-in-out forwards; }
+              .tech-card-inner.group-lit .corner-tl,
+              .tech-card-inner.group-lit .corner-tr,
+              .tech-card-inner.group-lit .corner-bl,
+              .tech-card-inner.group-lit .corner-br        { opacity: 1 !important; }
+              .tech-card-inner.group-lit .circuit-svg      { opacity: 1 !important; }
+              .tech-card-inner.group-lit .circuit-svg path { stroke-dashoffset: 0 !important; }
+              .tech-card-inner.group-lit .glitch-label     { animation: glitch-flicker 0.4s steps(1) forwards; }
+              .tech-card-inner.group-lit .glow-bg          { opacity: 1 !important; animation: glow-breathe 1.2s ease-in-out infinite; }
+              .tech-card-inner.group-lit .colored-icon     { opacity: 1 !important; transform: scale(1.2) !important; }
+              .tech-card-inner.group-lit .bw-icon          { opacity: 0 !important; }
+              .tech-card-inner.group-lit .bottom-bar       { opacity: 1 !important; }
+              .tech-card-inner.group-lit .outer-glow       { opacity: 1 !important; }
+              .tech-card-inner.group-lit                   { transform: translateY(-4px) scale(1.06) !important; border-color: rgba(34,211,238,0.4) !important; animation: group-hover-pulse 1.5s ease-in-out infinite; }
+            `}</style>
             <div className="flex flex-col items-center justify-center gap-2 sm:gap-3 lg:gap-4 w-full">
               {diamondRows.map((row, rowIndex) => (
                 <div

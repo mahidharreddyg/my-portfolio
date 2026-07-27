@@ -42,12 +42,12 @@ export default function Navbar({ isMonochrome = false }: { isMonochrome?: boolea
         >
           <div className="max-w-7xl mx-auto">
             <motion.div
-              className={`relative rounded-full px-6 py-4 flex items-center justify-between shadow-2xl group transition-all duration-300 border border-white/20 ${isMonochrome ? 'grayscale opacity-90' : ''}`}
+              className={`relative rounded-full px-5 py-2 flex items-center justify-between shadow-2xl group transition-all duration-300 border border-white/15`}
               style={{
-                background: 'rgba(255, 255, 255, 0.08)',
-                backdropFilter: 'blur(8px) saturate(180%)',
-                WebkitBackdropFilter: 'blur(8px) saturate(180%)',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.05)',
+                background: 'rgba(255, 255, 255, 0.06)',
+                backdropFilter: 'blur(12px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(12px) saturate(180%)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(255, 255, 255, 0.04)',
                 position: 'relative',
                 overflow: 'hidden',
               }}
@@ -80,23 +80,23 @@ export default function Navbar({ isMonochrome = false }: { isMonochrome?: boolea
                 }}
               />
 
-              <div className="w-full h-full flex items-center justify-between px-2">
-                {/* Profile Info - UNCHANGED */}
-                <div className="flex items-center gap-4 relative z-10">
-                  <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-gray-700/50">
+              <div className="w-full h-full flex items-center justify-between px-1.5">
+                {/* Profile Info */}
+                <div className="flex items-center gap-3 relative z-10">
+                  <div className="relative h-9 w-9 overflow-hidden rounded-full border border-white/15">
                     <Image
                       src="/profile_pic.PNG"
                       alt="Profile"
-                      width={48}
-                      height={48}
+                      width={40}
+                      height={40}
                       className="object-cover"
                     />
                   </div>
-                  <div className="flex items-center gap-3">
-                    <h2 className="text-white font-semibold text-lg bg-gradient-to-r from-white to-gray-300 bg-clip-text">
+                  <div className="flex items-center gap-2.5">
+                    <h2 className="text-white font-semibold text-[15px] tracking-tight">
                       Mahidhar Reddy
                     </h2>
-                    {/* Perplexity-style dot */}
+                    {/* Status dot — antique gold, the site's one warm accent */}
                     <motion.div
                       className="relative flex items-center justify-center"
                       animate={{
@@ -109,28 +109,29 @@ export default function Navbar({ isMonochrome = false }: { isMonochrome?: boolea
                         ease: "easeInOut",
                       }}
                     >
-                      {/* Glowing turquoise outer ring */}
+                      {/* Glowing gold outer ring */}
                       <span
-                        className="absolute w-3.5 h-3.5 rounded-full"
+                        className="absolute w-3 h-3 rounded-full"
                         style={{
-                          background: "radial-gradient(circle, rgba(6,182,212,0.6) 0%, rgba(6,182,212,0.2) 50%, transparent 80%)",
-                          boxShadow: "0 0 10px rgba(6,182,212,0.6)"
+                          background: "radial-gradient(circle, rgba(224,173,84,0.65) 0%, rgba(224,173,84,0.25) 50%, transparent 80%)",
+                          boxShadow: "0 0 9px rgba(224,173,84,0.7)"
                         }}
                       />
-                      {/* Inner solid turquoise dot */}
-                      <span className="relative w-2 h-2 rounded-full bg-cyan-400"
+                      {/* Inner solid gold dot */}
+                      <span className="relative w-1.5 h-1.5 rounded-full"
                         style={{
-                          boxShadow: "0 0 8px rgba(34,211,238,0.8), inset 0 0 4px rgba(255,255,255,0.8)"
+                          background: "var(--accent-2)",
+                          boxShadow: "0 0 6px rgba(224,173,84,0.8), inset 0 0 3px rgba(255,255,255,0.8)"
                         }} />
                     </motion.div>
-                    <span className="text-gray-400 text-sm font-medium">
+                    <span className="text-gray-400 text-[13px] font-medium">
                       Software Developer
                     </span>
                   </div>
                 </div>
 
-                {/* Navigation + Copy Button - UNCHANGED */}
-                <div className="hidden md:flex items-center gap-4 ml-32 relative z-10">
+                {/* Navigation + Copy Button */}
+                <div className="hidden md:flex items-center gap-6 relative z-10">
                   <nav className="flex items-center gap-8">
                     {["About", "Experience", "Skills", "Projects", "Certifications"].map((item) => (
                       <div key={item} className="relative group/navitem">
@@ -138,8 +139,8 @@ export default function Navbar({ isMonochrome = false }: { isMonochrome?: boolea
                           href={`#${item.toLowerCase()}`}
                           className="text-gray-300 font-medium relative z-10 px-1
                            transition-all duration-500 hover:text-transparent
-                           hover:bg-clip-text hover:bg-[linear-gradient(90deg,#00f2fe_0%,#4facfe_50%,#00f2fe_100%)]
-                           hover:drop-shadow-[0_0_15px_rgba(79,172,254,0.6)]
+                           hover:bg-clip-text hover:bg-[linear-gradient(90deg,rgb(var(--tc2-rgb))_0%,rgb(var(--tc10-rgb))_50%,rgb(var(--tc2-rgb))_100%)]
+                           hover:drop-shadow-[0_0_15px_rgba(var(--tc10-rgb),0.6)]
                            group-hover/navitem:animate-[text-glitch_0.3s_linear_infinite]"
                         >
                           {item}
@@ -147,65 +148,47 @@ export default function Navbar({ isMonochrome = false }: { isMonochrome?: boolea
 
                         <span
                           className="absolute left-0 -bottom-1 w-full h-[2px]
-                          bg-[linear-gradient(90deg,transparent_0%,#4facfe_50%,transparent_100%)]
+                          bg-[linear-gradient(90deg,transparent_0%,rgb(var(--tc10-rgb))_50%,transparent_100%)]
                           rounded-full scale-x-0 origin-left
                           transition-transform duration-500 shadow-[0_0_25px_-3px] shadow-blue-400/60
-                          group-hover/navitem:scale-x-100 
+                          group-hover/navitem:scale-x-100
                           group-hover/navitem:animate-[laser-sweep_1.5s_linear_infinite]"
                         />
 
                         <div
-                          className="absolute -inset-2 rounded-lg bg-[radial-gradient(circle_at_center,#4facfe30_0%,transparent_70%)]
+                          className="absolute -inset-2 rounded-lg bg-[radial-gradient(circle_at_center,rgba(var(--tc10-rgb),0.19)_0%,transparent_70%)]
                           opacity-0 blur-[12px] transition-opacity duration-300 -z-10
-                          group-hover/navitem:opacity-100 
+                          group-hover/navitem:opacity-100
                           group-hover/navitem:animate-[hologram-pulse_2s_linear_infinite]"
                         />
                       </div>
                     ))}
                   </nav>
 
-                  {/* Copy Button - UNCHANGED */}
-                  <motion.div className="relative z-10 ml-4">
-                    <Button
-                      onClick={copyEmail}
-                      className="group relative overflow-hidden w-[150px] bg-gray-900/80 hover:bg-gray-800/90
-                      text-cyan-300 hover:text-white border-2 border-cyan-400/30 hover:border-cyan-400/50
-                      rounded-full px-7 py-2.5 transition-all duration-300 shadow-[0_0_20px_-5px_#00f2fe30]
-                      hover:shadow-[0_0_30px_-5px_#4facfe60]"
-                    >
-                      {/* Grid Overlay */}
-                      <div className="absolute inset-0 bg-[linear-gradient(rgba(79,172,254,0.1)_1px,transparent_1px),
-                      linear-gradient(90deg,rgba(79,172,254,0.1)_1px,transparent_1px)]
-                      bg-[size:8px_8px] opacity-0 group-hover:opacity-30 transition-opacity duration-300" />
-
-                      <div className="flex items-center justify-center gap-2 relative z-10">
-                        <motion.div
-                          animate={emailCopied ? {
-                            rotate: [0, 180, 360],
-                            scale: [1, 1.2, 1]
-                          } : {
-                            rotate: 0,
-                            scale: 1
-                          }}
-                          transition={{ duration: 0.7, times: [0, 0.5, 1] }}
-                        >
-                          {emailCopied ? (
-                            <Mail className="h-5 w-5 text-cyan-400 animate-[icon-pulse_1s_ease-in-out_infinite]" />
-                          ) : (
-                            <Copy className="h-5 w-5 text-cyan-300 group-hover:text-cyan-400 transition-colors" />
-                          )}
-                        </motion.div>
-                        <span className="text-sm font-medium bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                          {emailCopied ? "Copied!" : "Copy Email"}
-                        </span>
-                      </div>
-
-                      {/* Data Stream Animation */}
-                      <div className="absolute inset-y-0 -left-4 w-12 bg-[linear-gradient(90deg,transparent_0%,#4facfe20_30%,transparent_70%)]
-                      skew-x-[30deg] opacity-0 group-hover:opacity-100 group-hover:animate-[data-stream_1s_linear_infinite]
-                      transition-opacity duration-300" />
-                    </Button>
-                  </motion.div>
+                  {/* Copy Button — sleek */}
+                  <Button
+                    onClick={copyEmail}
+                    className="group relative overflow-hidden bg-white/[0.04] hover:bg-white/[0.08]
+                    text-cyan-200 hover:text-white border border-cyan-400/25 hover:border-cyan-400/45
+                    rounded-full pl-4 pr-4 py-2 h-auto transition-all duration-300 shadow-none"
+                  >
+                    <div className="flex items-center justify-center gap-2 relative z-10">
+                      <motion.div
+                        animate={emailCopied ? { rotate: [0, 180, 360], scale: [1, 1.15, 1] } : { rotate: 0, scale: 1 }}
+                        transition={{ duration: 0.7, times: [0, 0.5, 1] }}
+                      >
+                        {emailCopied
+                          ? <Mail className="h-4 w-4 text-cyan-400" />
+                          : <Copy className="h-4 w-4 text-cyan-300 group-hover:text-cyan-400 transition-colors" />}
+                      </motion.div>
+                      <span className="text-[13px] font-medium">
+                        {emailCopied ? "Copied!" : "Copy Email"}
+                      </span>
+                    </div>
+                    {/* subtle shine sweep on hover */}
+                    <div className="absolute inset-y-0 -left-6 w-16 -skew-x-[20deg] bg-gradient-to-r from-transparent via-white/10 to-transparent
+                    opacity-0 group-hover:opacity-100 group-hover:translate-x-[220%] transition-all duration-700 ease-out" />
+                  </Button>
                 </div>
               </div>
             </motion.div>

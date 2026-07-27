@@ -34,11 +34,11 @@ export default function StickyLock({ children, className = "", id, lockDistance 
         
         {/* Progress Indicator */}
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/5 z-[60]">
-          <motion.div 
-            className="h-full bg-blue-500/50"
-            style={{ 
-              width: scrollYProgress,
-              boxShadow: "0 0 10px rgba(59, 130, 246, 0.4)"
+          <motion.div
+            className="h-full w-full bg-blue-500/50 origin-left"
+            style={{
+              scaleX: scrollYProgress,
+              boxShadow: "0 0 10px rgba(var(--tc1-rgb), 0.4)"
             }}
           />
         </div>

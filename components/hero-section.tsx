@@ -2,14 +2,23 @@
 
 import React from "react"
 import { useState, useEffect, useRef, useCallback } from "react"
-import { motion, useAnimation, AnimatePresence } from "framer-motion"
+import { motion, useAnimation, AnimatePresence, useInView } from "framer-motion"
+import dynamic from "next/dynamic"
 import LetsConnectModal from "./letsconnectmodal"
 import { HyperText } from "@/src/components/HyperText/HyperText"
 import GlassSurface from "./GlassSurface"
+import LazyCanvas from "./three/LazyCanvas"
+
+const HeroGoldDustScene = dynamic(() => import("./three/HeroGoldDustScene"), { ssr: false })
 
 // ─── Rich Background ───────────────────────────────────────────────────────────
 function RichBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const wrapRef = useRef<HTMLDivElement>(null)
+  // Hero is sticky and visible for a long scroll range, but does eventually
+  // scroll away — stop the ambient blob loops once it's off screen instead
+  // of letting them run for the rest of the session.
+  const bgInView = useInView(wrapRef, { margin: "200px 0px 200px 0px" })
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -119,16 +128,16 @@ function RichBackground() {
   }, [])
 
   return (
-    <div className="absolute inset-0 overflow-hidden" style={{ background: "#020617" }}>
+    <div ref={wrapRef} className="absolute inset-0 overflow-hidden" style={{ background: "#020617" }}>
       <motion.div
         className="absolute pointer-events-none"
         style={{
           width: "85vw", height: "70vh",
           top: "-25%", left: "-20%",
-          background: "radial-gradient(ellipse at 40% 45%, rgba(29,78,216,0.16) 0%, rgba(29,78,216,0.05) 45%, transparent 68%)",
+          background: "radial-gradient(ellipse at 40% 45%, rgba(var(--tc5-rgb),0.16) 0%, rgba(var(--tc5-rgb),0.05) 45%, transparent 68%)",
           filter: "blur(90px)",
         }}
-        animate={{ x: [0, 28, -12, 0], y: [0, -18, 8, 0], scale: [1, 1.07, 0.97, 1] }}
+        animate={bgInView ? { x: [0, 28, -12, 0], y: [0, -18, 8, 0], scale: [1, 1.07, 0.97, 1] } : undefined}
         transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
       />
 
@@ -137,10 +146,10 @@ function RichBackground() {
         style={{
           width: "75vw", height: "65vh",
           bottom: "-20%", right: "-15%",
-          background: "radial-gradient(ellipse at 55% 50%, rgba(109,40,217,0.13) 0%, rgba(109,40,217,0.04) 48%, transparent 70%)",
+          background: "radial-gradient(ellipse at 55% 50%, rgba(var(--tc11-rgb),0.13) 0%, rgba(var(--tc11-rgb),0.04) 48%, transparent 70%)",
           filter: "blur(110px)",
         }}
-        animate={{ x: [0, -22, 10, 0], y: [0, 16, -8, 0], scale: [1, 1.05, 0.98, 1] }}
+        animate={bgInView ? { x: [0, -22, 10, 0], y: [0, 16, -8, 0], scale: [1, 1.05, 0.98, 1] } : undefined}
         transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 5 }}
       />
 
@@ -149,10 +158,10 @@ function RichBackground() {
         style={{
           width: "50vw", height: "50vh",
           top: "15%", right: "-5%",
-          background: "radial-gradient(ellipse, rgba(6,182,212,0.07) 0%, rgba(6,182,212,0.02) 50%, transparent 68%)",
+          background: "radial-gradient(ellipse, rgba(var(--tc8-rgb),0.07) 0%, rgba(var(--tc8-rgb),0.02) 50%, transparent 68%)",
           filter: "blur(80px)",
         }}
-        animate={{ x: [0, -18, 6, 0], y: [0, 12, -6, 0], scale: [1, 1.09, 0.95, 1] }}
+        animate={bgInView ? { x: [0, -18, 6, 0], y: [0, 12, -6, 0], scale: [1, 1.09, 0.95, 1] } : undefined}
         transition={{ duration: 17, repeat: Infinity, ease: "easeInOut", delay: 2 }}
       />
 
@@ -161,14 +170,39 @@ function RichBackground() {
         style={{
           width: "45vw", height: "45vh",
           bottom: "5%", left: "-5%",
-          background: "radial-gradient(ellipse, rgba(99,102,241,0.08) 0%, transparent 65%)",
+          background: "radial-gradient(ellipse, rgba(var(--tc9-rgb),0.08) 0%, transparent 65%)",
           filter: "blur(70px)",
         }}
-        animate={{ x: [0, 14, -8, 0], y: [0, -10, 5, 0] }}
+        animate={bgInView ? { x: [0, 14, -8, 0], y: [0, -10, 5, 0] } : undefined}
         transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 8 }}
       />
 
+      {/* Gold ember glow — the site's one warm accent against the cool field */}
+      <motion.div
+        className="absolute pointer-events-none"
+        style={{
+          width: "40vw", height: "40vh",
+          top: "4%", left: "3%",
+          background: "radial-gradient(ellipse, rgba(198,155,63,0.16) 0%, rgba(122,95,34,0.07) 48%, transparent 72%)",
+          filter: "blur(55px)",
+        }}
+        animate={bgInView ? { x: [0, 16, -6, 0], y: [0, -8, 10, 0], opacity: [0.65, 1, 0.65] } : undefined}
+        transition={{ duration: 24, repeat: Infinity, ease: "easeInOut", delay: 4 }}
+      />
+
       <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none" style={{ opacity: 0.85 }} />
+
+      {/* Central glow — elevates the glass circles off the background */}
+      <motion.div
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none rounded-full"
+        style={{
+          width: "92vmin", height: "92vmin",
+          background: "radial-gradient(circle, rgba(var(--tc3-rgb),0.28) 0%, rgba(var(--tc2-rgb),0.10) 38%, transparent 66%)",
+          filter: "blur(50px)",
+        }}
+        animate={bgInView ? { opacity: [0.75, 1, 0.75], scale: [1, 1.05, 1] } : undefined}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+      />
 
       <motion.div
         className="absolute pointer-events-none rounded-full"
@@ -178,20 +212,17 @@ function RichBackground() {
           border: "0.5px solid rgba(99,179,255,0.06)",
           background: "radial-gradient(circle, rgba(29,115,235,0.03) 0%, transparent 70%)",
         }}
-        animate={{ scale: [1, 1.04, 1], rotate: [0, 8, 0] }}
+        animate={bgInView ? { scale: [1, 1.04, 1], rotate: [0, 8, 0] } : undefined}
         transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
       />
-      <motion.div
-        className="absolute pointer-events-none rounded-full"
-        style={{
-          width: 220, height: 220,
-          bottom: "12%", left: "8%",
-          border: "0.5px solid rgba(139,92,246,0.07)",
-          background: "radial-gradient(circle, rgba(109,40,217,0.04) 0%, transparent 70%)",
-        }}
-        animate={{ scale: [1, 1.06, 1], rotate: [0, -10, 0] }}
-        transition={{ duration: 19, repeat: Infinity, ease: "easeInOut", delay: 3 }}
-      />
+
+      {/* Real WebGL gold dust — genuine depth (particles drift at different
+          Z, catching parallax) instead of a flat painted background. */}
+      <div className="absolute inset-0 pointer-events-none">
+        <LazyCanvas className="w-full h-full" camera={{ position: [0, 0, 5], fov: 45 }}>
+          <HeroGoldDustScene />
+        </LazyCanvas>
+      </div>
 
       <div
         className="absolute inset-0 pointer-events-none"
@@ -207,38 +238,91 @@ function RichBackground() {
 
 // ─── Welcome Banner ────────────────────────────────────────────────────────────
 function WelcomeBanner({ onThemeToggle, show }: { onThemeToggle?: () => void; show: boolean }) {
+  const [hovered, setHovered] = useState(false)
+
   return (
-    <AnimatePresence>
-      {show && (
+    <div className="mb-6 flex justify-center">
         <motion.div
           initial={{ opacity: 0, y: -16, filter: "blur(8px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          animate={show ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: -16, filter: "blur(8px)" }}
           transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
-          className="mb-6 flex justify-center"
+          style={{ pointerEvents: show ? "auto" : "none" }}
         >
-          <button
+          <motion.button
             onClick={onThemeToggle}
-            className="group relative inline-flex cursor-pointer items-center justify-center overflow-hidden rounded-full py-2 px-6 text-sm md:text-base font-semibold transition-all duration-500"
+            onHoverStart={() => setHovered(true)}
+            onHoverEnd={() => setHovered(false)}
+            whileTap={{ scale: 0.97 }}
+            animate={{
+              scale: hovered ? 1.02 : 1,
+              boxShadow: hovered
+                ? "0 12px 32px rgba(198,155,63,0.22), inset 0 1px 0 rgba(255,255,255,0.3)"
+                : "0 6px 18px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.16)",
+              borderColor: hovered ? "rgba(198,155,63,0.5)" : "rgba(198,155,63,0.24)",
+            }}
+            transition={{ duration: 0.35, ease: "easeOut" }}
+            className="group relative flex cursor-pointer items-center overflow-hidden rounded-full py-2 pl-4 pr-5"
             style={{
               background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.2)",
-              backdropFilter: 'none',
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1), 0 4px 14px rgba(0,0,0,0.2)",
+              border: "0.5px solid rgba(198,155,63,0.24)",
+              WebkitBackdropFilter: "blur(28px)",
+              WebkitBackfaceVisibility: "hidden",
             }}
           >
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-full"
-              style={{ background: "linear-gradient(120deg, rgba(255,255,255,0.1) 0%, transparent 60%)" }} />
-            <div className="relative z-10 flex items-center gap-3">
-              <span className="h-2 w-2 rounded-full bg-blue-400 animate-pulse"
-                style={{ boxShadow: "0 0 10px rgba(96,165,250,0.9)" }} />
-              <span className="text-white/80 group-hover:text-white transition-colors duration-300 tracking-wide font-sans">
-                Welcome to My Creative World
+            {/* Liquid Glass Texture — same language as the glass circles / Let's Connect button */}
+            <motion.div
+              className="absolute inset-0 rounded-full"
+              animate={{ opacity: hovered ? 0.22 : 0.1 }}
+              transition={{ duration: 0.28 }}
+              style={{
+                background: `
+                  radial-gradient(circle at 28% 25%, rgba(255,255,255,0.18) 0%, transparent 50%),
+                  radial-gradient(circle at 72% 78%, rgba(198,155,63,0.16) 0%, transparent 40%)
+                `,
+              }}
+            />
+
+            {/* Shine Sweep */}
+            <motion.div
+              className="absolute inset-0 rounded-full"
+              animate={{ x: hovered ? "150%" : "-150%" }}
+              transition={{ duration: 1.1, ease: "easeInOut", repeat: hovered ? Infinity : 0, repeatDelay: 2 }}
+              style={{
+                background:
+                  "linear-gradient(110deg, transparent 15%, rgba(255,255,255,0.12) 38%, rgba(243,226,179,0.14) 55%, rgba(255,255,255,0.05) 68%, transparent 85%)",
+                filter: "blur(2px)",
+              }}
+            />
+
+            {/* Top Inner Highlight */}
+            <div className="absolute inset-0 rounded-full" style={{ boxShadow: "inset 0 2px 5px rgba(255,255,255,0.22)" }} />
+            {/* Bottom Inner Depth */}
+            <div className="absolute inset-0 rounded-full" style={{ boxShadow: "inset 0 -2px 5px rgba(0,0,0,0.12)" }} />
+
+            <div className="relative z-10 flex items-center gap-2.5">
+              <span className="relative flex h-2 w-2 shrink-0">
+                <motion.span
+                  className="absolute inset-0 rounded-full"
+                  style={{ background: "var(--gold-core)" }}
+                  animate={{ scale: [1, 2.4], opacity: [0.55, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+                />
+                <span
+                  className="relative h-2 w-2 rounded-full"
+                  style={{
+                    background: "var(--gold-bead)",
+                    border: "0.5px solid rgba(255,248,230,0.5)",
+                    boxShadow: "0 0 10px rgba(212,175,55,0.85), inset 0 1px 1px rgba(255,255,255,0.6)",
+                  }}
+                />
+              </span>
+              <span className="text-[13px] font-medium tracking-wide text-white/90 group-hover:text-white transition-colors duration-300 font-sans">
+                Welcome to my creative world
               </span>
             </div>
-          </button>
+          </motion.button>
         </motion.div>
-      )}
-    </AnimatePresence>
+    </div>
   )
 }
 
@@ -254,20 +338,34 @@ function StaticHello({ show }: { show: boolean }) {
   }, [])
 
   return (
-    <AnimatePresence>
-      {show && (
-        <motion.div
-          initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+    <div className="mb-3 flex items-center justify-center gap-3">
+        {/* Grows outward away from the text (transformOrigin at the inner
+            edge), starting at the same moment as the name's underline —
+            ~1s after this row's own text has already faded in. */}
+        <motion.span
+          className="h-px w-8 md:w-12"
+          style={{ background: "linear-gradient(90deg, transparent, rgba(198,155,63,0.85))", transformOrigin: "right" }}
+          initial={{ opacity: 0, scaleX: 0 }}
+          animate={show ? { opacity: 1, scaleX: 1 } : { opacity: 0, scaleX: 0 }}
+          transition={{ scaleX: { duration: 1.4, delay: 2.0, ease: "easeInOut" }, opacity: { duration: 0.5, delay: 2.0, ease: "easeOut" } }}
+        />
+        <motion.span
+          className="text-[13px] md:text-sm font-medium tracking-[0.32em] uppercase"
+          initial={{ opacity: 0, y: 12 }}
+          animate={show ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
           transition={{ duration: 0.7, delay: 0.12, ease: [0.23, 1, 0.32, 1] }}
-          className="text-center mb-2"
+          style={{ color: "rgba(255,255,255,0.82)" }}
         >
-          <span className="text-2xl md:text-3xl font-light tracking-widest text-white/70 font-sans">
-            {greeting}, I&apos;m
-          </span>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          {greeting}, I&apos;m
+        </motion.span>
+        <motion.span
+          className="h-px w-8 md:w-12"
+          style={{ background: "linear-gradient(270deg, transparent, rgba(198,155,63,0.85))", transformOrigin: "left" }}
+          initial={{ opacity: 0, scaleX: 0 }}
+          animate={show ? { opacity: 1, scaleX: 1 } : { opacity: 0, scaleX: 0 }}
+          transition={{ scaleX: { duration: 1.4, delay: 2.0, ease: "easeInOut" }, opacity: { duration: 0.5, delay: 2.0, ease: "easeOut" } }}
+        />
+    </div>
   )
 }
 
@@ -275,12 +373,30 @@ function StaticHello({ show }: { show: boolean }) {
 function NameRevealAnimation({ showName }: { showName: boolean }) {
   const textRef = useRef<SVGTextElement>(null)
   const styleRef = useRef<HTMLStyleElement | null>(null)
+  const svgRef = useRef<SVGSVGElement>(null)
+  const hoverGradRef = useRef<SVGRadialGradientElement>(null)
+  const [isHovering, setIsHovering] = useState(false)
+  const rafRef = useRef<number | null>(null)
+
+  const onNameMove = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
+    if (rafRef.current !== null) return
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null
+      const svg = svgRef.current
+      if (!svg) return
+      const r = svg.getBoundingClientRect()
+      const x = ((e.clientX - r.left) / r.width) * 1900
+      const y = ((e.clientY - r.top) / r.height) * 220
+      hoverGradRef.current?.setAttribute("cx", String(x))
+      hoverGradRef.current?.setAttribute("cy", String(y))
+    })
+  }, [])
 
   const generateKeyframes = useCallback(() => `
     @keyframes stroke-draw {
-      0%   { fill: transparent; stroke: rgba(255,255,255,0.85); stroke-dashoffset: 25%; stroke-dasharray: 0 50%; stroke-width: 0.4; opacity: 0; }
-      50%  { fill: transparent; stroke: rgba(255,255,255,0.95); stroke-dashoffset: 0%; stroke-dasharray: 20% 0; stroke-width: 1; opacity: 1; }
-      72%  { fill: transparent; stroke: rgba(255,255,255,0.9); stroke-width: 1; opacity: 1; }
+      0%   { fill: transparent; stroke: rgba(226,240,255,0.85); stroke-dashoffset: 25%; stroke-dasharray: 0 50%; stroke-width: 0.4; opacity: 0; }
+      50%  { fill: transparent; stroke: rgba(226,240,255,0.95); stroke-dashoffset: 0%; stroke-dasharray: 20% 0; stroke-width: 1; opacity: 1; }
+      72%  { fill: transparent; stroke: rgba(226,240,255,0.9); stroke-width: 1; opacity: 1; }
       100% { fill: url(#nameGradient); stroke: transparent; stroke-dashoffset: -25%; stroke-dasharray: 50% 0; stroke-width: 0; opacity: 1; }
     }
   `, [])
@@ -308,46 +424,134 @@ function NameRevealAnimation({ showName }: { showName: boolean }) {
     }
   }, [generateKeyframes, showName])
 
-  if (!showName) return null
-
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.97, filter: "blur(4px)" }}
-      animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+      animate={showName ? { opacity: 1, scale: 1, filter: "blur(0px)" } : { opacity: 0, scale: 0.97, filter: "blur(4px)" }}
       transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
       className="flex flex-col items-center"
     >
-      <svg viewBox="0 0 1320 120" className="w-[90vw] h-[90px] md:h-[120px] max-w-[1000px]">
+      <svg
+        ref={svgRef}
+        viewBox="0 0 1900 220"
+        className="w-[78vmin] h-auto max-w-[860px]"
+        onMouseMove={onNameMove}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+        style={{ cursor: "default", userSelect: "none" }}
+      >
         <defs>
           <linearGradient id="nameGradient" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stopColor="#ffffff" />
-            <stop offset="50%" stopColor="#f8fafc" />
-            <stop offset="100%" stopColor="#94a3b8" />
+            <stop offset="55%" stopColor="#dce8fb" />
+            <stop offset="100%" stopColor="#8ea3c2" />
           </linearGradient>
           <filter id="nameGlow" x="-15%" y="-15%" width="130%" height="130%">
             <feGaussianBlur stdDeviation="3" result="blur" />
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          </filter>
+          {/* Antique metallic gold — the name's true material, kept hidden
+              under the modern white fill above until the cursor reveals it.
+              A banded gradient (dark shadow → bright specular → dark again)
+              reads as real metal instead of a flat tint. */}
+          <linearGradient id="nameAntiqueGold" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#9c7a2e" />
+            <stop offset="22%" stopColor="#e0ad54" />
+            <stop offset="42%" stopColor="#fff3d4" />
+            <stop offset="58%" stopColor="#f3d18a" />
+            <stop offset="78%" stopColor="#c9a04a" />
+            <stop offset="100%" stopColor="#e0ad54" />
+          </linearGradient>
+          {/* gold hover spotlight — position updated on mousemove, in viewBox
+              units, so the reveal below tracks the cursor exactly. Single,
+              modest radius — a subtle, contained reveal, not a dramatic one. */}
+          <radialGradient
+            ref={hoverGradRef}
+            id="nameHoverGrad"
+            gradientUnits="userSpaceOnUse"
+            cx="950" cy="110" r="150"
+          >
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="1" />
+            <stop offset="50%" stopColor="#ffffff" stopOpacity="0.65" />
+            <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+          </radialGradient>
+          {/* the mask's own alpha comes only from the spotlight above, so the
+              gold reveal is confined to wherever the cursor currently is */}
+          <mask id="nameHoverMask" maskUnits="userSpaceOnUse" x="0" y="0" width="1900" height="220">
+            <rect x="0" y="0" width="1900" height="220" fill="url(#nameHoverGrad)" />
+          </mask>
+          {/* a soft glow halo merged behind the crisp gold glyphs — richer
+              than a flat fill, still contained and tasteful */}
+          <filter id="nameBloomSoft" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="3.2" result="glow" />
+            <feMerge>
+              <feMergeNode in="glow" />
+              <feMergeNode in="glow" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
           </filter>
         </defs>
         <text
           ref={textRef}
           x="50%" y="50%" dy=".35em"
           textAnchor="middle"
-          className="uppercase tracking-widest font-black"
+          className="uppercase font-bold"
           style={{
-            fontFamily: "var(--font-jakarta), system-ui, sans-serif",
-            fontSize: "clamp(36px, 9vw, 100px)",
+            fontFamily: "var(--font-space-grotesk), system-ui, sans-serif",
+            fontSize: "172px",
+            fontWeight: 800,
             strokeLinejoin: "round",
             fill: "transparent",
             stroke: "transparent",
             opacity: 0,
             filter: "url(#nameGlow)",
-            letterSpacing: "0.04em",
+            letterSpacing: "-0.005em",
+            cursor: "default",
+            userSelect: "none",
           }}
         >
           MAHIDHAR REDDY G
         </text>
+
+        {/* antique gold reveal — identical glyph shape underneath the white
+            name above. The cursor spotlight mask is the ONLY thing that
+            makes it visible, so hovering subtly reveals the metallic gold
+            beneath, never past the glyph outlines themselves. One quiet
+            layer — restrained, not a dramatic spotlight. */}
+        <text
+          x="50%" y="50%" dy=".35em"
+          textAnchor="middle"
+          className="uppercase font-bold pointer-events-none"
+          style={{
+            fontFamily: "var(--font-space-grotesk), system-ui, sans-serif",
+            fontSize: "172px",
+            fontWeight: 800,
+            letterSpacing: "-0.005em",
+            fill: "url(#nameAntiqueGold)",
+            opacity: isHovering ? 0.85 : 0,
+            transition: "opacity 0.5s ease-out",
+            filter: "url(#nameBloomSoft)",
+          }}
+          mask="url(#nameHoverMask)"
+        >
+          MAHIDHAR REDDY G
+        </text>
       </svg>
+      {/* gold accent rule beneath the name — scaleX from a center origin so
+          it visibly draws outward from the middle, not left-to-right. Gated
+          on showName, starting 1s after the name's own stroke-draw begins
+          (that starts 100ms after showName, so 1.1s total) and running the
+          same 3.5s duration. Same width as the roles pill. */}
+      <motion.div
+        className="h-px mt-1 w-[300px] sm:w-[340px] md:w-[380px]"
+        style={{
+          background: "linear-gradient(90deg, transparent, var(--gold-core) 20%, var(--gold-hi) 50%, var(--gold-core) 80%, transparent)",
+          transformOrigin: "center",
+        }}
+        initial={{ scaleX: 0, opacity: 0 }}
+        animate={showName ? { scaleX: 1, opacity: 0.85 } : { scaleX: 0, opacity: 0 }}
+        transition={{ scaleX: { duration: 3.5, delay: 1.1, ease: "easeInOut" }, opacity: { duration: 0.6, delay: 1.1, ease: "easeOut" } }}
+      />
     </motion.div>
   )
 }
@@ -355,11 +559,26 @@ function NameRevealAnimation({ showName }: { showName: boolean }) {
 // ─── Roles Decryption ─────────────────────────────────────────────────────────
 function RolesDecryption({ showRoles }: { showRoles: boolean }) {
   const roles = [
-    "Full Stack Developer",
-    "UI/UX Designer",
-    "AI/ML Enthusiast",
-    "Creative Problem Solver",
-    "Digital Innovator",
+    {
+      label: "Full Stack Developer",
+      icon: <path d="M8 6 2 12l6 6M16 6l6 6-6 6" />,
+    },
+    {
+      label: "UI/UX Designer",
+      icon: <path d="M12 19 19 12l3 3-7 7-3-3ZM17 14 15.5 6.5 3 4l2.5 12.5L13 19l4-5Z" />,
+    },
+    {
+      label: "AI/ML Enthusiast",
+      icon: <><rect x="6" y="6" width="12" height="12" rx="2" /><path d="M12 1v4M12 19v4M1 12h4M19 12h4" /></>,
+    },
+    {
+      label: "Creative Problem Solver",
+      icon: <><path d="M9 18h6M10 22h4M15.09 14c.18-1.02.6-1.65 1.29-2.34A6 6 0 1 0 8.5 12c.32.55.55 1.15.7 1.66.14.51.22.87.31 1.34" /></>,
+    },
+    {
+      label: "Digital Innovator",
+      icon: <><path d="M12 2l1.7 4.8L18 8.5l-4.3 1.7L12 15l-1.7-4.8L6 8.5l4.3-1.7L12 2Z" /><path d="M19 14l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2L16 17l2.2-.8L19 14Z" /></>,
+    },
   ]
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
   const [triggerAnimation, setTriggerAnimation] = useState(false)
@@ -380,20 +599,130 @@ function RolesDecryption({ showRoles }: { showRoles: boolean }) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: showRoles ? 1 : 0, y: showRoles ? 0 : 10 }}
       transition={{ duration: 0.9, ease: [0.23, 1, 0.32, 1] }}
-      className="text-center mt-1 h-[40px] md:h-[56px] flex items-center justify-center"
+      className="mt-4 flex items-center justify-center"
     >
-      <div className="text-2xl md:text-4xl font-light tracking-wider font-sans">
-        <HyperText
-          key={`role-${currentRoleIndex}`}
-          triggerAnimation={triggerAnimation}
-          animateOnHover={true}
-          duration={2500}
-          animationDirection="center-out"
-          className="bg-gradient-to-r from-blue-200 via-white to-blue-200 bg-clip-text text-transparent font-medium"
-          characterSet={["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]}
+      <div
+        className="relative rounded-full"
+        style={{
+          padding: "1px",
+          background: "rgba(255,255,255,0.09)",
+          boxShadow: "0 0 0 1px rgba(200,147,46,0.16), 0 16px 36px -16px rgba(2,6,23,0.7), 0 8px 18px -6px rgba(0,0,0,0.55)",
+        }}
+      >
+        <div
+          className="relative z-10 flex items-center gap-3 rounded-full pl-3.5 pr-4 py-2 w-[300px] sm:w-[340px] md:w-[380px] overflow-hidden"
+          style={{
+            background: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.04) 0%, rgba(var(--tc4-rgb),0.07) 55%, rgba(0,0,0,0.12) 100%)",
+            backdropFilter: "blur(10px) saturate(120%)",
+            WebkitBackdropFilter: "blur(10px) saturate(120%)",
+            WebkitBackfaceVisibility: "hidden",
+          }}
         >
-          {roles[currentRoleIndex]}
-        </HyperText>
+        {/* Specular highlight — same top-left glass catch-light the circles use */}
+        <div
+          className="absolute inset-0 rounded-full pointer-events-none"
+          style={{
+            background: "radial-gradient(ellipse at 24% 20%, rgba(230,245,255,0.14) 0%, rgba(190,235,255,0.06) 22%, transparent 48%)",
+          }}
+        />
+        {/* Ambient pool — same bottom blue glass pool the circles use */}
+        <div
+          className="absolute inset-0 rounded-full pointer-events-none"
+          style={{
+            background: "radial-gradient(ellipse at 50% 120%, rgba(var(--tc1-rgb),0.22) 0%, rgba(var(--tc1-rgb),0.06) 55%, transparent 80%)",
+          }}
+        />
+        {/* a hint of gold warmth, kept sparing — the accent, not the material */}
+        <div
+          className="absolute inset-0 rounded-full pointer-events-none"
+          style={{ opacity: 0.1, background: "radial-gradient(circle at 76% 84%, rgba(200,147,46,0.28) 0%, transparent 40%)" }}
+        />
+
+        {/* Top Inner Highlight */}
+        <div className="absolute inset-0 rounded-full" style={{ boxShadow: "inset 0 2px 5px rgba(255,255,255,0.18)" }} />
+        {/* Bottom Inner Depth */}
+        <div className="absolute inset-0 rounded-full" style={{ boxShadow: "inset 0 -2px 5px rgba(0,0,0,0.15)" }} />
+
+        {/* role icon — a glass roundel matching the pill's own material
+            (same blue-tinted glass, not a dark gold disc), sized to feel
+            proportionate to the pill's height rather than a small chip */}
+        <span className="relative flex items-center justify-center shrink-0" style={{ width: "32px", height: "32px" }}>
+          <span
+            className="absolute inset-0 rounded-full"
+            style={{
+              background: "radial-gradient(circle at 30% 28%, rgba(255,255,255,0.16) 0%, rgba(var(--tc1-rgb),0.12) 45%, rgba(0,0,0,0.1) 100%)",
+              backdropFilter: "blur(6px) saturate(120%)",
+              WebkitBackdropFilter: "blur(6px) saturate(120%)",
+              border: "1px solid rgba(224,173,84,0.35)",
+              boxShadow: "inset 0 1px 1px rgba(255,255,255,0.2), inset 0 -1px 2px rgba(0,0,0,0.2)",
+            }}
+          />
+          <AnimatePresence mode="wait">
+            <motion.svg
+              key={`icon-${currentRoleIndex}`}
+              className="relative"
+              width="17" height="17" viewBox="0 0 24 24" fill="none"
+              stroke="var(--accent-2)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+              initial={{ opacity: 0, scale: 0.6, rotate: -25 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              exit={{ opacity: 0, scale: 0.6, rotate: 25 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {roles[currentRoleIndex].icon}
+            </motion.svg>
+          </AnimatePresence>
+        </span>
+
+        <div className="relative h-[26px] md:h-[30px] flex-1 flex items-center justify-center overflow-hidden">
+          <AnimatePresence mode="popLayout">
+            <motion.div
+              key={`wrap-${currentRoleIndex}`}
+              initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <HyperText
+                triggerAnimation={triggerAnimation}
+                animateOnHover={false}
+                duration={2200}
+                animationDirection="center-out"
+                className="text-[15px] md:text-[17px] font-medium tracking-[0.04em] whitespace-nowrap"
+                style={{ color: "rgba(255,255,255,0.95)", fontFamily: "var(--font-jetbrains-mono), ui-monospace, monospace", textShadow: "0 1px 3px rgba(0,0,0,0.4)" }}
+                characterSet={["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]}
+              >
+                {roles[currentRoleIndex].label}
+              </HyperText>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* role ticks — a quiet non-numeric progress read, the active one lit gold */}
+        <div className="flex items-center gap-[3px] shrink-0 pl-2" style={{ borderLeft: "0.5px solid rgba(200,147,46,0.22)" }} aria-hidden>
+          {roles.map((_, i) => (
+            <span
+              key={i}
+              className="rounded-full transition-all duration-500"
+              style={
+                i === currentRoleIndex
+                  ? { width: "10px", height: "3px", background: "var(--accent-2)", boxShadow: "0 0 5px rgba(224,173,84,0.7)" }
+                  : { width: "3px", height: "3px", background: "rgba(255,255,255,0.18)" }
+              }
+            />
+          ))}
+        </div>
+
+        {/* progress rule along the bottom edge — fills over the role's dwell time */}
+        <motion.span
+          key={`rule-${currentRoleIndex}`}
+          className="absolute left-4 right-4 -bottom-px h-px rounded-full origin-left"
+          style={{ background: "linear-gradient(90deg, var(--accent), var(--accent-2))" }}
+          initial={{ scaleX: 0, opacity: 0.9 }}
+          animate={{ scaleX: 1 }}
+          transition={{ duration: 6, ease: "linear" }}
+          aria-hidden
+        />
+        </div>
       </div>
     </motion.div>
   )
@@ -409,48 +738,91 @@ function LetsConnectButton({
 }) {
   const [hovered, setHovered] = useState(false)
 
+  // HoverBorderGradient-style border — a bright highlight continuously
+  // travels around the rim by sweeping the conic-gradient's own angle
+  // (never a CSS transform rotate, which would swing this wide pill's
+  // corners outside its own footprint). Always running, speeds up on hover.
+  const borderRef = useRef<HTMLDivElement>(null)
+  const hoveredRef = useRef(false)
+  useEffect(() => {
+    let angle = 0
+    let raf: number
+    let last = performance.now()
+    const tick = (now: number) => {
+      const dt = now - last
+      last = now
+      const speed = hoveredRef.current ? 90 : 30 // deg/sec
+      angle = (angle + (speed * dt) / 1000) % 360
+      if (borderRef.current) {
+        borderRef.current.style.background = `conic-gradient(from ${angle}deg,
+          rgba(122,95,34,0.3) 0deg,
+          rgba(198,155,63,0.5) 70deg,
+          #fff8e6 110deg,
+          rgba(230,192,90,0.6) 150deg,
+          rgba(122,95,34,0.25) 220deg,
+          rgba(198,155,63,0.4) 300deg,
+          rgba(122,95,34,0.3) 360deg)`
+      }
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [])
+
   return (
-    <AnimatePresence>
-      {show && (
+    <div className="flex justify-center">
         <motion.div
           initial={{ opacity: 0, y: 20, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -10, scale: 0.95 }}
+          animate={show ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 20, scale: 0.95 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="flex justify-center"
+          style={{ pointerEvents: show ? "auto" : "none" }}
         >
           <motion.button
             onClick={onClick}
-            onHoverStart={() => setHovered(true)}
-            onHoverEnd={() => setHovered(false)}
-            whileTap={{ scale: 0.97 }}
+            onHoverStart={() => { setHovered(true); hoveredRef.current = true }}
+            onHoverEnd={() => { setHovered(false); hoveredRef.current = false }}
+            whileTap={{ scale: 0.96 }}
             animate={{
-              y: hovered ? -2 : 0,
+              scale: hovered ? 1.02 : 1,
               boxShadow: hovered
-                ? "0 16px 45px rgba(59,130,246,0.3), 0 10px 30px rgba(59,130,246,0.15), inset 0 1px 0 rgba(255,255,255,0.35)"
-                : "0 10px 30px rgba(0,0,0,0.25), 0 5px 15px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.2)",
+                ? "0 20px 50px -12px rgba(0,0,0,0.55), 0 8px 22px -6px rgba(0,0,0,0.5)"
+                : "0 10px 30px -10px rgba(0,0,0,0.4), 0 4px 14px -4px rgba(0,0,0,0.3)",
             }}
             transition={{ duration: 0.35, ease: "easeOut" }}
-            className="group relative flex items-center gap-3.5 overflow-hidden rounded-full"
-            style={{
-              padding: "9px 12px 9px 26px",
-              background: "rgba(255, 255, 255, 0.07)",
-              border: "0.5px solid rgba(255, 255, 255, 0.22)",
-              backdropFilter: 'none',
-              WebkitBackdropFilter: "blur(35px)",
-              borderRadius: "9999px",
-            }}
+            className="relative rounded-full"
+            style={{ padding: "1.6px" }}
           >
-            {/* Liquid Glass Texture */}
+            {/* the travelling gradient border */}
+            <div ref={borderRef} className="absolute inset-0 rounded-full pointer-events-none" />
+
+            <div
+              className="group relative flex items-center gap-2.5 overflow-hidden rounded-full"
+              style={{
+                padding: "6px 7px 6px 20px",
+                background: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.04) 0%, rgba(var(--tc4-rgb),0.07) 55%, rgba(0,0,0,0.12) 100%)",
+                backdropFilter: "blur(10px) saturate(120%)",
+                WebkitBackdropFilter: "blur(10px) saturate(120%)",
+                WebkitBackfaceVisibility: "hidden",
+              }}
+            >
+            {/* Specular highlight — same top-left glass catch-light the
+                circles / roles pill use */}
+            <div
+              className="absolute inset-0 rounded-full pointer-events-none"
+              style={{ background: "radial-gradient(ellipse at 24% 20%, rgba(230,245,255,0.14) 0%, rgba(190,235,255,0.06) 22%, transparent 48%)" }}
+            />
+            {/* Ambient pool — same bottom blue glass pool the circles / roles pill use */}
+            <div
+              className="absolute inset-0 rounded-full pointer-events-none"
+              style={{ background: "radial-gradient(ellipse at 50% 120%, rgba(var(--tc1-rgb),0.22) 0%, rgba(var(--tc1-rgb),0.06) 55%, transparent 80%)" }}
+            />
+            {/* Liquid Glass Texture — glass only, no gold tint */}
             <motion.div
               className="absolute inset-0 rounded-full"
-              animate={{ opacity: hovered ? 0.18 : 0.09 }}
+              animate={{ opacity: hovered ? 0.22 : 0.1 }}
               transition={{ duration: 0.28 }}
               style={{
-                background: `
-                  radial-gradient(circle at 30% 20%, rgba(255,255,255,0.18) 0%, transparent 50%),
-                  radial-gradient(circle at 70% 80%, rgba(59,130,246,0.12) 0%, transparent 40%)
-                `,
+                background: "radial-gradient(circle at 30% 20%, rgba(255,255,255,0.18) 0%, transparent 50%)",
               }}
             />
 
@@ -466,7 +838,7 @@ function LetsConnectButton({
               }}
               style={{
                 background:
-                  "linear-gradient(110deg, transparent 15%, rgba(255,255,255,0.14) 40%, rgba(255,255,255,0.08) 60%, transparent 85%)",
+                  "linear-gradient(110deg, transparent 15%, rgba(255,255,255,0.14) 38%, rgba(255,255,255,0.18) 55%, rgba(255,255,255,0.06) 68%, transparent 85%)",
                 filter: "blur(2px)",
               }}
             />
@@ -474,93 +846,56 @@ function LetsConnectButton({
             {/* Top Inner Highlight */}
             <div
               className="absolute inset-0 rounded-full"
-              style={{ boxShadow: "inset 0 2px 5px rgba(255,255,255,0.28)" }}
+              style={{ boxShadow: "inset 0 2px 5px rgba(255,255,255,0.22)" }}
             />
 
             {/* Bottom Inner Depth */}
             <div
               className="absolute inset-0 rounded-full"
-              style={{ boxShadow: "inset 0 -2px 5px rgba(0,0,0,0.12)" }}
+              style={{ boxShadow: "inset 0 -2px 5px rgba(0,0,0,0.2)" }}
             />
 
-            {/* Text - smaller, sleeker */}
+            {/* Text */}
             <span
               className="relative z-10 font-medium"
               style={{
                 color: "#fff",
-                fontSize: "14px",
-                fontWeight: 550,
-                letterSpacing: "-0.015em",
+                fontSize: "13px",
+                fontWeight: 500,
+                letterSpacing: "-0.01em",
                 textShadow: "0 1px 2px rgba(0,0,0,0.25)",
               }}
             >
-              Let's Connect
+              Let&apos;s Connect
             </span>
 
-            {/* Full Liquid Glass Circle */}
+            {/* Icon disc — glass only, no gold fill on hover */}
             <motion.div
-              animate={{
-                scale: hovered ? 1.06 : 1,
-                background: hovered
-                  ? "rgba(59,130,246,0.25)"
-                  : "rgba(255,255,255,0.06)",
-                border: hovered
-                  ? "0.5px solid rgba(59,130,246,0.45)"
-                  : "0.5px solid rgba(255,255,255,0.24)",
-              }}
-              transition={{
-                type: "spring",
-                stiffness: 340,
-                damping: 22,
-              }}
+              animate={{ scale: hovered ? 1.06 : 1 }}
+              transition={{ type: "spring", stiffness: 340, damping: 22 }}
               className="relative z-10 flex items-center justify-center rounded-full overflow-hidden"
               style={{
-                width: "42px",
-                height: "42px",
-                backdropFilter: 'none',
-                WebkitBackdropFilter: "blur(22px)",
+                width: "34px",
+                height: "34px",
+                background: "rgba(255,255,255,0.06)",
+                border: "0.5px solid rgba(255,255,255,0.24)",
               }}
             >
-              {/* Liquid Glow */}
-              <motion.div
-                className="absolute inset-0 rounded-full"
-                animate={{
-                  opacity: hovered ? 0.75 : 0,
-                  scale: hovered ? 1.15 : 0.5,
-                }}
-                transition={{ duration: 0.35, ease: "easeOut" }}
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(59,130,246,0.55) 0%, rgba(59,130,246,0.2) 50%, rgba(59,130,246,0) 75%)",
-                  filter: "blur(8px)",
-                }}
-              />
-
               {/* Specular Reflection */}
               <motion.div
                 className="absolute inset-0 rounded-full"
-                animate={{ opacity: hovered ? 0.22 : 0.08 }}
+                animate={{ opacity: hovered ? 0.24 : 0.08 }}
                 transition={{ duration: 0.28 }}
-                style={{
-                  background:
-                    "radial-gradient(circle at 30% 25%, rgba(255,255,255,0.35) 0%, transparent 50%)",
-                }}
+                style={{ background: "radial-gradient(circle at 30% 25%, rgba(255,255,255,0.35) 0%, transparent 50%)" }}
               />
-
               {/* Arrow - East (0°), Northeast (45°) on hover */}
               <motion.svg
-                width="18"
-                height="18"
+                width="15"
+                height="15"
                 viewBox="0 0 24 24"
                 fill="none"
-                animate={{
-                  rotate: hovered ? 45 : 0,
-                }}
-                transition={{
-                  type: "spring",
-                  stiffness: 320,
-                  damping: 22,
-                }}
+                animate={{ rotate: hovered ? 45 : 0 }}
+                transition={{ type: "spring", stiffness: 320, damping: 22 }}
                 className="relative z-10"
               >
                 <path
@@ -569,31 +904,13 @@ function LetsConnectButton({
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  style={{
-                    filter: hovered ? "drop-shadow(0 0 5px rgba(255,255,255,0.65))" : "none",
-                  }}
                 />
               </motion.svg>
             </motion.div>
-
-            {/* Bottom Glow Line */}
-            <motion.div
-              className="absolute bottom-0 left-1/2 -translate-x-1/2 rounded-full"
-              animate={{
-                opacity: hovered ? 0.45 : 0,
-                width: hovered ? "75%" : "0%",
-              }}
-              transition={{ duration: 0.35 }}
-              style={{
-                height: "2px",
-                background: "rgba(59,130,246,0.65)",
-                filter: "blur(6px)",
-              }}
-            />
+            </div>
           </motion.button>
         </motion.div>
-      )}
-    </AnimatePresence>
+    </div>
   )
 }
 
@@ -608,36 +925,36 @@ function GlassCircles({
   const rings = [
     {
       baseOpacity: 0.5,
-      bg: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.03) 0%, rgba(30,58,138,0.05) 50%, rgba(0,0,0,0.1) 100%)",
+      bg: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.03) 0%, rgba(var(--tc4-rgb),0.05) 50%, rgba(0,0,0,0.1) 100%)",
       border: "1px solid rgba(255, 255, 255, 0.05)",
       backdropFilter: "blur(16px) saturate(120%)",
       innerTop: "inset 0 2px 10px rgba(255,255,255,0.1)",
-      innerBottom: "inset 0 -2px 10px rgba(59,130,246,0.15)",
-      glow: "0 0 60px rgba(29,78,216,0.15), inset 0 0 40px rgba(29,78,216,0.1)",
+      innerBottom: "inset 0 -2px 10px rgba(var(--tc1-rgb),0.15)",
+      glow: "0 0 60px rgba(var(--tc5-rgb),0.15), inset 0 0 40px rgba(var(--tc5-rgb),0.1)",
       dropShadow: "0 40px 80px rgba(2,6,23,0.6), 0 20px 40px rgba(2,6,23,0.8)",
-      ambientPool: "radial-gradient(ellipse at 50% 100%, rgba(59,130,246,0.5) 0%, rgba(59,130,246,0.15) 60%, transparent 85%)",
+      ambientPool: "radial-gradient(ellipse at 50% 100%, rgba(var(--tc1-rgb),0.5) 0%, rgba(var(--tc1-rgb),0.15) 60%, transparent 85%)",
     },
     {
       baseOpacity: 0.65,
-      bg: "radial-gradient(circle at 70% 30%, rgba(255,255,255,0.04) 0%, rgba(30,58,138,0.06) 50%, rgba(0,0,0,0.05) 100%)",
+      bg: "radial-gradient(circle at 70% 30%, rgba(255,255,255,0.04) 0%, rgba(var(--tc4-rgb),0.06) 50%, rgba(0,0,0,0.05) 100%)",
       border: "1px solid rgba(255, 255, 255, 0.08)",
       backdropFilter: "blur(10px) saturate(110%)",
       innerTop: "inset 0 1px 8px rgba(255,255,255,0.15)",
-      innerBottom: "inset 0 -1px 8px rgba(59,130,246,0.2)",
-      glow: "0 0 40px rgba(37,99,235,0.2), inset 0 0 30px rgba(37,99,235,0.15)",
+      innerBottom: "inset 0 -1px 8px rgba(var(--tc1-rgb),0.2)",
+      glow: "0 0 40px rgba(var(--tc3-rgb),0.2), inset 0 0 30px rgba(var(--tc3-rgb),0.15)",
       dropShadow: "0 40px 80px rgba(2,6,23,0.7), 0 20px 40px rgba(2,6,23,0.8)",
-      ambientPool: "radial-gradient(ellipse at 50% 100%, rgba(59,130,246,0.4) 0%, rgba(59,130,246,0.1) 50%, transparent 75%)",
+      ambientPool: "radial-gradient(ellipse at 50% 100%, rgba(var(--tc1-rgb),0.4) 0%, rgba(var(--tc1-rgb),0.1) 50%, transparent 75%)",
     },
     {
       baseOpacity: 0.8,
-      bg: "radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 0%, rgba(30,58,138,0.08) 100%)",
+      bg: "radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 0%, rgba(var(--tc4-rgb),0.08) 100%)",
       border: "1px solid rgba(255, 255, 255, 0.12)",
       backdropFilter: "blur(6px) saturate(100%)",
       innerTop: "inset 0 1px 5px rgba(255,255,255,0.2)",
-      innerBottom: "inset 0 -1px 5px rgba(59,130,246,0.25)",
-      glow: "0 0 30px rgba(59,130,246,0.25), inset 0 0 20px rgba(59,130,246,0.2)",
+      innerBottom: "inset 0 -1px 5px rgba(var(--tc1-rgb),0.25)",
+      glow: "0 0 30px rgba(var(--tc1-rgb),0.25), inset 0 0 20px rgba(var(--tc1-rgb),0.2)",
       dropShadow: "0 50px 100px rgba(2,6,23,0.8), 0 25px 50px rgba(2,6,23,0.9)",
-      ambientPool: "radial-gradient(ellipse at 50% 100%, rgba(59,130,246,0.3) 0%, transparent 50%)",
+      ambientPool: "radial-gradient(ellipse at 50% 100%, rgba(var(--tc1-rgb),0.3) 0%, transparent 50%)",
     },
   ]
 
@@ -693,25 +1010,25 @@ function GlassCircles({
             >
 
             {/* Animation glow target - Driven by intro sequence */}
-            <motion.div 
-              className="absolute inset-0 rounded-full pointer-events-none mix-blend-screen" 
+            <motion.div
+              className="absolute inset-0 rounded-full pointer-events-none mix-blend-screen"
               initial={{ opacity: 0 }}
-              animate={config.glowControls} 
+              animate={config.glowControls}
               style={{
-                boxShadow: "0 0 150px rgba(37,99,235,0.7), 0 0 120px rgba(29,78,216,0.8), 0 0 180px rgba(30,58,138,0.7), 0 0 250px rgba(15,23,42,0.6)",
+                boxShadow: "0 0 150px rgba(var(--tc3-rgb),0.7), 0 0 120px rgba(var(--tc5-rgb),0.8), 0 0 180px rgba(var(--tc4-rgb),0.7), 0 0 250px rgba(15,23,42,0.6)",
               }}
             />
 
             {/* Hover glow target - Decoupled for instant interactivity */}
-            <motion.div 
-              className="absolute inset-0 rounded-full pointer-events-none mix-blend-screen" 
+            <motion.div
+              className="absolute inset-0 rounded-full pointer-events-none mix-blend-screen"
               variants={{
                 initial: { opacity: 0 },
                 hover: { opacity: 1, transition: { duration: 0.05, ease: "easeOut" } }
               }}
               style={{
-                boxShadow: "inset 0 0 150px rgba(37,99,235,0.7), 0 0 140px rgba(29,78,216,0.8), 0 0 220px rgba(30,58,138,0.7), 0 0 350px rgba(15,23,42,0.6)",
-                background: "radial-gradient(circle at 50% 50%, rgba(37,99,235,0.5) 0%, transparent 95%)",
+                boxShadow: "inset 0 0 150px rgba(var(--tc3-rgb),0.7), 0 0 140px rgba(var(--tc5-rgb),0.8), 0 0 220px rgba(var(--tc4-rgb),0.7), 0 0 350px rgba(15,23,42,0.6)",
+                background: "radial-gradient(circle at 50% 50%, rgba(var(--tc3-rgb),0.5) 0%, transparent 95%)",
                 backdropFilter: "saturate(250%) contrast(150%)",
               }}
             />
@@ -743,44 +1060,67 @@ function StatusBar() {
       animate={{ opacity: 1 }}
       transition={{ delay: 0.4, duration: 1 }}
     >
-      <div className="text-white/18 text-xs font-medium tracking-[0.28em] uppercase">MRG</div>
-      <div className="flex items-center gap-1.5">
-        {[0, 1, 2].map((i) => (
-          <motion.div key={i} className="w-0.5 h-0.5 rounded-full"
-            style={{ background: "rgba(255,255,255,0.2)" }}
-            animate={{ opacity: [0.2, 0.55, 0.2] }}
-            transition={{ duration: 2.4, repeat: Infinity, delay: i * 0.5 }}
-          />
-        ))}
-      </div>
-      <div className="text-white/18 text-xs font-medium tabular-nums">{time}</div>
+      {/* Left: identity mark */}
+      <span className="lo-meta" style={{ color: "rgba(255,255,255,0.3)", letterSpacing: "0.3em" }}>MRG</span>
+
+      {/* Right: live time */}
+      <div className="lo-meta tabular-nums" style={{ color: "rgba(255,255,255,0.3)", letterSpacing: "0.16em" }}>{time}</div>
     </motion.div>
   )
 }
 
-// ─── Corner Marquees ──────────────────────────────────────────────────────────
-function CornerMarquees() {
+// ─── Corner Registration Marks (observatory framing) ──────────────────────────
+function CornerFrame() {
+  const stroke = "rgba(120,170,255,0.22)"
+  const goldStroke = "rgba(198,155,63,0.4)"
+  const corner = (pos: string, d: string, color = stroke) => (
+    <svg
+      className={`absolute ${pos} z-30 pointer-events-none`}
+      width="46" height="46" viewBox="0 0 46 46" fill="none"
+    >
+      <path d={d} stroke={color} strokeWidth="1" strokeLinecap="round" />
+    </svg>
+  )
   return (
-    <>
-      <div className="absolute top-0 left-0 z-30 pointer-events-none">
-        <div className="w-32 h-8 overflow-hidden transform -rotate-45 origin-bottom-left">
-          <div className="flex whitespace-nowrap animate-marquee-left">
-            {["PORTFOLIO", "PORTFOLIO", "PORTFOLIO", "PORTFOLIO"].map((t, i) => (
-              <span key={i} className="text-blue-300/25 text-xs font-bold tracking-wider mx-2">{t}</span>
-            ))}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.6, duration: 1.2 }}
+      className="absolute inset-0 pointer-events-none"
+    >
+      {/* dual-tone: gold on the diagonal pair, blue on the other — a deliberate, restrained accent */}
+      {corner("top-6 left-6", "M1 15 L1 1 L15 1", goldStroke)}
+      {corner("top-6 right-6", "M45 15 L45 1 L31 1")}
+      {corner("bottom-6 left-6", "M1 31 L1 45 L15 45")}
+      {corner("bottom-6 right-6", "M45 31 L45 45 L31 45", goldStroke)}
+    </motion.div>
+  )
+}
+
+// ─── Scroll Cue ───────────────────────────────────────────────────────────────
+function ScrollCue({ show }: { show: boolean }) {
+  return (
+    <AnimatePresence>
+      {show && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute bottom-7 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-2 pointer-events-none"
+        >
+          <span className="lo-meta" style={{ letterSpacing: "0.3em" }}>Scroll</span>
+          <div className="relative h-9 w-[22px] rounded-full" style={{ border: "1px solid var(--lo-hairline-strong)" }}>
+            <motion.span
+              className="absolute left-1/2 top-1.5 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-sky-400"
+              animate={{ y: [0, 12, 0], opacity: [1, 0.2, 1] }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+              style={{ boxShadow: "0 0 8px rgba(var(--tc2-rgb),0.8)" }}
+            />
           </div>
-        </div>
-      </div>
-      <div className="absolute top-0 right-0 z-30 pointer-events-none">
-        <div className="w-32 h-8 overflow-hidden transform rotate-45 origin-bottom-right">
-          <div className="flex whitespace-nowrap animate-marquee-right">
-            {["DEVELOPER", "DEVELOPER", "DEVELOPER", "DEVELOPER"].map((t, i) => (
-              <span key={i} className="text-blue-300/25 text-xs font-bold tracking-wider mx-2">{t}</span>
-            ))}
-          </div>
-        </div>
-      </div>
-    </>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }
 
@@ -822,12 +1162,21 @@ export default function HeroSection({ onThemeToggle }: { onThemeToggle?: () => v
       hasStarted = true
       
       setStartCircles(true)
+
+      // The circles form over `animationDuration`, then run a staggered
+      // per-circle glow before all three finally glow together at once —
+      // that combined moment lands at (animationDuration + 0.3s) + 350ms +
+      // 350ms + 1.5s ≈ animationDuration + 2.5s. Delaying the whole text/UI
+      // sequence by that same amount means the name's 3.5s stroke-draw
+      // (which starts 100ms after showName fires) finishes in the same
+      // second as that synchronized three-circle glow, instead of ~2s early.
+      const START_DELAY = 3200
       timers = [
-        setTimeout(() => isMounted && setShowBanner(true), 700),
-        setTimeout(() => isMounted && setShowGreeting(true), 850),
-        setTimeout(() => isMounted && setShowName(true), 750),
-        setTimeout(() => isMounted && setShowRoles(true), 3200),
-        setTimeout(() => isMounted && setShowButton(true), 4000),
+        setTimeout(() => isMounted && setShowBanner(true), 700 + START_DELAY),
+        setTimeout(() => isMounted && setShowGreeting(true), 850 + START_DELAY),
+        setTimeout(() => isMounted && setShowName(true), 750 + START_DELAY),
+        setTimeout(() => isMounted && setShowRoles(true), 2200 + START_DELAY),
+        setTimeout(() => isMounted && setShowButton(true), 3000 + START_DELAY),
       ]
 
       glowTimer = setTimeout(async () => {
@@ -843,11 +1192,11 @@ export default function HeroSection({ onThemeToggle }: { onThemeToggle?: () => v
         glowControls3.start(pulse)
         await new Promise<void>((r) => setTimeout(r, 350))
         if (!isMounted) return
-        
+
         glowControls2.start(pulse)
         await new Promise<void>((r) => setTimeout(r, 350))
         if (!isMounted) return
-        
+
         await glowControls1.start(pulse)
         if (!isMounted) return
 
@@ -894,7 +1243,7 @@ export default function HeroSection({ onThemeToggle }: { onThemeToggle?: () => v
       >
         <RichBackground />
         <StatusBar />
-        <CornerMarquees />
+        <CornerFrame />
 
         <GlassCircles
           circleConfigs={circleConfigs}
@@ -903,12 +1252,12 @@ export default function HeroSection({ onThemeToggle }: { onThemeToggle?: () => v
         />
 
         <div className="relative z-20 text-center flex flex-col items-center"
-          style={{ textRendering: "optimizeLegibility" }}>
+          style={{ textRendering: "optimizeLegibility", transform: "translateY(-10px)" }}>
           <WelcomeBanner show={showBanner} onThemeToggle={onThemeToggle} />
           <StaticHello show={showGreeting} />
           <NameRevealAnimation showName={showName} />
           <RolesDecryption showRoles={showRoles} />
-          <div className="mt-10">
+          <div className="mt-9">
             <LetsConnectButton show={showButton} onClick={() => setShowConnectModal(true)} />
           </div>
         </div>

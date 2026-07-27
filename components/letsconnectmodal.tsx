@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTransition } from "react";
 import { createPortal } from "react-dom";
 import { QRCodeSVG } from 'qrcode.react';
+import { useLenis } from 'lenis/react';
 
 const socials = [
   {
@@ -118,6 +119,7 @@ export default function LetsConnectModal({
   const [isPending, startTransition] = useTransition();
   const [copiedText, copyToClipboard] = useCopyToClipboard();
   const [mounted, setMounted] = useState(false);
+  const lenis = useLenis();
 
   useEffect(() => {
     setMounted(true);
@@ -155,9 +157,14 @@ export default function LetsConnectModal({
     qrContainerRef.current.style.transform = 'rotateX(0deg) rotateY(0deg)';
   };
 
-  // Handle blur effect when modal opens/closes
+  // Handle blur effect + scroll lock when modal opens/closes.
+  // Lenis intercepts wheel/touch itself, so body/html `overflow:hidden`
+  // alone doesn't stop it — it keeps advancing its internal scroll target
+  // while the page is visually frozen, then snaps to that stale target
+  // once overflow is restored. lenis.stop()/start() prevents that desync.
   useEffect(() => {
     if (isOpen) {
+      lenis?.stop();
       document.body.style.overflow = 'hidden';
       document.documentElement.style.overflow = 'hidden';
       // Target the specific content wrapper we added an ID to
@@ -171,36 +178,20 @@ export default function LetsConnectModal({
         }
       }
     } else {
+      lenis?.start();
       document.body.style.overflow = 'unset';
       document.documentElement.style.overflow = 'unset';
       const contentElement = document.getElementById('main-content');
       if (contentElement) {
-        // Restore previous filter
+        // Restore previous filter. Note: if `isMonochrome` (in page.tsx)
+        // toggles while the modal is open, React's own filter update and
+        // this direct DOM write can race — acceptable tradeoff since the
+        // two rarely happen together, but worth knowing if filter state
+        // ever looks wrong after closing the modal mid-theme-toggle.
         if (contentElement.dataset.prevFilter !== undefined) {
           contentElement.style.filter = contentElement.dataset.prevFilter;
           delete contentElement.dataset.prevFilter;
         } else {
-          // Fallback if no stored filter (e.g. if it wasn't monochrome)
-          // But valid monochrome filter might have been updated by React while modal was open?
-          // If React updates the style prop while we have overridden it, React might overwrite our blur.
-          // Or our blur might overwrite React's monochrome update.
-          // Safest: Use a separate fixed overlay backdrop that blurs? 
-          // But user wants "everything else should be blur".
-          // Backdrop filter on the modal backdrop handles the visual blur ON TOP.
-          // But typically "background blur" means the content *itself* is blurred?
-          // The modal backdrop *already* has `backdrop-filter: blur(4px)`.
-          // If the user says "everything else should be blur", `backdrop-filter` is exactly that.
-          // Maybe they mean it should be MORE blurred?
-          // Or maybe `backdrop-filter` isn't supported/working?
-          // Let's assume the user wants the actual content to be blurred.
-
-          // Issue with manipulating style directly: React reconciliation.
-          // If `isMonochrome` changes while modal is open, React updates `style.filter`.
-          // This conflict is real.
-          // Ideally, `page.tsx` should know `isModalOpen` and apply blur class.
-          // But `isModalOpen` is in `HeroSection`.
-          // Passing it up is best.
-          // For now, let's stick to the direct manipulation, it's usually fine if no theme switch happens while modal is open.
           contentElement.style.filter = contentElement.style.filter.replace(/ ?blur\(8px\)/g, '');
           if (contentElement.style.filter === '') contentElement.style.filter = 'none';
         }
@@ -208,6 +199,7 @@ export default function LetsConnectModal({
     }
 
     return () => {
+      lenis?.start();
       document.body.style.overflow = 'unset';
       document.documentElement.style.overflow = 'unset';
       const contentElement = document.getElementById('main-content');
@@ -216,7 +208,7 @@ export default function LetsConnectModal({
         if (contentElement.style.filter === '') contentElement.style.filter = 'none';
       }
     };
-  }, [isOpen]);
+  }, [isOpen, lenis]);
 
   const handleTabChange = (newTab: string) => {
     if (newTab === tab) return;
@@ -920,7 +912,7 @@ export default function LetsConnectModal({
         }
 
         .share-compact-glow-purple {
-          background: radial-gradient(circle at center, rgba(147, 51, 234, 0.15) 0%, transparent 70%);
+          background: radial-gradient(circle at center, rgba(var(--tc14-rgb), 0.15) 0%, transparent 70%);
           filter: blur(12px);
         }
 
@@ -1124,12 +1116,12 @@ export default function LetsConnectModal({
         }
 
         .contact-glow {
-          background: radial-gradient(circle at center, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+          background: radial-gradient(circle at center, rgba(var(--tc1-rgb), 0.15) 0%, transparent 70%);
           filter: blur(20px);
         }
 
         .contact-glow-purple {
-          background: radial-gradient(circle at center, rgba(147, 51, 234, 0.15) 0%, transparent 70%);
+          background: radial-gradient(circle at center, rgba(var(--tc14-rgb), 0.15) 0%, transparent 70%);
           filter: blur(20px);
         }
 

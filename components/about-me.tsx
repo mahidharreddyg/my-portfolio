@@ -1,534 +1,283 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import dynamic from "next/dynamic";
+import { motion } from "framer-motion";
+import LazyCanvas from "./three/LazyCanvas";
 
-const STACK = [
-  "Go", "React.js", "Next.js", "Node.js", "Angular", "TypeScript",
-  "Swift", "PostgreSQL", "MongoDB", "Docker", "Kubernetes", "AWS", "CI/CD", "Figma",
-];
+// Three.js/R3F stay out of the initial bundle entirely until this actually mounts.
+const AboutOrbitScene = dynamic(() => import("./three/AboutOrbitScene"), { ssr: false });
+const HeroGoldDustScene = dynamic(() => import("./three/HeroGoldDustScene"), { ssr: false });
 
-const ROLES = [
-  {
-    icon: "⚙",
-    title: "AI Solutions Engineer",
-    sub: "AVAAMO.AI",
-    desc: "Building agentic AI co-pilots and intelligent voice systems for enterprise clients. Multi-agent pipelines, LLM orchestration, real-time voice APIs.",
-  },
-  {
-    icon: "⚡",
-    title: "Software Development Intern",
-    sub: "SYNCLOVIS SYSTEMS",
-    desc: "Full-stack development on MERN & MEAN stack. Led sprint planning as Scrum Master, improving deployment efficiency and team execution.",
-  },
-  {
-    icon: "✦",
-    title: "Director of Creativity",
-    sub: "E-CELL VIT",
-    desc: "Led brand identity and visual communication for E-Summit '25, Incepta, Futurepreneurs X, and Pioneira — VIT's flagship entrepreneurship events.",
-  },
-];
-
+/**
+ * A note from me — deliberately NOT a summary of the site (the bento already
+ * does that). This is the personal, human beat: a short first-person note, a
+ * portrait, and a signature. It renders inside the same max-width column as the
+ * bento grid so it reads as a continuation, not a separate full-bleed section.
+ */
 export default function AboutMe() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const wrapRef = useRef<HTMLDivElement>(null);
+  const portraitRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const raf = useRef<number | null>(null);
+  const [panelHovered, setPanelHovered] = useState(false);
 
-  /* ── Particle canvas ── */
+  // Cursor-driven 3D, tracked once across the whole panel instead of just the
+  // photo — the portrait tilts hard, the panel itself tilts subtly, so the
+  // entire section reads as one spatial object instead of a flat card with
+  // a 3D sticker glued on top of it (the same "everything moves together"
+  // feel the hero's glass circles + name + button all share).
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d")!;
+    const panel = panelRef.current;
+    const card = portraitRef.current;
+    if (!panel || !card) return;
+    const onMove = (e: MouseEvent) => {
+      if (raf.current !== null) return;
+      const cx = e.clientX, cy = e.clientY;
+      raf.current = requestAnimationFrame(() => {
+        raf.current = null;
+        const pr = panel.getBoundingClientRect();
+        const pnx = (cx - (pr.left + pr.width / 2)) / pr.width;
+        const pny = (cy - (pr.top + pr.height / 2)) / pr.height;
+        panel.style.setProperty("--prx", `${(-pny * 3.2).toFixed(2)}deg`);
+        panel.style.setProperty("--pry", `${(pnx * 3.6).toFixed(2)}deg`);
 
-    let W = 0, H = 0;
-    let raf: number;
-    let isVisible = true;
-
-    const pts = Array.from({ length: 30 }, () => ({
-      x: Math.random() * 1400,
-      y: Math.random() * 900,
-      vx: (Math.random() - 0.5) * 0.18,
-      vy: (Math.random() - 0.5) * 0.12,
-      r: Math.random() * 1.1 + 0.3,
-      a: Math.random(),
-    }));
-
-    const resize = () => {
-      W = canvas.width = window.innerWidth;
-      H = canvas.height = window.innerHeight;
-    };
-    resize();
-    window.addEventListener("resize", resize);
-
-    const draw = () => {
-      if (!isVisible) {
-        raf = requestAnimationFrame(draw);
-        return;
-      }
-      ctx.clearRect(0, 0, W, H);
-      pts.forEach((p) => {
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x < -20) p.x = W + 20;
-        if (p.x > W + 20) p.x = -20;
-        if (p.y < -20) p.y = H + 20;
-        if (p.y > H + 20) p.y = -20;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(167,139,250,${p.a * 0.25})`;
-        ctx.fill();
+        const r = card.getBoundingClientRect();
+        const nx = (cx - (r.left + r.width / 2)) / r.width;
+        const ny = (cy - (r.top + r.height / 2)) / r.height;
+        card.style.setProperty("--rx", `${(-ny * 15).toFixed(2)}deg`);
+        card.style.setProperty("--ry", `${(nx * 18).toFixed(2)}deg`);
+        card.style.setProperty("--px", `${(nx * 22).toFixed(1)}px`);
+        card.style.setProperty("--py", `${(ny * 22).toFixed(1)}px`);
       });
-      pts.forEach((a, i) => {
-        for (let j = i + 1; j < pts.length; j++) {
-          const b = pts[j];
-          const dx = a.x - b.x, dy = a.y - b.y;
-          const d = Math.sqrt(dx * dx + dy * dy);
-          if (d < 120) {
-            ctx.beginPath();
-            ctx.moveTo(a.x, a.y);
-            ctx.lineTo(b.x, b.y);
-            ctx.strokeStyle = `rgba(167,139,250,${(1 - d / 120) * 0.06})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
-        }
-      });
-      raf = requestAnimationFrame(draw);
     };
-    draw();
-
-    // Pause canvas when section is off-screen
-    const observer = new IntersectionObserver(
-      ([entry]) => { isVisible = entry.isIntersecting; },
-      { threshold: 0.05 }
-    );
-    if (canvas.parentElement) observer.observe(canvas.parentElement);
-
+    const reset = () => {
+      panel.style.setProperty("--prx", "0deg");
+      panel.style.setProperty("--pry", "0deg");
+      card.style.setProperty("--rx", "0deg");
+      card.style.setProperty("--ry", "0deg");
+      card.style.setProperty("--px", "0px");
+      card.style.setProperty("--py", "0px");
+    };
+    panel.addEventListener("mousemove", onMove);
+    panel.addEventListener("mouseenter", () => setPanelHovered(true));
+    panel.addEventListener("mouseleave", () => { setPanelHovered(false); reset(); });
     return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
-      observer.disconnect();
+      panel.removeEventListener("mousemove", onMove);
+      if (raf.current !== null) cancelAnimationFrame(raf.current);
     };
-  }, []);
-
-  /* ── Entrance animations ── */
-  useEffect(() => {
-    const t = (id: string, delay: number) =>
-      setTimeout(() => document.getElementById(id)?.classList.add("am-in"), delay);
-
-    t("am-topbar", 100);
-    t("am-header-label", 200);
-    t("am-profile-wrapper", 300);
-    t("am-name", 400);
-    t("am-location", 500);
-    t("am-bio-main", 600);
-    t("am-divider", 750);
-    t("am-experience-label", 850);
-    t("am-r0", 950);
-    t("am-r1", 1050);
-    t("am-r2", 1150);
-    t("am-stack-label", 1250);
-    t("am-mission", 1350);
-    t("am-footer", 1450);
-
-    const obs = new IntersectionObserver(
-      (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add("am-vis")),
-      { threshold: 0.1, rootMargin: "0px 0px -30px 0px" }
-    );
-
-    [
-      "am-experience-card-0", "am-experience-card-1", "am-experience-card-2",
-      "am-stack", "am-mission", "am-footer",
-      ...STACK.map((_, i) => `am-pill-${i}`),
-    ].forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) obs.observe(el);
-    });
-
-    return () => obs.disconnect();
   }, []);
 
   return (
-    <>
+    <section className="w-full max-w-6xl mx-auto px-4 pt-6 pb-20">
       <style>{`
-        .am-root {
-          position: relative;
-          background: #080810;
-          font-family: 'Space Grotesk', sans-serif;
-          color: #e8e4dc;
-          overflow-x: hidden;
-          min-height: 100vh;
-        }
+        .note-panel { position: relative; border-radius: 24px; overflow: hidden;
+          background: rgba(255,255,255,0.035);
+          border: 1px solid rgba(255,255,255,0.09);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 30px 70px -40px rgba(0,0,0,0.8);
+          transform: rotateX(var(--prx,0)) rotateY(var(--pry,0));
+          transition: transform 0.3s cubic-bezier(0.22,1,0.36,1); }
+        .note-frame { position: relative; border-radius: 24px; perspective: 1600px; }
+        .note-grain { position:absolute; inset:0; pointer-events:none; opacity:0.5;
+          background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 0);
+          background-size: 22px 22px;
+          mask-image: radial-gradient(ellipse at 70% 20%, black 10%, transparent 75%);
+          -webkit-mask-image: radial-gradient(ellipse at 70% 20%, black 10%, transparent 75%); }
+        .note-glow { position:absolute; width:420px; height:420px; left:-120px; bottom:-160px; pointer-events:none;
+          background: radial-gradient(circle, rgba(var(--tc3-rgb),0.28), transparent 68%); filter: blur(50px); }
+        .note-glow-gold { position:absolute; width:340px; height:340px; right:-100px; top:-140px; pointer-events:none;
+          background: radial-gradient(circle, rgba(198,155,63,0.16), transparent 70%); filter: blur(46px); }
+        .note-grid { position:absolute; inset:0; pointer-events:none; opacity:0.5;
+          background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+          background-size: 32px 32px;
+          mask-image: radial-gradient(ellipse at 50% 0%, black 0%, transparent 65%);
+          -webkit-mask-image: radial-gradient(ellipse at 50% 0%, black 0%, transparent 65%); }
+        .note-corner { position:absolute; width:18px; height:18px; pointer-events:none; }
+        .sig { font-family: var(--font-caveat), cursive; }
 
-        .am-canvas {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-          pointer-events: none;
-          z-index: 0;
+        /* Portrait diorama */
+        .diorama { transform-style: preserve-3d; transform: rotateX(var(--rx,0)) rotateY(var(--ry,0)); transition: transform 0.25s cubic-bezier(0.22,1,0.36,1); }
+        .dio-shadow { position:absolute; left:8%; right:8%; bottom:-22px; height:22px; border-radius:9999px;
+          background: radial-gradient(ellipse, rgba(0,0,0,0.55), transparent 72%); pointer-events:none; }
+        .dio-scan {
+          position: absolute; left: 4%; right: 4%; height: 2px; border-radius: 2px;
+          background: linear-gradient(90deg, transparent, rgba(212,175,55,0.9), rgba(243,226,179,1), rgba(212,175,55,0.9), transparent);
+          box-shadow: 0 0 12px 2px rgba(212,175,55,0.6); pointer-events: none;
         }
-
-        .am-wrap {
-          position: relative;
-          z-index: 1;
-          max-width: 800px;
-          margin: 0 auto;
-          padding: 80px 40px 80px;
-        }
-
-        /* Top bar */
-        .am-topbar {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-bottom: 56px;
-          opacity: 0;
-          transform: translateY(-12px);
-          transition: opacity 0.7s, transform 0.7s;
-        }
-        .am-topbar.am-in { opacity: 1; transform: none; }
-
-        .am-mono {
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 11px;
-          color: rgba(255,255,255,0.22);
-          letter-spacing: .18em;
-        }
-
-        .am-status {
-          display: flex;
-          align-items: center;
-          gap: 7px;
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 10px;
-          color: #6ee7b7;
-          letter-spacing: .12em;
-        }
-        .am-dot {
-          width: 5px; height: 5px;
-          border-radius: 50%;
-          background: #6ee7b7;
-          animation: am-breathe 2.5s ease-in-out infinite;
-        }
-        @keyframes am-breathe {
-          0%,100% { opacity:1; transform:scale(1); }
-          50% { opacity:.3; transform:scale(.6); }
-        }
-
-        /* Header with profile */
-        .am-header-label {
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 10px;
-          color: rgba(255,255,255,0.18);
-          letter-spacing: .2em;
-          margin-bottom: 24px;
-          opacity: 0;
-          transform: translateX(-8px);
-          transition: opacity 0.6s, transform 0.6s;
-        }
-        .am-header-label.am-in { opacity:1; transform:none; }
-
-        .am-profile-wrapper {
-          display: flex;
-          align-items: flex-start;
-          gap: 32px;
-          margin-bottom: 32px;
-          opacity: 0;
-          transform: translateY(16px);
-          transition: opacity 0.8s, transform 0.8s cubic-bezier(.16,1,.3,1);
-        }
-        .am-profile-wrapper.am-in { opacity:1; transform:none; }
-
-        .am-profile-img {
-          width: 140px;
-          height: 140px;
-          border-radius: 16px;
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(255,255,255,0.08);
-          overflow: hidden;
-          flex-shrink: 0;
-          box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-        }
-        .am-profile-img img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-
-        .am-profile-info {
-          flex: 1;
-        }
-
-        .am-name {
-          font-size: 42px;
-          font-weight: 700;
-          line-height: 1.1;
-          letter-spacing: -0.02em;
-          margin-bottom: 8px;
-          opacity: 0;
-          transform: translateY(8px);
-          transition: opacity 0.6s, transform 0.6s;
-        }
-        .am-name.am-in { opacity:1; transform:none; }
-
-        .am-location {
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 13px;
-          color: rgba(255,255,255,0.35);
-          margin-bottom: 16px;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          opacity: 0;
-          transform: translateY(8px);
-          transition: opacity 0.6s, transform 0.6s;
-        }
-        .am-location.am-in { opacity:1; transform:none; }
-
-        .am-bio-main {
-          font-size: 16px;
-          line-height: 1.75;
-          color: rgba(255,255,255,0.42);
-          max-width: 560px;
-          opacity: 0;
-          transform: translateY(8px);
-          transition: opacity 0.7s, transform 0.7s;
-        }
-        .am-bio-main.am-in { opacity:1; transform:none; }
-
-        .am-accent { color: #a78bfa; }
-
-        /* Divider */
-        .am-divider {
-          width: 100%;
-          height: 1px;
-          background: rgba(255,255,255,0.06);
-          margin: 0 0 48px;
-          opacity: 0;
-          transition: opacity 0.5s;
-        }
-        .am-divider.am-in { opacity:1; }
-
-        /* Section label */
-        .am-section-label {
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 10px;
-          color: rgba(255,255,255,0.18);
-          letter-spacing: .2em;
-          margin-bottom: 24px;
-          opacity: 0;
-          transition: opacity 0.5s 0.1s;
-        }
-        .am-section-label.am-vis { opacity:1; }
-
-        /* Experience cards */
-        .am-experience { margin-bottom: 48px; }
-        .am-experience-card {
-          display: flex;
-          align-items: flex-start;
-          gap: 18px;
-          padding: 18px 0;
-          border-bottom: .5px solid rgba(255,255,255,0.06);
-          opacity: 0;
-          transform: translateX(-12px);
-          transition: opacity 0.55s, transform 0.55s cubic-bezier(.16,1,.3,1);
-        }
-        .am-experience-card:first-of-type { border-top: .5px solid rgba(255,255,255,0.06); }
-        .am-experience-card.am-vis { opacity:1; transform:none; }
-
-        .am-experience-icon {
-          width: 34px; height: 34px;
-          border-radius: 8px;
-          background: rgba(255,255,255,0.04);
-          border: .5px solid rgba(255,255,255,0.08);
-          display: flex; align-items: center; justify-content: center;
-          flex-shrink: 0;
-          font-size: 14px;
-        }
-        .am-experience-title { font-size: 14px; font-weight: 600; color: #f0ece4; margin-bottom: 4px; }
-        .am-experience-sub {
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 10px;
-          color: rgba(255,255,255,0.25);
-          letter-spacing: .08em;
-          margin-bottom: 8px;
-        }
-        .am-experience-desc { font-size: 13px; color: rgba(255,255,255,0.38); line-height: 1.65; }
-
-        /* Stack */
-        .am-stack { margin-bottom: 52px; }
-        .am-stack-grid { display: flex; flex-wrap: wrap; gap: 8px; }
-        .am-pill {
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 11px;
-          padding: 7px 14px;
-          border-radius: 4px;
-          background: rgba(255,255,255,0.03);
-          border: .5px solid rgba(255,255,255,0.08);
-          color: rgba(255,255,255,0.45);
-          letter-spacing: .05em;
-          cursor: default;
-          opacity: 0;
-          transform: scale(.92);
-          transition: opacity 0.4s, transform 0.4s cubic-bezier(.34,1.56,.64,1),
-                      background 0.25s, border-color 0.25s, color 0.25s;
-        }
-        .am-pill.am-vis { opacity:1; transform:scale(1); }
-        .am-pill:hover {
-          background: rgba(167,139,250,0.08);
-          border-color: rgba(167,139,250,0.28);
-          color: rgba(167,139,250,0.9);
-          transform: translateY(-2px);
-        }
-
-        /* Mission */
-        .am-mission {
-          padding: 32px;
-          border: .5px solid rgba(255,255,255,0.07);
-          border-radius: 12px;
-          background: rgba(255,255,255,0.018);
-          opacity: 0;
-          transform: translateY(12px);
-          transition: opacity 0.6s, transform 0.6s cubic-bezier(.16,1,.3,1);
-        }
-        .am-mission.am-vis { opacity:1; transform:none; }
-        .am-mission-label {
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 9px;
-          color: rgba(255,255,255,0.2);
-          letter-spacing: .22em;
-          margin-bottom: 14px;
-        }
-        .am-mission-text { font-size: 17px; font-weight: 500; line-height: 1.6; color: rgba(255,255,255,0.72); }
-        .am-mission-text .am-accent { color: #a78bfa; }
-
-        /* Footer */
-        .am-footer-row {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-top: 48px;
-          padding-top: 32px;
-          border-top: .5px solid rgba(255,255,255,0.06);
-          opacity: 0;
-          transition: opacity 0.5s;
-        }
-        .am-footer-row.am-vis { opacity:1; }
-        .am-contact {
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 11px;
-          color: rgba(255,255,255,0.28);
-          letter-spacing: .08em;
-          text-decoration: none;
-          transition: color 0.2s;
-        }
-        .am-contact:hover { color: rgba(167,139,250,0.8); }
-        .am-tagline {
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 10px;
-          color: rgba(255,255,255,0.14);
-          letter-spacing: .14em;
-        }
-
-        @media (max-width: 700px) {
-          .am-wrap { padding: 56px 24px 64px; }
-          .am-profile-wrapper { flex-direction: column; align-items: center; gap: 24px; }
-          .am-profile-img { width: 120px; height: 120px; }
-          .am-name { font-size: 32px; text-align: center; }
-          .am-bio-main { text-align: center; max-width: 100%; }
-          .am-footer-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+        .dio-badge {
+          position: absolute; display: flex; align-items: center; gap: 5px;
+          background: rgba(8,11,18,0.78); border: 1px solid rgba(212,175,55,0.4);
+          border-radius: 999px; padding: 4px 9px 4px 6px; pointer-events: none;
+          box-shadow: 0 8px 20px -6px rgba(0,0,0,0.7);
         }
       `}</style>
 
-      <div className="am-root">
-        <canvas ref={canvasRef} className="am-canvas" />
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="note-frame"
+        style={{
+          padding: "1.4px",
+          background: panelHovered
+            ? "linear-gradient(135deg, var(--accent-2) 0%, var(--accent) 45%, var(--accent-ink) 100%)"
+            : "linear-gradient(135deg, rgba(198,155,63,0.3) 0%, rgba(122,95,34,0.15) 50%, rgba(198,155,63,0.25) 100%)",
+          borderRadius: "24px",
+          transition: "background 0.4s ease-out",
+        }}
+      >
+        <div ref={panelRef} className="note-panel">
+        {/* Ambient WebGL gold dust — the same depth language as the hero,
+            carried through so About doesn't feel like a flat page after it */}
+        <div className="absolute inset-0 pointer-events-none opacity-60">
+          <LazyCanvas className="w-full h-full" camera={{ position: [0, 0, 5], fov: 45 }}>
+            <HeroGoldDustScene />
+          </LazyCanvas>
+        </div>
+        <div className="note-grain" />
+        <div className="note-grid" />
+        <div className="note-glow" />
+        <div className="note-glow-gold" />
 
-        <div className="am-wrap" ref={wrapRef}>
-          {/* Top bar */}
-          <div className="am-topbar" id="am-topbar">
-            <span className="am-mono">mahidhar.reddy.g / about</span>
-            <div className="am-status">
-              <span className="am-dot" />
-              AVAILABLE
-            </div>
-          </div>
+        {/* corner brackets — same instrument language as the bento cards, gold-tinted */}
+        <span className="note-corner top-4 left-4 border-t border-l rounded-tl-md" style={{ borderColor: "rgba(212,175,55,0.35)" }} />
+        <span className="note-corner bottom-4 right-4 border-b border-r rounded-br-md" style={{ borderColor: "rgba(212,175,55,0.35)" }} />
 
-          {/* Header with profile photo */}
-          <div>
-            <div className="am-header-label" id="am-header-label">ABOUT</div>
-            <div className="am-profile-wrapper" id="am-profile-wrapper">
-              <div className="am-profile-img">
-                <img src="profile_pic.PNG" alt="Mahidhar Reddy G" />
-              </div>
-              <div className="am-profile-info">
-                <h1 className="am-name" id="am-name">
-                  Mahidhar Reddy G
-                </h1>
-                <div className="am-location" id="am-location">
-                  📍 Bengaluru, India
-                </div>
-                <p className="am-bio-main" id="am-bio-main">
-                  Final year Computer Science Engineering undergrad at <span className="am-accent">VIT</span>, specializing in
-                  <span className="am-accent"> Full Stack Development</span>, <span className="am-accent">DevOps</span>,
-                  <span className="am-accent"> UI/UX Strategy</span>, and <span className="am-accent">Cloud Infrastructure</span>.
-                  AWS-certified as both Cloud Practitioner and Solutions Architect, I focus on scalable architectures,
-                  performance optimization, cloud-native deployment, containerized workflows, and CI/CD automation.
-                </p>
-              </div>
-            </div>
-          </div>
+        {/* top instrument bar */}
+        <div className="relative z-10 flex items-center justify-between px-7 md:px-12 pt-6 pb-2">
+          <span className="lo-meta" style={{ letterSpacing: "0.28em" }}>PROFILE.DAT</span>
+          <span className="inline-flex items-center gap-1.5 font-mono text-[9px] tracking-[0.24em] uppercase" style={{ color: "rgba(230,192,90,0.8)" }}>
+            <span className="h-1.5 w-1.5 rounded-full" style={{ background: "var(--gold-bead)" }} />
+            Verified
+          </span>
+        </div>
 
-          <div className="am-divider" id="am-divider" />
+        <div className="relative z-10 grid grid-cols-1 md:grid-cols-[260px_1fr] gap-8 md:gap-12 p-7 md:p-12 pt-4 items-center">
+          {/* Portrait — layered 3D diorama */}
+          <div className="[perspective:1400px] mx-auto md:mx-0 py-6">
+            <div ref={portraitRef} className="diorama relative w-[210px] md:w-full aspect-[4/5]">
 
-          {/* Experience */}
-          <div className="am-experience">
-            <div className="am-section-label" id="am-experience-label">EXPERIENCE</div>
-            {ROLES.map((role, i) => (
+              {/* deep backdrop glow — drifts opposite the cursor for depth */}
               <div
-                className="am-experience-card"
-                id={`am-experience-card-${i}`}
-                key={i}
-              >
-                <div className="am-experience-icon">{role.icon}</div>
-                <div>
-                  <div className="am-experience-title">{role.title}</div>
-                  <div className="am-experience-sub">{role.sub}</div>
-                  <div className="am-experience-desc">{role.desc}</div>
-                </div>
-              </div>
-            ))}
-          </div>
+                className="absolute -inset-10 rounded-[32px] pointer-events-none"
+                style={{
+                  background: "radial-gradient(circle at 50% 40%, rgba(var(--tc3-rgb),0.5), transparent 70%)",
+                  filter: "blur(34px)",
+                  transform: "translateZ(-90px) translate(calc(var(--px,0px) * -1), calc(var(--py,0px) * -1))",
+                }}
+              />
 
-          {/* Stack */}
-          <div className="am-stack" id="am-stack">
-            <div className="am-section-label" id="am-stack-label">TECH ARSENAL</div>
-            <div className="am-stack-grid">
-              {STACK.map((s, i) => (
-                <span className="am-pill" id={`am-pill-${i}`} key={s}>
-                  {s}
-                </span>
-              ))}
+              {/* Real WebGL rings + floating chips — one GPU canvas instead of
+                  a dozen composited CSS layers. Extends past the card bounds
+                  so the rings can orbit around it. */}
+              <div className="absolute -inset-20 pointer-events-none">
+                <LazyCanvas className="w-full h-full" camera={{ position: [0, 0, 4], fov: 40 }}>
+                  <AboutOrbitScene />
+                </LazyCanvas>
+              </div>
+
+              {/* ground shadow, sinks as the card tilts */}
+              <div className="dio-shadow" style={{ transform: "translateZ(-60px)" }} />
+
+              {/* the photo itself */}
+              <div
+                className="absolute inset-0 rounded-[20px] overflow-hidden border border-white/12"
+                style={{ boxShadow: "0 30px 60px -30px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.12)", transform: "translateZ(0px)" }}
+              >
+                <Image src="/profile_pic.PNG" alt="Mahidhar Reddy G" width={420} height={525} className="w-full h-full object-cover" style={{ filter: "saturate(1.05) contrast(1.03)" }} />
+                {/* gold biometric-style scan sweep — plays once when scrolled into view */}
+                <motion.div
+                  className="dio-scan"
+                  style={{ top: "0%" }}
+                  initial={{ y: "-10%", opacity: 0 }}
+                  whileInView={{ y: ["-10%", "480%"], opacity: [0, 1, 1, 0] }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 1.6, delay: 0.5, ease: [0.65, 0, 0.35, 1] }}
+                />
+              </div>
+              {/* glass sheen — sweeps opposite parallax so it reads as a reflection */}
+              <div
+                className="absolute inset-0 rounded-[20px] pointer-events-none"
+                style={{
+                  background: "linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 46%)",
+                  transform: "translateZ(2px) translate(var(--px,0px), var(--py,0px))",
+                }}
+              />
+
+              {/* corner ticks — float above the surface */}
+              <span className="absolute top-2.5 left-2.5 w-3.5 h-3.5 border-t border-l border-[#e6c05a]/80 rounded-tl-[4px]" style={{ transform: "translateZ(38px)" }} />
+              <span className="absolute bottom-2.5 right-2.5 w-3.5 h-3.5 border-b border-r border-[#e6c05a]/80 rounded-br-[4px]" style={{ transform: "translateZ(38px)" }} />
+
+              {/* ID badge — a small tech-flavored detail, floats in front */}
+              <div className="dio-badge -bottom-3 left-1/2 -translate-x-1/2" style={{ transform: "translateZ(50px) translateX(-50%)" }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f3e2b3" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+                <span className="font-mono text-[8px] tracking-[0.16em] uppercase" style={{ color: "#f3e2b3" }}>MR · 2026</span>
+              </div>
             </div>
           </div>
 
-          {/* Mission */}
-          <div className="am-mission" id="am-mission">
-            <div className="am-mission-label">MISSION</div>
-            <p className="am-mission-text">
-              Build systems that{" "}
-              <span className="am-accent">scale like infrastructure</span>, carry
-              the finesse of design, and lead with intent.
-            </p>
-          </div>
+          {/* Note */}
+          <div>
+            <div className="inline-flex items-center gap-2.5 mb-6">
+              <span className="h-px w-8" style={{ background: "linear-gradient(90deg, rgba(212,175,55,0.75), transparent)" }} />
+              <span className="font-mono text-[10px] tracking-[0.3em] uppercase" style={{ color: "rgba(230,192,90,0.75)" }}>A note from me</span>
+            </div>
 
-          {/* Footer */}
-          <div className="am-footer-row" id="am-footer">
-            <a href="mailto:mahidhar.reddy2003@gmail.com" className="am-contact">
-              mahidhar.reddy2003@gmail.com
-            </a>
-            <span className="am-tagline">BLR, INDIA · VIT '26</span>
+            <div className="space-y-4 text-[15px] md:text-[16.5px] leading-[1.75] text-white/70 max-w-[60ch]">
+              <p>
+                Hi — I&apos;m <span className="text-white font-medium">Mahidhar</span>. I build things because I genuinely can&apos;t
+                help it. I&apos;ve always been the person who takes something apart just to understand how it fits together,
+                then quietly puts it back a little better than before.
+              </p>
+              <p>
+                What pulls me in is the seam where solid engineering meets thoughtful design — systems that scale calmly in
+                the background while the experience up front feels effortless. Clean architecture, honest performance, and
+                interfaces with a bit of soul. That&apos;s the work I want to keep chasing.
+              </p>
+              <p className="text-white/55">
+                When I&apos;m not shipping, you&apos;ll find me sketching interfaces, breaking down products I admire, or
+                over-thinking the details nobody asked about. If any of this resonates, I&apos;d love to build something with you.
+              </p>
+            </div>
+
+            {/* Gold circuit divider — thin trace with a lit node, tech-savvy not decorative */}
+            <div className="mt-9 mb-1 flex items-center gap-3" aria-hidden="true">
+              <span className="h-px flex-1" style={{ background: "linear-gradient(90deg, var(--gold-core), transparent)" }} />
+              <span className="h-1.5 w-1.5 rounded-full" style={{ background: "var(--gold-bead)", boxShadow: "0 0 8px rgba(230,192,90,0.7)" }} />
+              <span className="h-px flex-1" style={{ background: "linear-gradient(90deg, transparent, var(--gold-core))" }} />
+            </div>
+
+            {/* Signature — gold ink, the one warm accent in an otherwise cool room */}
+            <div className="mt-7 flex items-end justify-between flex-wrap gap-4">
+              <div>
+                <div className="sig lo-gold-text text-4xl md:text-5xl leading-none" style={{ filter: "drop-shadow(0 0 18px rgba(212,175,55,0.35))" }}>
+                  Mahidhar
+                </div>
+                <div className="mt-2 font-mono text-[10px] tracking-[0.2em] uppercase text-white/35">
+                  Mahidhar Reddy G · Bengaluru, IN
+                </div>
+              </div>
+              <a
+                href="mailto:mahidhar.reddy2003@gmail.com"
+                className="group inline-flex items-center gap-2.5 rounded-full pl-4 pr-2 py-2 border border-white/15 bg-white/[0.04] text-white text-sm font-medium transition-all duration-300 hover:bg-white/[0.08]"
+                style={{ borderColor: "rgba(198,155,63,0.25)" }}
+                onMouseEnter={(e) => (e.currentTarget.style.borderColor = "rgba(230,192,90,0.5)")}
+                onMouseLeave={(e) => (e.currentTarget.style.borderColor = "rgba(198,155,63,0.25)")}
+              >
+                Say hello
+                <span
+                  className="flex h-7 w-7 items-center justify-center rounded-full transition-transform duration-300 group-hover:rotate-45"
+                  style={{ background: "rgba(198,155,63,0.15)", border: "1px solid rgba(230,192,90,0.35)", color: "#e6c05a" }}
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                </span>
+              </a>
+            </div>
           </div>
         </div>
-      </div>
-    </>
+        </div>
+      </motion.div>
+    </section>
   );
 }

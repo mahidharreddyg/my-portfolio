@@ -69,6 +69,226 @@
   }
 }
 
+/* ─────────────────────────────────────────────────────────────
+   LIQUID OBSERVATORY — design tokens
+   Premium dark-tech world. Blue/cyan liquid glass is the signature
+   material; monochrome ink everywhere else. Consumed by the
+   portfolio sections for a single, cohesive visual language.
+   ───────────────────────────────────────────────────────────── */
+:root {
+  /* Canvas & surfaces */
+  --lo-canvas: #05060a;
+  --lo-canvas-2: #080b12;
+  --lo-elevate: #0b0f18;
+
+  /* Ink — cool-tinted, never flat gray */
+  --lo-ink: #f4f7fb;
+  --lo-ink-dim: #aeb9c9;
+  --lo-ink-faint: #6b7688;
+
+  /* Signature accent (the circles' material) */
+  --lo-accent: #3b82f6;
+  --lo-accent-2: #38bdf8;
+  --lo-accent-deep: #1d4ed8;
+  --lo-accent-rgb: 59, 130, 246;
+  --lo-cyan-rgb: 56, 189, 248;
+
+  /* Theme accent RGB tuples — every "blue" used anywhere on the site funnels
+     through one of these (see the exact-value table in the comment below).
+     Default value = the site's real, unchanged blue. [data-theme="gold"]
+     on <html> (toggled by the "Welcome to my creative world" button) swaps
+     these to gold equivalents, and because every consumer references the
+     variable — never the literal numbers — the whole site recolors as one
+     uniform, centrally-driven theme instead of a filter/overlay trick.
+       --tc1  blue-500    59,130,246   --tc8  cyan-500    6,182,212
+       --tc2  sky-400     56,189,248   --tc9  indigo-500  99,102,241
+       --tc3  blue-600    37,99,235    --tc10 blue-400    96,165,250
+       --tc4  blue-900    30,58,138    --tc11 purple-700  109,40,217
+       --tc5  blue-700    29,78,216    --tc12 purple-500  168,85,247
+       --tc6  custom-blue 41,141,238   --tc13 violet-500  139,92,246
+       --tc7  sky-500     14,165,233   --tc14 purple-600  147,51,234       */
+  --tc1-rgb: 59, 130, 246;
+  --tc2-rgb: 56, 189, 248;
+  --tc3-rgb: 37, 99, 235;
+  --tc4-rgb: 30, 58, 138;
+  --tc5-rgb: 29, 78, 216;
+  --tc6-rgb: 41, 141, 238;
+  --tc7-rgb: 14, 165, 233;
+  --tc8-rgb: 6, 182, 212;
+  --tc9-rgb: 99, 102, 241;
+  --tc10-rgb: 96, 165, 250;
+  --tc11-rgb: 109, 40, 217;
+  --tc12-rgb: 168, 85, 247;
+  --tc13-rgb: 139, 92, 246;
+  --tc14-rgb: 147, 51, 234;
+
+  /* Gold — deep, desaturated metal, not lemon-yellow. Real gold reads dark
+     and warm in its midtones (closer to brass/bronze) with only a small,
+     sharp highlight — it is NOT a bright even yellow. */
+  --gold-hi: #f3e2b3;
+  --gold: #b6923f;
+  --gold-core: #9c7a2e;
+  --gold-deep: #7a5f22;
+  --gold-shadow: #4a3814;
+  --gold-rgb: 156, 122, 46;
+  /* Foil text: hard-edged bands (not a smooth blend) so it reads as struck
+     metal catching light, not a soft yellow wash. */
+  --gold-grad: linear-gradient(115deg,
+    #7a5f22 0%, #c9a04a 18%, #f3e2b3 32%, #b6923f 46%,
+    #7a5f22 58%, #c9a04a 74%, #9c7a2e 88%, #4a3814 100%);
+  /* Small round accents (dots, cursor blocks): a specular "bead" — a tight
+     bright hotspot over a dark gold body. This is what actually reads as
+     metal at small sizes; a linear gradient just looks like flat yellow. */
+  --gold-bead: radial-gradient(circle at 32% 28%, #f8ecc4 0%, #cfa64f 24%, #8a6a28 62%, #4a3814 100%);
+
+  /* Accent gold — the user's preferred palette for small, sparing UI
+     accents (nav, chips, borders): antique gold primary, light gold for
+     hover/glow, deep gold-brown for text sitting on a light-gold fill. */
+  --accent: #c8932e;
+  --accent-2: #e0ad54;
+  --accent-ink: #5c4012;
+
+  /* Structure */
+  --lo-hairline: rgba(255, 255, 255, 0.08);
+  --lo-hairline-strong: rgba(255, 255, 255, 0.14);
+  --lo-glass: rgba(255, 255, 255, 0.045);
+  --lo-glass-strong: rgba(255, 255, 255, 0.07);
+
+  /* Motion — exponential ease-out from an already-visible default */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ─── Black-gold theme override ──────────────────────────────────────────
+   Real color values swap here, not a filter — every component that reads
+   these variables (or the matching Tailwind classes overridden below)
+   recolors uniformly the instant [data-theme="gold"] is set on <html>. */
+[data-theme="gold"] {
+  --lo-accent: var(--accent-2);
+  --lo-accent-2: var(--gold-hi);
+  --lo-accent-deep: var(--accent);
+  --lo-accent-rgb: 224, 173, 84;
+  --lo-cyan-rgb: 243, 226, 179;
+
+  --tc1-rgb: 224, 173, 84;   /* was blue-500 */
+  --tc2-rgb: 243, 226, 179;  /* was sky-400 */
+  --tc3-rgb: 200, 147, 46;   /* was blue-600 */
+  --tc4-rgb: 92, 64, 18;     /* was blue-900 */
+  --tc5-rgb: 156, 122, 46;   /* was blue-700 */
+  --tc6-rgb: 224, 173, 84;   /* was custom-blue */
+  --tc7-rgb: 224, 173, 84;   /* was sky-500 */
+  --tc8-rgb: 243, 226, 179;  /* was cyan-500 */
+  --tc9-rgb: 156, 122, 46;   /* was indigo-500 */
+  --tc10-rgb: 224, 173, 84;  /* was blue-400 */
+  --tc11-rgb: 122, 95, 34;   /* was purple-700 */
+  --tc12-rgb: 200, 147, 46;  /* was purple-500 */
+  --tc13-rgb: 156, 122, 46;  /* was violet-500 */
+  --tc14-rgb: 122, 95, 34;   /* was purple-600 */
+}
+
+/* Tailwind utility-class overrides — the same [data-theme="gold"] gate, for
+   the handful of components that use Tailwind's blue/cyan/sky/purple color
+   classes directly instead of an inline style. Generated from every such
+   class actually used in the codebase; !important is required to win over
+   Tailwind's own utility of equal specificity. */
+[data-theme="gold"] .text-blue-300 { color: rgba(200,147,46,1) !important; }
+[data-theme="gold"] .text-sky-300 { color: rgba(224,173,84,1) !important; }
+[data-theme="gold"] .border-cyan-400 { border-color: rgba(243,226,179,1) !important; }
+[data-theme="gold"] .bg-blue-400 { background-color: rgba(200,147,46,1) !important; }
+[data-theme="gold"] .text-sky-400 { color: rgba(224,173,84,1) !important; }
+[data-theme="gold"] .text-cyan-400 { color: rgba(243,226,179,1) !important; }
+[data-theme="gold"] .border-sky-400\/40 { border-color: rgba(224,173,84,0.4) !important; }
+[data-theme="gold"] .border-blue-500 { border-color: rgba(200,147,46,1) !important; }
+[data-theme="gold"] .via-blue-400\/40 { --tw-gradient-stops: var(--tw-gradient-from), rgba(200,147,46,0.4), var(--tw-gradient-to) !important; }
+[data-theme="gold"] .text-purple-400 { color: rgba(122,95,34,1) !important; }
+[data-theme="gold"] .text-purple-300 { color: rgba(122,95,34,1) !important; }
+[data-theme="gold"] .text-purple-100 { color: rgba(122,95,34,1) !important; }
+[data-theme="gold"] .text-cyan-300 { color: rgba(243,226,179,1) !important; }
+[data-theme="gold"] .text-blue-500 { color: rgba(200,147,46,1) !important; }
+[data-theme="gold"] .text-blue-400 { color: rgba(200,147,46,1) !important; }
+[data-theme="gold"] .shadow-purple-900\/20 { --tw-shadow-color: rgba(122,95,34,0.2) !important; }
+[data-theme="gold"] .from-blue-500\/90 { --tw-gradient-from: rgba(200,147,46,0.9) !important; }
+[data-theme="gold"] .border-sky-400\/30 { border-color: rgba(224,173,84,0.3) !important; }
+[data-theme="gold"] .border-purple-500\/40 { border-color: rgba(122,95,34,0.4) !important; }
+[data-theme="gold"] .bg-sky-500\/15 { background-color: rgba(224,173,84,0.15) !important; }
+[data-theme="gold"] .bg-sky-400 { background-color: rgba(224,173,84,1) !important; }
+[data-theme="gold"] .bg-blue-500\/50 { background-color: rgba(200,147,46,0.5) !important; }
+[data-theme="gold"] .bg-blue-500\/30 { background-color: rgba(200,147,46,0.3) !important; }
+[data-theme="gold"] .bg-blue-400\/80 { background-color: rgba(200,147,46,0.8) !important; }
+[data-theme="gold"] .bg-blue-400\/60 { background-color: rgba(200,147,46,0.6) !important; }
+[data-theme="gold"] .via-purple-500\/5 { --tw-gradient-stops: var(--tw-gradient-from), rgba(122,95,34,0.05), var(--tw-gradient-to) !important; }
+[data-theme="gold"] .via-blue-500\/10 { --tw-gradient-stops: var(--tw-gradient-from), rgba(200,147,46,0.1), var(--tw-gradient-to) !important; }
+[data-theme="gold"] .via-blue-100 { --tw-gradient-stops: var(--tw-gradient-from), rgba(200,147,46,1), var(--tw-gradient-to) !important; }
+[data-theme="gold"] .to-purple-900\/30 { --tw-gradient-to: rgba(122,95,34,0.3) !important; }
+[data-theme="gold"] .to-cyan-500\/5 { --tw-gradient-to: rgba(243,226,179,0.05) !important; }
+[data-theme="gold"] .to-blue-900\/30 { --tw-gradient-to: rgba(200,147,46,0.3) !important; }
+[data-theme="gold"] .text-sky-400\/50 { color: rgba(224,173,84,0.5) !important; }
+[data-theme="gold"] .text-sky-300\/60 { color: rgba(224,173,84,0.6) !important; }
+[data-theme="gold"] .text-sky-200 { color: rgba(224,173,84,1) !important; }
+[data-theme="gold"] .text-cyan-200 { color: rgba(243,226,179,1) !important; }
+[data-theme="gold"] .text-cyan-100 { color: rgba(243,226,179,1) !important; }
+[data-theme="gold"] .text-blue-100 { color: rgba(200,147,46,1) !important; }
+[data-theme="gold"] .shadow-cyan-900\/20 { --tw-shadow-color: rgba(243,226,179,0.2) !important; }
+[data-theme="gold"] .shadow-blue-900\/20 { --tw-shadow-color: rgba(200,147,46,0.2) !important; }
+[data-theme="gold"] .shadow-blue-400\/60 { --tw-shadow-color: rgba(200,147,46,0.6) !important; }
+[data-theme="gold"] .from-purple-900\/40 { --tw-gradient-from: rgba(122,95,34,0.4) !important; }
+[data-theme="gold"] .from-purple-800\/60 { --tw-gradient-from: rgba(122,95,34,0.6) !important; }
+[data-theme="gold"] .from-blue-900\/40 { --tw-gradient-from: rgba(200,147,46,0.4) !important; }
+[data-theme="gold"] .from-blue-900 { --tw-gradient-from: rgba(200,147,46,1) !important; }
+[data-theme="gold"] .from-blue-800\/60 { --tw-gradient-from: rgba(200,147,46,0.6) !important; }
+[data-theme="gold"] .from-blue-500\/5 { --tw-gradient-from: rgba(200,147,46,0.05) !important; }
+[data-theme="gold"] .border-cyan-500\/40 { border-color: rgba(243,226,179,0.4) !important; }
+[data-theme="gold"] .border-cyan-400\/45 { border-color: rgba(243,226,179,0.45) !important; }
+[data-theme="gold"] .border-cyan-400\/40 { border-color: rgba(243,226,179,0.4) !important; }
+[data-theme="gold"] .border-cyan-400\/25 { border-color: rgba(243,226,179,0.25) !important; }
+[data-theme="gold"] .border-blue-500\/40 { border-color: rgba(200,147,46,0.4) !important; }
+[data-theme="gold"] .border-blue-400\/50 { border-color: rgba(200,147,46,0.5) !important; }
+[data-theme="gold"] .bg-sky-400\/80 { background-color: rgba(224,173,84,0.8) !important; }
+[data-theme="gold"] .bg-blue-600 { background-color: rgba(200,147,46,1) !important; }
+[data-theme="gold"] .bg-blue-500\/10 { background-color: rgba(200,147,46,0.1) !important; }
+
+/* Signature glass surface — a specific material, not decoration.
+   Use for elevated instrument panels across sections. */
+.lo-glass {
+  background: var(--lo-glass);
+  border: 1px solid var(--lo-hairline);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    0 24px 60px -24px rgba(0, 0, 0, 0.7);
+}
+.lo-hairline {
+  border: 1px solid var(--lo-hairline);
+}
+/* Real metallic gold text — banded gradient reads as a reflective surface,
+   not a flat tint. Use sparingly, as an accent, never as body color. */
+.lo-gold-text {
+  background: var(--gold-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+/* Instrument label — mono reserved for real data/measurement only */
+.lo-meta {
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--lo-ink-faint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* ── Performance: prevent scroll-behavior: smooth from causing parallax jank ── */
 html {
   scroll-behavior: auto;
@@ -91,6 +311,24 @@ body {
 
 .preserve-3d {
   transform-style: preserve-3d;
+}
+
+/* Navbar link hover effect (glitch / laser sweep / hologram pulse) */
+@keyframes text-glitch {
+  0% { text-shadow: 2px 2px #4facfe, -2px -2px #00f2fe; }
+  25% { text-shadow: -2px 2px #4facfe, 2px -2px #00f2fe; }
+  50% { text-shadow: 2px -2px #4facfe, -2px 2px #00f2fe; }
+  75% { text-shadow: -2px -2px #4facfe, 2px 2px #00f2fe; }
+  100% { text-shadow: 2px 2px #4facfe, -2px -2px #00f2fe; }
+}
+@keyframes laser-sweep {
+  0% { background-position: -100% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes hologram-pulse {
+  0% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.02); }
+  100% { opacity: 0.8; transform: scale(1); }
 }
 
 @keyframes wormhole {

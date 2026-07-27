@@ -12,15 +12,29 @@ import Projects from "@/components/projects";
 import Certifications from "@/components/certifications";
 import AboutMe from "@/components/about-me";
 import GSAPSection from "@/components/scroll/GSAPSection";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export default function Home() {
   const sectionRef = useRef(null);
+  // The content wrapper INSIDE #about — its natural height never changes
+  // because of styles written back onto #about itself (minHeight/clipPath),
+  // so observing this instead of #about breaks the self-triggering resize
+  // loop that was causing the whole page to visibly jitter.
+  const contentRef = useRef<HTMLDivElement>(null);
   const [clipPath, setClipPath] = useState("");
   const [isMonochrome, setIsMonochrome] = useState(false);
 
   const toggleTheme = () => {
     setIsMonochrome((prev) => !prev);
   }
+
+  // Real color swap, driven by shared CSS variables (see globals.css) —
+  // every component that reads --tc*-rgb / --lo-accent* recolors uniformly
+  // the instant this attribute changes, no filter/overlay involved.
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", isMonochrome ? "gold" : "");
+  }, [isMonochrome]);
 
   useEffect(() => {
     // Force start at top
@@ -31,13 +45,20 @@ export default function Home() {
 
     let rafId: number;
     let timeoutId: NodeJS.Timeout;
+    let refreshTimeoutId: NodeJS.Timeout;
+    let lastClipPath = "";
+    let lastContentHeight = -1;
 
     function updateClipPath() {
-      if (!sectionRef.current) return;
-      const el = sectionRef.current as HTMLElement;
+      if (!sectionRef.current || !contentRef.current) return;
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      const sectionHeight = Math.max(vh * 1.3, el.scrollHeight); // Use actual content height if taller
+      // Measure the CONTENT wrapper, not #about itself — #about's own
+      // minHeight/clipPath are written from this same measurement below, so
+      // measuring #about directly self-triggers the ResizeObserver every
+      // time (a feedback loop that read as the whole page jittering).
+      const contentHeight = contentRef.current.scrollHeight;
+      const sectionHeight = Math.max(vh * 1.3, contentHeight); // Use actual content height if taller
       const bandCenterY = 120;
       const angleRad = (12 * Math.PI) / 180;
 
@@ -53,15 +74,30 @@ export default function Home() {
       const rightY = bandEndY + (vw * 0.5 * tanAngle);
       const centerY = bandEndY;
 
-      setClipPath(`
+      const next = `
         polygon(
           0% ${leftY}px,
-          50% ${centerY}px, 
+          50% ${centerY}px,
           100% ${rightY}px,
           100% ${sectionHeight + 200}px,
           0% ${sectionHeight + 200}px
         )
-      `.replace(/\s+/g, ' '));
+      `.replace(/\s+/g, ' ');
+
+      if (next !== lastClipPath) {
+        lastClipPath = next;
+        setClipPath(next);
+      }
+
+      // Only tell GSAP to re-measure pinned/sticky offsets when the actual
+      // content height changed — not on every observer fire — otherwise
+      // ScrollTrigger's cached positions can desync from the corrected
+      // layout, which shows up as the whole scroll experience fluctuating.
+      if (contentHeight !== lastContentHeight) {
+        lastContentHeight = contentHeight;
+        clearTimeout(refreshTimeoutId);
+        refreshTimeoutId = setTimeout(() => ScrollTrigger.refresh(), 120);
+      }
     }
 
     // Debounced version for ResizeObserver to prevent thrashing
@@ -74,11 +110,11 @@ export default function Home() {
 
     updateClipPath();
 
-    // Use ResizeObserver to detect size changes of the section itself
+    // Observe the content wrapper's natural size, not #about (see above)
     const resizeObserver = new ResizeObserver(debouncedUpdate);
 
-    if (sectionRef.current) {
-      resizeObserver.observe(sectionRef.current);
+    if (contentRef.current) {
+      resizeObserver.observe(contentRef.current);
     }
 
     // Keep window resize as a fallback for viewport changes
@@ -89,17 +125,18 @@ export default function Home() {
       resizeObserver.disconnect();
       if (timeoutId) clearTimeout(timeoutId);
       if (rafId) cancelAnimationFrame(rafId);
+      clearTimeout(refreshTimeoutId);
     };
   }, []);
 
   return (
-    <main className={`relative bg-black text-white min-h-screen ${isMonochrome ? 'grayscale opacity-95 transition-all duration-1000' : ''}`}>
+    <main className="relative bg-black text-white min-h-screen">
       <Navbar isMonochrome={isMonochrome} />
 
       {/* Removing heavy filter style inline wrapper that tanks scrolling performance */}
       <div>
         <div className="marquee-hero-wrapper bg-black">
-          <div className="sticky top-0 h-screen z-10">
+          <div id="home" className="sticky top-0 h-screen z-10">
             <HeroSection onThemeToggle={toggleTheme} />
           </div>
           <div className="relative z-20">
@@ -115,10 +152,11 @@ export default function Home() {
               {/* ABOUT SECTION: Normal Document Flow so it correctly sits beneath Marquee */}
               <div
                 ref={sectionRef}
+                id="about"
                 className="relative bg-gradient-to-br from-blue-900 via-black to-black overflow-hidden flex items-start justify-center pointer-events-auto rounded-b-[3rem] md:rounded-b-[4rem] z-20"
                 style={{ clipPath, minHeight: "130vh" }}
               >
-                <div className="w-full flex flex-col items-center justify-start pt-[45vw] md:pt-[25vw] xl:pt-[20vw] pb-24 px-4 md:px-8">
+                <div ref={contentRef} className="w-full flex flex-col items-center justify-start pt-[45vw] md:pt-[25vw] xl:pt-[20vw] pb-24 px-4 md:px-8">
                   <BentoGridRedesign />
                   <AboutMe />
                 </div>
@@ -144,18 +182,25 @@ export default function Home() {
 
                 {/* 2. SKILLS - z30 (Stacks OVER Experience AND covers Projects for reveal) */}
                 <div id="skills" className="relative h-[200vh] z-30 mt-[-100vh]">
-                  <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-[3rem] md:rounded-[4rem] bg-[#050505] shadow-[0_20px_100px_rgba(0,0,0,0.9)] border-t border-white/5 overflow-hidden">
+                  <div
+                    className="sticky top-0 h-screen w-full flex flex-col items-center justify-center rounded-[3rem] md:rounded-[4rem] bg-[#050505] shadow-[0_20px_100px_rgba(0,0,0,0.9)] border-t border-white/5 overflow-hidden"
+                    style={{ contain: "layout paint" }}
+                  >
                     <Skills />
                   </div>
                 </div>
 
                 {/* 3. PROJECTS - z20 (Hidden behind Skills, revealed as Skills scrolls away) */}
-                <div id="projects" className="relative h-[500vh] w-full z-20 mt-[-100vh] bg-black">
+                <div id="projects" className="relative h-[500vh] w-full z-20 mt-[-100vh] bg-black" style={{ contain: "layout paint" }}>
                   <Projects />
                 </div>
 
                 {/* 4. CERTIFICATIONS - z50 */}
-                <div id="certifications" className="relative z-50 bg-zinc-950 shadow-[0_-50px_100px_rgba(0,0,0,0.9)] border-t border-white/5 overflow-hidden rounded-[3rem] md:rounded-[4rem] mt-[-100vh]">
+                <div
+                  id="certifications"
+                  className="relative z-50 bg-zinc-950 shadow-[0_-50px_100px_rgba(0,0,0,0.9)] border-t border-white/5 overflow-hidden rounded-[3rem] md:rounded-[4rem] mt-[-100vh]"
+                  style={{ contain: "layout paint" }}
+                >
                   <Certifications />
                 </div>
               </div>

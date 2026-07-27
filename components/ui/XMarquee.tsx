@@ -37,11 +37,12 @@ function ParallaxText({
   const hasInitialized = useRef(false);
 
 
-  // Smooth velocity handling with better spring settings
+  // Smooth velocity handling — a lighter, less-stiff spring so the marquee's
+  // speed eases in and out of scroll input rather than snapping to it.
   const smoothVelocity = useSpring(scrollVelocity, {
-    damping: 40,
-    stiffness: 400,
-    mass: 1,
+    damping: 60,
+    stiffness: 260,
+    mass: 1.4,
   });
 
   const velocityFactor = useTransform(
@@ -147,13 +148,13 @@ export default function XVelocityBandsCorrected({
       <style jsx global>{`
         .matrix-band {
           background: transparent !important;
-          border-top: 1px solid rgba(41, 141, 238, 0.3);
-          border-bottom: 1px solid rgba(41, 141, 238, 0.3);
+          border-top: 1px solid rgba(var(--tc6-rgb), 0.3);
+          border-bottom: 1px solid rgba(var(--tc6-rgb), 0.3);
           box-shadow:
-            0 0 20px rgba(41, 141, 238, 0.2),
-            0 0 40px rgba(41, 141, 238, 0.1),
-            inset 0 1px 0 rgba(41, 141, 238, 0.1),
-            inset 0 -1px 0 rgba(41, 141, 238, 0.1);
+            0 0 20px rgba(var(--tc6-rgb), 0.2),
+            0 0 40px rgba(var(--tc6-rgb), 0.1),
+            inset 0 1px 0 rgba(var(--tc6-rgb), 0.1),
+            inset 0 -1px 0 rgba(var(--tc6-rgb), 0.1);
           display: flex;
           align-items: center;
           justify-content: center;

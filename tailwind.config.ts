@@ -21,7 +21,13 @@ const config: Config = {
     },
     extend: {
       fontFamily: {
+        // Unified system: Malinton (display) · Space Grotesk (body/sans) · JetBrains Mono (data)
+        sans: ["var(--font-space-grotesk)", "system-ui", "sans-serif"],
         malinton: ["var(--font-malinton)", "sans-serif"],
+        display: ["var(--font-malinton)", "var(--font-syne)", "sans-serif"],
+        syne: ["var(--font-malinton)", "sans-serif"],
+        grotesk: ["var(--font-space-grotesk)", "sans-serif"],
+        mono: ["var(--font-jetbrains-mono)", "ui-monospace", "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",

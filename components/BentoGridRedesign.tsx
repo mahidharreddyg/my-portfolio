@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import Image from "next/image";
 
 
@@ -10,6 +10,15 @@ const glassStyle = {
   border: '1px solid rgba(255, 255, 255, 0.15)',
   boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(255, 255, 255, 0.05)'
 };
+
+/* Puzzle-assemble entrance — every card slides in from its own edge with a
+   slight rotate + scale, staggered so the grid clicks together like pieces. */
+const puzzleIn = (delay: number, fromX = 0, fromY = 0, fromR = 0) => ({
+  initial: { opacity: 0, scale: 0.86, x: fromX, y: fromY, rotate: fromR },
+  whileInView: { opacity: 1, scale: 1, x: 0, y: 0, rotate: 0 },
+  viewport: { once: true, margin: "-70px" },
+  transition: { duration: 0.72, delay, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
+});
 
 
 
@@ -25,28 +34,92 @@ const GlassHighlight = () => (
   </>
 );
 
+/* Shared card microinteraction chrome — learned from the profile & Passionate
+   cards: hover spotlight glow, tech grid, ambient corner glow, HUD brackets,
+   and a bottom shimmer line. Gives every bento card the same living feel. */
+function CardChrome({ hovered, accent = "56,189,248" }: { hovered: boolean; accent?: string }) {
+  return (
+    <>
+      {/* cursor spotlight (uses --mx/--my set by useCardTilt) */}
+      <div className="absolute inset-0 rounded-2xl pointer-events-none transition-opacity duration-500 z-0"
+        style={{ background: `radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(${accent},0.10) 0%, transparent 55%)`, opacity: hovered ? 1 : 0 }} />
+      {/* tech grid */}
+      <div className="absolute inset-0 pointer-events-none transition-opacity duration-500 z-0"
+        style={{
+          backgroundImage: "linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px)",
+          backgroundSize: "22px 22px", opacity: hovered ? 0.7 : 0.15,
+          maskImage: "radial-gradient(ellipse at center,black 15%,transparent 80%)",
+          WebkitMaskImage: "radial-gradient(ellipse at center,black 15%,transparent 80%)",
+        }} />
+      {/* ambient corner glows */}
+      <div className="absolute pointer-events-none rounded-full transition-opacity duration-500" style={{ top: -42, left: -42, width: 170, height: 170, background: `radial-gradient(circle, rgba(${accent},0.16) 0%, transparent 70%)`, filter: "blur(30px)", opacity: hovered ? 1 : 0 }} />
+      <div className="absolute pointer-events-none rounded-full transition-opacity duration-500" style={{ bottom: -30, right: -30, width: 130, height: 130, background: `radial-gradient(circle, rgba(${accent},0.10) 0%, transparent 70%)`, filter: "blur(22px)", opacity: hovered ? 1 : 0 }} />
+      {/* HUD brackets */}
+      <svg className="absolute pointer-events-none" style={{ top: 11, left: 11, zIndex: 5 }} width="14" height="14" viewBox="0 0 15 15" fill="none">
+        <path d="M1 7.5 L1 1 L7.5 1" stroke={hovered ? `rgba(${accent},0.9)` : "rgba(255,255,255,0.14)"} strokeWidth="1.5" strokeLinecap="round" style={{ transition: "stroke .35s ease" }} />
+      </svg>
+      <svg className="absolute pointer-events-none" style={{ bottom: 11, right: 11, zIndex: 5 }} width="14" height="14" viewBox="0 0 15 15" fill="none">
+        <path d="M7.5 14 L14 14 L14 7.5" stroke={hovered ? `rgba(${accent},0.9)` : "rgba(255,255,255,0.14)"} strokeWidth="1.5" strokeLinecap="round" style={{ transition: "stroke .35s ease" }} />
+      </svg>
+      {/* bottom shimmer */}
+      <div className="absolute pointer-events-none rounded-full" style={{ bottom: 0, left: "15%", right: "15%", height: "1px", zIndex: 5, background: `linear-gradient(90deg, transparent, rgba(${accent},0.8), rgba(var(--tc7-rgb),0.6), transparent)`, opacity: hovered ? 1 : 0.1, transform: `scaleX(${hovered ? 1 : 0.4})`, transition: "opacity .5s ease, transform .5s cubic-bezier(0.22,1,0.36,1)", boxShadow: hovered ? `0 -2px 10px rgba(${accent},0.5)` : "none" }} />
+    </>
+  );
+}
+
+/* Generic 3D cursor tilt + hover state (rAF-throttled, no re-renders on move).
+   Apply the returned ref/handlers to an inner wrapper so it never fights the
+   card's framer-motion entrance transform on the outer element. */
+function useCardTilt(max = 8) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [hovered, setHovered] = useState(false);
+  const raf = useRef<number | null>(null);
+  const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = ref.current;
+    if (!el) return;
+    const cx = e.clientX, cy = e.clientY;
+    if (raf.current !== null) return;
+    raf.current = requestAnimationFrame(() => {
+      raf.current = null;
+      const r = el.getBoundingClientRect();
+      const nx = (cx - r.left) / r.width, ny = (cy - r.top) / r.height;
+      el.style.setProperty("--mx", `${nx * 100}%`);
+      el.style.setProperty("--my", `${ny * 100}%`);
+      el.style.transform = `perspective(900px) rotateY(${(nx - 0.5) * max}deg) rotateX(${(ny - 0.5) * -max}deg)`;
+    });
+  };
+  const onMouseEnter = () => setHovered(true);
+  const onMouseLeave = () => {
+    if (raf.current !== null) { cancelAnimationFrame(raf.current); raf.current = null; }
+    if (ref.current) ref.current.style.transform = "perspective(900px) rotateY(0deg) rotateX(0deg)";
+    setHovered(false);
+  };
+  useEffect(() => () => { if (raf.current !== null) cancelAnimationFrame(raf.current); }, []);
+  return { ref, hovered, onMouseMove, onMouseEnter, onMouseLeave };
+}
+
 const SkillsButton = () => {
   return (
     <motion.button
       whileHover={{
         y: -2,
-        boxShadow: "0 0 24px rgba(59,130,246,0.5), 0 0 8px rgba(59,130,246,0.3)",
+        boxShadow: "0 0 24px rgba(var(--tc1-rgb),0.5), 0 0 8px rgba(var(--tc1-rgb),0.3)",
       }}
       whileTap={{ scale: 0.96 }}
       transition={{ type: "spring", stiffness: 400, damping: 20 }}
       className="relative flex items-center gap-1.5 px-4 py-1.5 overflow-hidden cursor-pointer rounded-md"
       style={{
-        background: "linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(59,130,246,0.04) 100%)",
-        border: "1px solid rgba(59,130,246,0.3)",
+        background: "linear-gradient(135deg, rgba(var(--tc1-rgb),0.1) 0%, rgba(var(--tc1-rgb),0.04) 100%)",
+        border: "1px solid rgba(var(--tc1-rgb),0.3)",
       }}
     >
       <span
         className="absolute inset-x-0 top-0 h-px"
-        style={{ background: "linear-gradient(90deg, transparent, rgba(59,130,246,0.8), transparent)" }}
+        style={{ background: "linear-gradient(90deg, transparent, rgba(var(--tc1-rgb),0.8), transparent)" }}
       />
       <span
         className="w-1 h-1 rounded-full bg-blue-400"
-        style={{ boxShadow: "0 0 4px rgba(59,130,246,0.9)" }}
+        style={{ boxShadow: "0 0 4px rgba(var(--tc1-rgb),0.9)" }}
       />
       <span className="text-[10px] font-semibold tracking-[0.14em] uppercase text-blue-300">
         Skills
@@ -149,7 +222,7 @@ const PassionateCard = () => {
       <motion.div
         className="absolute inset-0 pointer-events-none transition-opacity duration-500 rounded-2xl z-10"
         style={{
-          background: "radial-gradient(600px circle at center, rgba(41, 141, 238, 0.15), transparent 40%)",
+          background: "radial-gradient(600px circle at center, rgba(var(--tc6-rgb), 0.15), transparent 40%)",
           opacity: isHovered ? 1 : 0,
         }}
       />
@@ -318,7 +391,7 @@ const PassionateCard = () => {
             width: "100%",
             height: "75%",
             background:
-              "radial-gradient(ellipse 100% 100% at 50% 100%, rgba(59,130,246,0.45) 0%, rgba(59,130,246,0.2) 35%, rgba(59,130,246,0.06) 65%, transparent 85%)",
+              "radial-gradient(ellipse 100% 100% at 50% 100%, rgba(var(--tc1-rgb),0.45) 0%, rgba(var(--tc1-rgb),0.2) 35%, rgba(var(--tc1-rgb),0.06) 65%, transparent 85%)",
             filter: "blur(18px)",
             zIndex: 0,
           }}
@@ -437,10 +510,8 @@ const PassionateCard = () => {
 
 function FoldedAvatar({
   hovered,
-  mousePos,
 }: {
   hovered: boolean;
-  mousePos: { x: number; y: number };
 }) {
   const W = 95, H = 140; // Shrunk slightly to give name plenty of space inside constraints
 
@@ -461,11 +532,11 @@ function FoldedAvatar({
           background: 'rgba(10, 15, 30, 0.4)', // Darker tech blue base
           backdropFilter: 'none',
           WebkitBackdropFilter: 'none',
-          border: '1px solid rgba(56, 189, 248, 0.3)', // Cyan tinted border
+          border: '1px solid rgba(var(--tc2-rgb), 0.3)', // Cyan tinted border
           boxShadow: `
             0 8px 32px rgba(0, 0, 0, 0.2),
-            inset 0 1px 0 rgba(56, 189, 248, 0.2),
-            inset 0 -1px 0 rgba(56, 189, 248, 0.05)
+            inset 0 1px 0 rgba(var(--tc2-rgb), 0.2),
+            inset 0 -1px 0 rgba(var(--tc2-rgb), 0.05)
           `,
         }}
       >
@@ -484,7 +555,7 @@ function FoldedAvatar({
           className="absolute top-0 left-0 right-0 h-1/2 pointer-events-none bg-gradient-to-b from-white/5 to-transparent"
         />
         {/* Subtle grid pattern inside base card for tech feel */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(56,189,248,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(56,189,248,0.08)_1px,transparent_1px)] bg-[size:10px_10px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(var(--tc2-rgb),0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(var(--tc2-rgb),0.08)_1px,transparent_1px)] bg-[size:10px_10px]" />
 
         {/* Tech Corner Accents on Base Card */}
         <div className="absolute top-2 left-2 w-2 h-2 border-t-2 border-l-2 border-cyan-400" />
@@ -516,6 +587,7 @@ function FoldedAvatar({
           src="/Mahidhar_Reddy_G_Card_Pic.png"
           alt="Mahidhar Reddy Gaddam"
           fill
+          sizes="95px"
           className="object-cover"
           style={{
             objectPosition: "50% 10%",
@@ -530,7 +602,7 @@ function FoldedAvatar({
         {/* Interactive hover glow */}
         <div style={{
           position: "absolute", inset: 0, pointerEvents: "none",
-          background: `radial-gradient(circle at ${mousePos.x * 100}% ${mousePos.y * 100}%, rgba(255,255,255,0.15) 0%, transparent 60%)`,
+          background: `radial-gradient(circle at var(--mx, 50%) var(--my, 35%), rgba(255,255,255,0.15) 0%, transparent 60%)`,
           opacity: hovered ? 1 : 0,
           transition: "opacity 0.25s ease",
           mixBlendMode: "overlay",
@@ -540,11 +612,11 @@ function FoldedAvatar({
       {/* Floating Shadow Pool (adapts width based on card split) */}
       <div style={{
         position: "absolute", bottom: -24, left: "15%", right: "15%", height: 16,
-        background: "rgba(37,99,235,0.4)",
+        background: "rgba(var(--tc3-rgb),0.4)",
         filter: "blur(14px)", borderRadius: "50%",
         opacity: hovered ? 0.9 : 0.4,
         transform: `scaleX(${hovered ? 1.3 : 0.8})`,
-        transition: "all 0.5s cubic-bezier(0.34,1.3,0.64,1)",
+        transition: "all 0.5s cubic-bezier(0.22,1,0.36,1)",
         zIndex: 0,
       }} />
 
@@ -555,11 +627,15 @@ function GlitchName({ hovered }: { hovered: boolean }) {
   const [glitch, setGlitch] = useState(false);
 
   useEffect(() => {
-    const t = setInterval(() => {
+    let offTimeout: ReturnType<typeof setTimeout>;
+    const interval = setInterval(() => {
       setGlitch(true);
-      setTimeout(() => setGlitch(false), 320);
+      offTimeout = setTimeout(() => setGlitch(false), 320);
     }, 5000);
-    return () => clearInterval(t);
+    return () => {
+      clearInterval(interval);
+      clearTimeout(offTimeout);
+    };
   }, []);
 
   const css = `
@@ -600,7 +676,7 @@ function GlitchName({ hovered }: { hovered: boolean }) {
       {/* Top Tech Accent Line */}
       <div className="flex items-center gap-1.5 mb-2.5 w-max opacity-80">
         <div className="flex gap-[2px]">
-          <div className="h-[2px] w-[2px] bg-blue-400 rounded-sm shadow-[0_0_8px_rgba(59,130,246,0.9)]" />
+          <div className="h-[2px] w-[2px] bg-blue-400 rounded-sm shadow-[0_0_8px_rgba(var(--tc1-rgb),0.9)]" />
           <div className="h-[2px] w-[2px] bg-blue-400/80 rounded-sm" />
           <div className="h-[2px] w-[2px] bg-blue-400/60 rounded-sm" />
         </div>
@@ -653,13 +729,13 @@ function GlitchName({ hovered }: { hovered: boolean }) {
         <div className="flex gap-[2px]">
           <div className="h-[2px] w-[2px] bg-blue-400/60 rounded-sm" />
           <div className="h-[2px] w-[2px] bg-blue-400/80 rounded-sm" />
-          <div className="h-[2px] w-[2px] bg-blue-400 rounded-sm shadow-[0_0_8px_rgba(59,130,246,0.9)]" />
+          <div className="h-[2px] w-[2px] bg-blue-400 rounded-sm shadow-[0_0_8px_rgba(var(--tc1-rgb),0.9)]" />
         </div>
       </div>
 
       <div className="flex items-center gap-2.5 mt-4 text-[13px] font-mono tracking-widest uppercase">
         <span className="text-[20px] drop-shadow-md leading-none flex items-center justify-center">🇮🇳</span>
-        <span className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-white via-white/90 to-white/60 drop-shadow-sm flex items-center h-full">
+        <span className="font-semibold text-white/85 drop-shadow-sm flex items-center h-full">
           Bengaluru, India
         </span>
       </div>
@@ -670,21 +746,31 @@ function GlitchName({ hovered }: { hovered: boolean }) {
 function useProfileCard() {
   const cardRef = useRef<HTMLDivElement>(null);
   const [hovered, setHovered] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.35 });
-
+  const rafId = useRef<number | null>(null);
 
   const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const r = cardRef.current?.getBoundingClientRect();
-    if (!r) return;
-    const nx = (e.clientX - r.left) / r.width;
-    const ny = (e.clientY - r.top) / r.height;
-    setMousePos({ x: nx, y: ny });
-    if (cardRef.current)
-      cardRef.current.style.transform =
+    const el = cardRef.current;
+    if (!el) return;
+    const clientX = e.clientX;
+    const clientY = e.clientY;
+    if (rafId.current !== null) return;
+    rafId.current = requestAnimationFrame(() => {
+      rafId.current = null;
+      const r = el.getBoundingClientRect();
+      const nx = (clientX - r.left) / r.width;
+      const ny = (clientY - r.top) / r.height;
+      el.style.setProperty("--mx", `${nx * 100}%`);
+      el.style.setProperty("--my", `${ny * 100}%`);
+      el.style.transform =
         `perspective(900px) rotateY(${(nx - 0.5) * 14}deg) rotateX(${(ny - 0.5) * -14}deg) scale(1.025)`;
+    });
   };
 
   const onMouseLeave = () => {
+    if (rafId.current !== null) {
+      cancelAnimationFrame(rafId.current);
+      rafId.current = null;
+    }
     if (cardRef.current)
       cardRef.current.style.transform =
         "perspective(900px) rotateY(0deg) rotateX(0deg) scale(1)";
@@ -693,14 +779,251 @@ function useProfileCard() {
 
   const onMouseEnter = () => setHovered(true);
 
-  return { cardRef, hovered, mousePos, onMouseMove, onMouseLeave, onMouseEnter };
+  useEffect(() => () => {
+    if (rafId.current !== null) cancelAnimationFrame(rafId.current);
+  }, []);
+
+  return { cardRef, hovered, onMouseMove, onMouseLeave, onMouseEnter };
+}
+
+/* ================================================================
+   MEANINGFUL BENTO BOXES (redesigned to earn their place)
+================================================================ */
+
+// Shared micro-label — mono is reserved for real data / measurement.
+const CardKicker = ({ children }: { children: React.ReactNode }) => (
+  <div className="flex items-center gap-2 mb-4">
+    <span className="h-1 w-1 rounded-full bg-sky-400" style={{ boxShadow: "0 0 6px rgba(var(--tc2-rgb),0.9)" }} />
+    <span className="font-mono text-[9px] tracking-[0.28em] uppercase text-white/35">{children}</span>
+  </div>
+);
+
+const CAPABILITIES = [
+  { t: "Full-Stack Engineering", d: "End-to-end products — data model to pixel.", icon: "M8 6 3 12l5 6M16 6l5 6-5 6" },
+  { t: "Cloud & DevOps", d: "AWS-native infra, containers, CI/CD automation.", icon: "M17 18a4 4 0 0 0 .3-8A5.5 5.5 0 0 0 6.5 9 3.5 3.5 0 0 0 7 18z" },
+  { t: "AI / ML Systems", d: "Agentic pipelines, RAG, applied machine learning.", icon: "M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M3 12h3m12 0h3M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1" },
+  { t: "UI / UX Strategy", d: "Interfaces engineered with a designer's eye.", icon: "M12 3 3 8l9 5 9-5zM3 14l9 5 9-5" },
+  { t: "Performance", d: "Scalable architectures tuned for speed.", icon: "M13 2 4 14h6l-1 8 10-12h-7z" },
+];
+
+// TALL LEFT — Capabilities (what he builds). Replaces the fake commit heatmap.
+function CapabilitiesCard() {
+  const { ref, hovered, onMouseMove, onMouseEnter, onMouseLeave } = useCardTilt(5);
+  return (
+    <motion.div {...puzzleIn(0.12, -70, 40, 3)} className="h-[502px] rounded-2xl relative" style={{ perspective: "1000px" }}>
+      <div
+        ref={ref}
+        onMouseMove={onMouseMove}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        className="bento-card w-full h-full rounded-2xl relative overflow-hidden group/cap"
+        style={{ ...glassStyle, transition: "transform 0.25s cubic-bezier(0.22,1,0.36,1)" }}
+      >
+      <GlassHighlight />
+      <CardChrome hovered={hovered} />
+      <div className="absolute inset-0 p-6 flex flex-col z-10">
+        <CardKicker>What I build</CardKicker>
+        <h3 className="font-display text-[22px] leading-[1.1] font-bold text-white mb-5 tracking-tight">
+          Capabilities
+        </h3>
+        <div className="flex flex-col divide-y divide-white/[0.06] -mx-1">
+          {CAPABILITIES.map((c) => (
+            <div key={c.t} className="group/row flex items-start gap-3.5 py-3 px-1 rounded-lg transition-colors duration-300 hover:bg-white/[0.02]">
+              <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] text-sky-300 transition-colors duration-300 group-hover/row:border-sky-400/40 group-hover/row:text-sky-200">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                  <path d={c.icon} />
+                </svg>
+              </span>
+              <div className="min-w-0">
+                <div className="text-[13px] font-semibold text-white/90 leading-tight">{c.t}</div>
+                <div className="text-[11.5px] text-white/40 leading-snug mt-0.5">{c.d}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// WIDE STRIP — Credentials (proof). Replaces the fake "Systems Online" uptime.
+function CredentialsStrip() {
+  const items = [
+    { k: "Certified", v: "AWS ×2", s: "Cloud Practitioner · Solutions Architect" },
+    { k: "Education", v: "B.Tech CS", s: "VIT · Final year" },
+    { k: "Based in", v: "Bengaluru", s: "IST · UTC+5:30" },
+  ];
+  const [hov, setHov] = useState(false);
+  return (
+    <motion.div
+      {...puzzleIn(0.06, 0, -50, -2)}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      className="bento-card col-span-2 rounded-2xl relative overflow-hidden"
+      style={glassStyle}
+    >
+      <GlassHighlight />
+      <CardChrome hovered={hov} />
+      <div className="absolute inset-0 flex items-center divide-x divide-white/[0.07] z-10">
+        {items.map((it) => (
+          <div key={it.k} className="flex-1 px-5 md:px-7 min-w-0 group/cred">
+            <div className="font-mono text-[8px] tracking-[0.28em] uppercase text-white/30 mb-1 transition-colors group-hover/cred:text-sky-300/60">{it.k}</div>
+            <div className="flex items-baseline gap-2 min-w-0">
+              <span className="font-display text-base md:text-lg font-bold text-white shrink-0">{it.v}</span>
+              <span className="hidden lg:inline text-[10px] text-white/35 truncate">{it.s}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+// SMALL — Availability (when/where). Live IST readout replaces the generic clock.
+function AvailabilityCard() {
+  const [time, setTime] = useState("--:--");
+  useEffect(() => {
+    const update = () =>
+      setTime(new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Kolkata" }).format(new Date()));
+    update();
+    const t = setInterval(update, 15000);
+    return () => clearInterval(t);
+  }, []);
+  const { ref, hovered, onMouseMove, onMouseEnter, onMouseLeave } = useCardTilt(7);
+  return (
+    <motion.div {...puzzleIn(0.18, 50, -30, 3)} className="rounded-2xl relative" style={{ perspective: "800px" }}>
+      <div
+        ref={ref}
+        onMouseMove={onMouseMove}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        className="bento-card w-full h-full rounded-2xl relative overflow-hidden group/avail"
+        style={{ ...glassStyle, transition: "transform 0.25s cubic-bezier(0.22,1,0.36,1)" }}
+      >
+        <GlassHighlight />
+        <CardChrome hovered={hovered} accent="52,211,153" />
+        <div className="absolute inset-0 p-5 flex flex-col justify-between z-10">
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400/60 animate-ping" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" style={{ boxShadow: "0 0 8px rgba(52,211,153,0.8)" }} />
+            </span>
+            <span className="font-mono text-[9px] tracking-[0.24em] uppercase text-emerald-300/80">Available</span>
+          </div>
+          <div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="font-mono text-3xl font-bold text-white tabular-nums tracking-tight">{time}</span>
+              <span className="font-mono text-[10px] text-white/30">IST</span>
+            </div>
+            <p className="text-[11px] text-white/40 mt-1 leading-snug">Open to full-time &amp; freelance — remote-friendly.</p>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+const NOW_ITEMS = [
+  "Building agentic AI & RAG systems",
+  "Shipping cloud-native, containerized apps",
+  "Sharpening large-scale system design",
+];
+
+// SMALL — Now (what's next). Replaces the % progress bars (craft-floor anti-pattern).
+function NowCard() {
+  const { ref, hovered, onMouseMove, onMouseEnter, onMouseLeave } = useCardTilt(7);
+  return (
+    <motion.div {...puzzleIn(0.24, 50, 50, -3)} className="rounded-2xl relative" style={{ perspective: "800px" }}>
+      <div
+        ref={ref}
+        onMouseMove={onMouseMove}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        className="bento-card w-full h-full rounded-2xl relative overflow-hidden group/now"
+        style={{ ...glassStyle, transition: "transform 0.25s cubic-bezier(0.22,1,0.36,1)" }}
+      >
+        <GlassHighlight />
+        <CardChrome hovered={hovered} />
+        <div className="absolute inset-0 p-5 flex flex-col z-10">
+          <CardKicker>Currently</CardKicker>
+          <h3 className="font-display text-lg font-bold text-white mb-4 tracking-tight">On my desk</h3>
+          <div className="flex flex-col gap-3.5 flex-1">
+            {NOW_ITEMS.map((t, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-sky-400/80" style={{ boxShadow: "0 0 6px rgba(var(--tc2-rgb),0.6)" }} />
+                <span className="text-[12.5px] text-white/60 leading-snug">{t}</span>
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-white/[0.06]">
+            <span className="font-mono text-[8px] tracking-[0.24em] uppercase text-white/25">Graduating 2026</span>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// WIDE — Contact CTA (call to action). Replaces the gradient-text "Let's Create".
+function ContactCTA() {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText("mahidhar.reddy2003@gmail.com");
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {}
+  };
+  const [hov, setHov] = useState(false);
+  return (
+    <motion.div
+      {...puzzleIn(0.3, 0, 60, 2)}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      className="bento-card col-span-2 rounded-2xl relative overflow-hidden group/cta"
+      style={glassStyle}
+    >
+      <GlassHighlight />
+      <CardChrome hovered={hov} />
+      <div className="absolute inset-0 p-6 md:p-8 flex items-center justify-between gap-6 z-10">
+        <div className="min-w-0">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-3">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" style={{ boxShadow: "0 0 6px rgba(52,211,153,0.7)" }} />
+            <span className="font-mono text-[9px] tracking-[0.2em] uppercase text-emerald-300/80">Open to collaborate</span>
+          </div>
+          <h3 className="font-display text-2xl md:text-[28px] font-bold text-white leading-tight tracking-tight">
+            Let&apos;s build something<span className="text-sky-400"> together.</span>
+          </h3>
+          <p className="text-[12.5px] md:text-sm text-white/40 mt-1.5 max-w-md leading-relaxed">
+            Engineering roles, freelance work, and ambitious side projects — worldwide.
+          </p>
+        </div>
+        <button
+          onClick={copy}
+          className="hidden md:inline-flex shrink-0 items-center gap-2.5 rounded-full pl-5 pr-2 py-2 border border-white/15 bg-white/[0.04] text-white text-sm font-medium transition-all duration-300 hover:border-sky-400/40 hover:bg-white/[0.07]"
+        >
+          <span className="tabular-nums">{copied ? "Copied to clipboard" : "mahidhar.reddy2003@gmail.com"}</span>
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-sky-500/15 border border-sky-400/30 text-sky-300">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              {copied ? <path d="M20 6 9 17l-5-5" /> : <><rect x="9" y="9" width="11" height="11" rx="2" /><path d="M5 15V5a2 2 0 0 1 2-2h10" /></>}
+            </svg>
+          </span>
+        </button>
+      </div>
+    </motion.div>
+  );
 }
 
 export function BentoGridRedesign() {
-  const { cardRef, hovered, mousePos, onMouseMove: profileMouseMove, onMouseLeave: profileMouseLeave, onMouseEnter: profileMouseEnter } = useProfileCard();
+  const { cardRef, hovered, onMouseMove: profileMouseMove, onMouseLeave: profileMouseLeave, onMouseEnter: profileMouseEnter } = useProfileCard();
+  const bentoRootRef = useRef<HTMLDivElement>(null);
+  // The whole grid mounts at page load (before the user has scrolled here) —
+  // only spin the MR circle's rings while the grid is actually on screen.
+  const bentoInView = useInView(bentoRootRef, { margin: "200px 0px 200px 0px" });
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 pb-12 pt-24 md:pt-48 group/bento">
+    <div ref={bentoRootRef} className="w-full max-w-6xl mx-auto px-4 pb-12 pt-10 md:pt-24 group/bento">
       <style>{`
         @keyframes bento-pulse-glow {
           0%, 100% { opacity: 0.55; }
@@ -714,10 +1037,7 @@ export function BentoGridRedesign() {
         <div className="flex flex-col gap-4">
           {/* 1. Profile Card (Top Left) - Fixed Height 270px */}
           <motion.div
-            initial={{ opacity: 0, x: -100, y: -50 }}
-            whileInView={{ opacity: 1, x: 0, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+            {...puzzleIn(0, -70, -40, -3)}
             className="h-[270px] rounded-2xl relative"
             style={{ perspective: "1000px" }}
           >
@@ -745,7 +1065,7 @@ export function BentoGridRedesign() {
               <div
                 className="absolute inset-0 rounded-2xl pointer-events-none"
                 style={{
-                  background: `radial-gradient(circle at ${mousePos.x * 100}% ${mousePos.y * 100}%, rgba(56,189,248,0.07) 0%, transparent 60%)`,
+                  background: `radial-gradient(circle at var(--mx, 50%) var(--my, 35%), rgba(var(--tc2-rgb),0.07) 0%, transparent 60%)`,
                   opacity: hovered ? 1 : 0,
                   transition: "opacity 0.3s ease",
                   zIndex: 0,
@@ -777,7 +1097,7 @@ export function BentoGridRedesign() {
               <div
                 className={`absolute inset-0 pointer-events-none transition-opacity duration-700 z-10 ${hovered ? "bento-pulse-anim" : ""}`}
                 style={{
-                  background: "radial-gradient(circle at 50% 100%, rgba(59, 130, 246, 0.15) 0%, transparent 60%)",
+                  background: "radial-gradient(circle at 50% 100%, rgba(var(--tc1-rgb), 0.15) 0%, transparent 60%)",
                   opacity: hovered ? 1 : 0,
                 }}
               />
@@ -794,14 +1114,14 @@ export function BentoGridRedesign() {
               {/* Ambient glow — top left */}
               <div className="absolute pointer-events-none rounded-full transition-opacity duration-500" style={{
                 top: -44, left: -44, width: 190, height: 190,
-                background: "radial-gradient(circle, rgba(37,99,235,0.18) 0%, transparent 70%)",
+                background: "radial-gradient(circle, rgba(var(--tc3-rgb),0.18) 0%, transparent 70%)",
                 filter: "blur(28px)", display: hovered ? "block" : "none",
               }} />
 
               {/* Ambient glow — bottom right */}
               <div className="absolute pointer-events-none rounded-full transition-opacity duration-500" style={{
                 bottom: -30, right: -30, width: 130, height: 130,
-                background: "radial-gradient(circle, rgba(14,165,233,0.1) 0%, transparent 70%)",
+                background: "radial-gradient(circle, rgba(var(--tc7-rgb),0.1) 0%, transparent 70%)",
                 filter: "blur(20px)", display: hovered ? "block" : "none",
               }} />
 
@@ -809,7 +1129,7 @@ export function BentoGridRedesign() {
               <svg className="absolute pointer-events-none" style={{ top: 12, left: 12, zIndex: 5 }}
                 width="15" height="15" viewBox="0 0 15 15" fill="none">
                 <path d="M1 7.5 L1 1 L7.5 1"
-                  stroke={hovered ? "rgba(56,189,248,0.85)" : "rgba(255,255,255,0.15)"}
+                  stroke={hovered ? "rgba(var(--tc2-rgb),0.85)" : "rgba(255,255,255,0.15)"}
                   strokeWidth="1.6" strokeLinecap="round"
                   style={{ transition: "stroke 0.35s ease" }}
                 />
@@ -819,7 +1139,7 @@ export function BentoGridRedesign() {
               <svg className="absolute pointer-events-none" style={{ bottom: 12, right: 12, zIndex: 5 }}
                 width="15" height="15" viewBox="0 0 15 15" fill="none">
                 <path d="M7.5 14 L14 14 L14 7.5"
-                  stroke={hovered ? "rgba(56,189,248,0.85)" : "rgba(255,255,255,0.15)"}
+                  stroke={hovered ? "rgba(var(--tc2-rgb),0.85)" : "rgba(255,255,255,0.15)"}
                   strokeWidth="1.6" strokeLinecap="round"
                   style={{ transition: "stroke 0.35s ease" }}
                 />
@@ -828,27 +1148,27 @@ export function BentoGridRedesign() {
               {/* Bottom shimmer */}
               <div className="absolute pointer-events-none rounded-full" style={{
                 bottom: 0, left: "15%", right: "15%", height: "1px", zIndex: 5,
-                background: "linear-gradient(90deg, transparent, rgba(56,189,248,0.8), rgba(14,165,233,0.6), transparent)",
+                background: "linear-gradient(90deg, transparent, rgba(var(--tc2-rgb),0.8), rgba(var(--tc7-rgb),0.6), transparent)",
                 opacity: hovered ? 1 : 0.1,
                 transform: `scaleX(${hovered ? 1 : 0.4})`,
                 transition: "opacity 0.5s ease, transform 0.5s cubic-bezier(0.23,1,0.32,1)",
-                boxShadow: hovered ? "0 -2px 10px rgba(56,189,248,0.5)" : "none"
+                boxShadow: hovered ? "0 -2px 10px rgba(var(--tc2-rgb),0.5)" : "none"
               }} />
 
               {/* Avatar with folded corner */}
-              <FoldedAvatar hovered={hovered} mousePos={mousePos} />
+              <FoldedAvatar hovered={hovered} />
 
               {/* Name + location */}
               <div className="flex flex-col justify-center relative z-10 flex-1 text-left pl-1">
                 <div className="font-mono text-[8px] tracking-wider uppercase font-semibold mb-2 flex flex-wrap items-center gap-1 w-max">
                   <span className="text-blue-500 font-bold">{'>'}</span>
-                  <span className="text-blue-300 drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]">Software Engineer</span>
+                  <span className="text-blue-300 drop-shadow-[0_0_8px_rgba(var(--tc1-rgb),0.6)]">Software Engineer</span>
                   <span className="text-gray-500">{"W/"}</span>
                   <span className="text-gray-400">Design Eye</span>
                   <motion.span
                     animate={{ opacity: [1, 0] }}
                     transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}
-                    className="w-[1.5px] h-2.5 bg-blue-400 inline-block shadow-[0_0_5px_rgba(59,130,246,0.8)] ml-0.5"
+                    className="w-[1.5px] h-2.5 bg-blue-400 inline-block shadow-[0_0_5px_rgba(var(--tc1-rgb),0.8)] ml-0.5"
                   />
                 </div>
                 <GlitchName hovered={hovered} />
@@ -856,350 +1176,26 @@ export function BentoGridRedesign() {
             </div>
           </motion.div>
 
-          {/* 3. Large Vertical Left (Bottom Left) — Live Code Activity */}
-          <motion.div
-            initial={{ opacity: 0, x: -100, y: 50 }}
-            whileInView={{ opacity: 1, x: 0, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="bento-card h-[502px] rounded-2xl relative overflow-hidden"
-            style={glassStyle}
-          >
-            <GlassHighlight />
+          <CapabilitiesCard />
 
-            {/* Terminal-style background */}
-            <div className="absolute inset-0 pointer-events-none" style={{
-              backgroundImage: 'linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px)',
-              backgroundSize: '16px 16px',
-            }} />
-
-            <div className="absolute inset-0 p-6 flex flex-col z-10">
-              {/* Header */}
-              <div className="flex items-center gap-2 mb-5">
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 rounded-full bg-red-400/80" />
-                  <div className="w-2 h-2 rounded-full bg-yellow-400/80" />
-                  <div className="w-2 h-2 rounded-full bg-green-400/80" />
-                </div>
-                <span className="text-[9px] font-mono text-white/25 ml-2 tracking-wider">~/code/activity</span>
-              </div>
-
-              {/* Commit Heatmap */}
-              <div className="mb-5">
-                <div className="text-[9px] font-mono text-white/30 uppercase tracking-widest mb-3">Contribution Heatmap</div>
-                <div className="grid grid-cols-12 gap-[3px]">
-                  {Array.from({ length: 84 }, (_, i) => {
-                    const intensity = Math.random();
-                    const bg = intensity > 0.8 ? 'bg-blue-400' : intensity > 0.6 ? 'bg-blue-500/70' : intensity > 0.35 ? 'bg-blue-600/40' : 'bg-white/5';
-                    return <div key={i} className={`w-full aspect-square rounded-[2px] ${bg}`} />;
-                  })}
-                </div>
-              </div>
-
-              {/* Stats Row */}
-              <div className="grid grid-cols-2 gap-3 mb-5">
-                <div className="bg-white/[0.03] border border-white/[0.06] rounded-lg p-3">
-                  <div className="text-[9px] font-mono text-white/30 uppercase tracking-wider mb-1">Total Commits</div>
-                  <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 font-mono">2,400+</div>
-                </div>
-                <div className="bg-white/[0.03] border border-white/[0.06] rounded-lg p-3">
-                  <div className="text-[9px] font-mono text-white/30 uppercase tracking-wider mb-1">Active Repos</div>
-                  <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-300 font-mono">15+</div>
-                </div>
-              </div>
-
-              {/* Recent Commits */}
-              <div className="flex-1 flex flex-col gap-2">
-                <div className="text-[9px] font-mono text-white/30 uppercase tracking-widest mb-1">Recent Activity</div>
-                {[
-                  { msg: 'feat: implement agentic AI pipeline', time: '2h ago', color: 'bg-green-400' },
-                  { msg: 'refactor: optimize scroll perf', time: '5h ago', color: 'bg-blue-400' },
-                  { msg: 'fix: resolve hydration mismatch', time: '1d ago', color: 'bg-yellow-400' },
-                  { msg: 'chore: update dependencies', time: '2d ago', color: 'bg-purple-400' },
-                ].map((commit, i) => (
-                  <div key={i} className="flex items-center gap-2 bg-white/[0.02] border border-white/[0.04] rounded-md px-3 py-2">
-                    <div className={`w-1.5 h-1.5 rounded-full ${commit.color} shrink-0`} style={{ boxShadow: '0 0 6px currentColor' }} />
-                    <span className="text-[10px] font-mono text-white/60 truncate flex-1">{commit.msg}</span>
-                    <span className="text-[9px] font-mono text-white/20 shrink-0">{commit.time}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
         </div>
 
         {/* RIGHT COLUMN - Independent Grid */}
         <div className="md:col-span-2 grid grid-cols-2 gap-4 grid-rows-[70px_184px_296px_190px]">
 
-          {/* 2. Top Bar (Top Right) — Performance Pulse */}
-          <motion.div
-            initial={{ opacity: 0, x: 100, y: -50 }}
-            whileInView={{ opacity: 1, x: 0, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="bento-card col-span-2 rounded-2xl relative overflow-hidden group/topbar"
-            style={glassStyle}
-          >
-            <GlassHighlight />
+          <CredentialsStrip />
 
-            {/* Animated line sweep on hover */}
-            <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
-              <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-blue-400/60 to-transparent opacity-0 group-hover/topbar:opacity-100 transition-opacity duration-500" />
-            </div>
 
-            <div className="absolute inset-0 flex items-center justify-between px-6 md:px-8 z-10">
-              <div className="flex items-center gap-3">
-                {/* Live pulse metallic orb */}
-                <div className="relative">
-                  <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center relative overflow-hidden"
-                       style={{
-                         background: "radial-gradient(circle at 30% 30%, #ffffff 0%, #e2e8f0 10%, #94a3b8 40%, #334155 80%, #0f172a 100%)",
-                         boxShadow: "inset -2px -2px 6px rgba(0,0,0,0.5), inset 2px 2px 6px rgba(255,255,255,0.8), 0 4px 10px rgba(0,0,0,0.4)"
-                       }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-slate-900 mix-blend-overlay"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                    {/* Sharp metallic specular */}
-                    <div className="absolute top-1 left-1.5 w-3 h-2 bg-white/80 rounded-full blur-[1px] rotate-[-45deg]" />
-                  </div>
-                  <motion.div
-                    className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-400 border border-green-200"
-                    animate={{ scale: [1, 1.3, 1], opacity: [0.8, 1, 0.8] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                    style={{ boxShadow: '0 0 8px rgba(34,197,94,0.8), inset 1px 1px 2px rgba(255,255,255,0.8)' }}
-                  />
-                </div>
-                <div>
-                  <h3 className="text-white font-semibold text-sm">Systems Online</h3>
-                  <p className="text-[10px] text-white/30 font-mono tracking-wider">ALL SERVICES OPERATIONAL</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="hidden md:flex items-center gap-1.5">
-                  {[0.3, 0.6, 0.8, 0.5, 0.9, 0.7, 0.4, 0.85].map((h, i) => (
-                    <motion.div
-                      key={i}
-                      className="w-1 rounded-full bg-gradient-to-t from-blue-500 to-cyan-400"
-                      initial={{ height: 4 }}
-                      animate={{ height: [4, h * 28, 4] }}
-                      transition={{ duration: 1.5, delay: i * 0.12, repeat: Infinity, ease: "easeInOut" }}
-                      style={{ opacity: 0.6 + h * 0.4 }}
-                    />
-                  ))}
-                </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 font-mono">99.9%</div>
-                  <p className="text-[9px] text-white/20 font-mono tracking-wider">UPTIME</p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
+          <AvailabilityCard />
 
-          {/* 4. Center Top (Middle Left) — Glassmorphic Clock */}
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="bento-card rounded-2xl relative overflow-hidden group/clock"
-            style={glassStyle}
-          >
-            <GlassHighlight />
-
-            <div className="absolute inset-0 p-5 flex flex-col justify-between z-10">
-              {/* Clock face */}
-              <div className="relative w-20 h-20 mx-auto">
-                {/* Outer metallic ring */}
-                <motion.div
-                  className="absolute inset-0 rounded-full"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 60, ease: "linear", repeat: Infinity }}
-                  style={{
-                    background: "conic-gradient(from 0deg, #94a3b8, #e2e8f0, #94a3b8, #475569, #94a3b8, #e2e8f0, #94a3b8)",
-                    padding: "2px",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.4)"
-                  }}
-                >
-                  {/* Clock body */}
-                  <div className="w-full h-full rounded-full relative overflow-hidden"
-                       style={{
-                         background: "radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%)",
-                         boxShadow: "inset 0 4px 8px rgba(0,0,0,0.6)"
-                       }}>
-                    
-                    {/* Hour markers */}
-                    {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg, i) => (
-                      <div key={i} className="absolute w-[1.5px] h-1.5 bg-slate-400" style={{
-                        top: '50%', left: '50%',
-                        transform: `translate(-50%, -50%) rotate(${deg}deg) translateY(-28px)`,
-                        height: i % 3 === 0 ? '5px' : '3px',
-                        opacity: i % 3 === 0 ? 0.8 : 0.4,
-                      }} />
-                    ))}
-                    
-                    {/* Hour hand metallic */}
-                    <motion.div
-                      className="absolute w-[2px] h-5 rounded-full origin-bottom"
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 43200, ease: "linear", repeat: Infinity }}
-                      style={{ bottom: '50%', left: 'calc(50% - 1px)', background: "linear-gradient(to top, #64748b, #f8fafc)", boxShadow: "0 2px 4px rgba(0,0,0,0.5)" }}
-                    />
-                    
-                    {/* Minute hand metallic */}
-                    <motion.div
-                      className="absolute w-[1.5px] h-7 rounded-full origin-bottom"
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 3600, ease: "linear", repeat: Infinity }}
-                      style={{ bottom: '50%', left: 'calc(50% - 0.75px)', background: "linear-gradient(to top, #3b82f6, #93c5fd)", boxShadow: "0 2px 4px rgba(0,0,0,0.5)" }}
-                    />
-                    
-                    {/* Center metallic dot */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full"
-                         style={{
-                           background: "radial-gradient(circle at 30% 30%, #ffffff 0%, #94a3b8 50%, #1e293b 100%)",
-                           boxShadow: "0 2px 4px rgba(0,0,0,0.5)"
-                         }} />
-                  </div>
-                </motion.div>
-              </div>
-
-              {/* Info */}
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-2 mb-1">
-                  <motion.div
-                    className="w-1.5 h-1.5 rounded-full bg-green-400"
-                    animate={{ scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    style={{ boxShadow: '0 0 6px rgba(34,197,94,0.6)' }}
-                  />
-                  <span className="text-[9px] font-mono text-green-400/70 uppercase tracking-widest">Available</span>
-                </div>
-                <p className="text-lg font-bold text-white font-mono">IST <span className="text-white/20 text-xs">UTC+5:30</span></p>
-                <p className="text-[10px] text-white/25 font-mono mt-0.5">Remote Worldwide</p>
-              </div>
-            </div>
-          </motion.div>
 
           <PassionateCard />
 
-          {/* 6. Center Bottom (Middle Left) — Current Focus Areas */}
-          <motion.div
-            initial={{ opacity: 0, x: 50, y: 50 }}
-            whileInView={{ opacity: 1, x: 0, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="bento-card rounded-2xl relative overflow-hidden group/focus"
-            style={glassStyle}
-          >
-            <GlassHighlight />
+          <NowCard />
 
-            <div className="absolute inset-0 p-5 flex flex-col z-10">
-              <div className="text-[9px] font-mono text-white/30 uppercase tracking-widest mb-3">Current Focus</div>
 
-              <div className="flex flex-col gap-2.5 flex-1 justify-center">
-                {[
-                  { label: 'Agentic AI', pct: 92, from: '#3b82f6', to: '#06b6d4' },
-                  { label: 'System Design', pct: 85, from: '#8b5cf6', to: '#a78bfa' },
-                  { label: 'Voice AI', pct: 78, from: '#22c55e', to: '#34d399' },
-                  { label: 'Web Perf', pct: 88, from: '#f59e0b', to: '#fbbf24' },
-                ].map((item, i) => (
-                  <div key={i}>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-[10px] font-semibold text-white/70">{item.label}</span>
-                      <span className="text-[9px] font-mono text-white/25">{item.pct}%</span>
-                    </div>
-                    <div className="h-1.5 rounded-full bg-white/[0.04] overflow-hidden">
-                      <motion.div
-                        className="h-full rounded-full"
-                        initial={{ width: 0 }}
-                        whileInView={{ width: `${item.pct}%` }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1.2, delay: 0.3 + i * 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
-                        style={{
-                          background: `linear-gradient(90deg, ${item.from}, ${item.to})`,
-                          boxShadow: `0 0 8px ${item.from}40`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
+          <ContactCTA />
 
-              <div className="flex items-center gap-1.5 mt-2">
-                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                <span className="text-[8px] font-mono text-white/15 uppercase tracking-wider">Always Learning</span>
-                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-              </div>
-            </div>
-          </motion.div>
-
-          {/* 7. Bottom Wide (Bottom) — Let's Create Together */}
-          <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="bento-card col-span-2 rounded-2xl relative overflow-hidden group/cta"
-            style={glassStyle}
-          >
-            <GlassHighlight />
-
-            {/* Hover glow sweep */}
-            <div className="absolute inset-0 pointer-events-none transition-opacity duration-700 opacity-0 group-hover/cta:opacity-100" style={{
-              background: 'radial-gradient(ellipse at 30% 50%, rgba(59,130,246,0.12) 0%, transparent 60%)',
-            }} />
-
-            <div className="absolute inset-0 p-6 md:p-8 flex items-center justify-between z-10">
-              <div className="flex-1">
-                {/* Open to work badge */}
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 mb-4">
-                  <motion.div
-                    className="w-1.5 h-1.5 rounded-full bg-green-400"
-                    animate={{ scale: [1, 1.3, 1], opacity: [0.7, 1, 0.7] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                    style={{ boxShadow: '0 0 6px rgba(34,197,94,0.6)' }}
-                  />
-                  <span className="text-[9px] font-mono text-green-400/80 uppercase tracking-widest">Open to Collaborate</span>
-                </div>
-
-                <h3 className="text-xl md:text-2xl font-bold mb-2">
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-200 to-blue-400">Let's Create</span>
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300"> Together</span>
-                </h3>
-                <p className="text-xs md:text-sm text-white/30 max-w-sm leading-relaxed">Open for engineering roles, freelance opportunities, and exciting collaborations worldwide.</p>
-              </div>
-
-              {/* Animated orbiting element */}
-              <div className="w-24 h-24 md:w-28 md:h-28 relative hidden md:flex items-center justify-center shrink-0">
-                {/* Orbiting rings */}
-                <motion.div
-                  className="absolute inset-0 rounded-full border border-white/[0.06]"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 12, ease: "linear", repeat: Infinity }}
-                >
-                  <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-blue-400/60" style={{ boxShadow: '0 0 8px rgba(59,130,246,0.4)' }} />
-                </motion.div>
-                <motion.div
-                  className="absolute inset-3 rounded-full border border-blue-500/15"
-                  animate={{ rotate: -360 }}
-                  transition={{ duration: 8, ease: "linear", repeat: Infinity }}
-                >
-                  <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-cyan-400/60" style={{ boxShadow: '0 0 6px rgba(6,182,212,0.4)' }} />
-                </motion.div>
-
-                {/* Center metallic icon */}
-                <div className="w-12 h-12 rounded-full relative overflow-hidden flex items-center justify-center"
-                     style={{
-                       background: "radial-gradient(circle at 35% 35%, #ffffff 0%, #cbd5e1 15%, #64748b 50%, #1e293b 90%)",
-                       boxShadow: "inset -2px -2px 6px rgba(0,0,0,0.6), inset 2px 2px 6px rgba(255,255,255,0.8), 0 5px 15px rgba(0,0,0,0.5)"
-                     }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-slate-900 mix-blend-overlay">
-                    <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                  {/* Sharp metallic specular */}
-                  <div className="absolute top-1.5 left-2.5 w-4 h-2 bg-white/90 rounded-full blur-[1px] rotate-[-45deg]" />
-                </div>
-              </div>
-            </div>
-          </motion.div>
         </div>
 
 
@@ -1267,14 +1263,14 @@ export function BentoGridRedesign() {
               
               {/* Rotating Ring 1 (Slow) */}
               <motion.div
-                animate={{ rotate: 360 }}
+                animate={bentoInView ? { rotate: 360 } : undefined}
                 transition={{ duration: 25, ease: "linear", repeat: Infinity }}
                 className="absolute inset-0 rounded-full border border-white/10 border-t-white/40 border-l-transparent"
               />
 
               {/* Rotating Ring 2 (Counter-Rotate) */}
               <motion.div
-                animate={{ rotate: -360 }}
+                animate={bentoInView ? { rotate: -360 } : undefined}
                 transition={{ duration: 20, ease: "linear", repeat: Infinity }}
                 className="absolute inset-2 rounded-full border border-white/5 border-b-white/30 border-r-transparent"
               />

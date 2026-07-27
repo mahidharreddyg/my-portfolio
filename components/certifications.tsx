@@ -114,7 +114,7 @@ function Background() {
 
       ctx.save();
       const horizon = H * 0.45;
-      ctx.strokeStyle = "rgba(56,189,248,0.15)";
+      ctx.strokeStyle = "rgba(var(--tc2-rgb),0.15)";
       ctx.lineWidth = 0.5;
 
       for (let i = -14; i <= 14; i++) {
@@ -129,7 +129,7 @@ function Background() {
         const p = (j / 14) ** 2;
         const y = horizon + (H - horizon) * p;
         const alpha = 0.15 * (1 - j / 15);
-        ctx.strokeStyle = `rgba(56,189,248,${alpha})`;
+        ctx.strokeStyle = `rgba(var(--tc2-rgb),${alpha})`;
         ctx.beginPath();
         ctx.moveTo(0, y);
         ctx.lineTo(W, y);
@@ -186,17 +186,32 @@ function Background() {
 ───────────────────────────────────────────────────────────────────────────── */
 function Card({ cert, onClick, i, showIds }: { cert: Cert; onClick: () => void; i: number; showIds: boolean }) {
   const [hov, setHov] = useState(false);
-  const [pos, setPos] = useState({ x: 0.5, y: 0.5 });
   const el = useRef<HTMLDivElement>(null);
+  const moveRaf = useRef<number | null>(null);
 
   const move = (e: React.MouseEvent) => {
-    if (!el.current) return;
-    const r = el.current.getBoundingClientRect();
-    setPos({ x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height });
+    const node = el.current;
+    if (!node) return;
+    const clientX = e.clientX;
+    const clientY = e.clientY;
+    if (moveRaf.current !== null) return;
+    moveRaf.current = requestAnimationFrame(() => {
+      moveRaf.current = null;
+      const r = node.getBoundingClientRect();
+      const x = (clientX - r.left) / r.width;
+      const y = (clientY - r.top) / r.height;
+      const rx = (y - 0.5) * -10;
+      const ry = (x - 0.5) * 10;
+      node.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-9px)`;
+      node.style.setProperty("--gx", `${x * 100}%`);
+      node.style.setProperty("--gy", `${y * 100}%`);
+    });
   };
 
-  const rx = hov ? (pos.y - 0.5) * -10 : 0;
-  const ry = hov ? (pos.x - 0.5) * 10 : 0;
+  useEffect(() => () => {
+    if (moveRaf.current !== null) cancelAnimationFrame(moveRaf.current);
+  }, []);
+
   const h = cert.hue;
 
   return (
@@ -204,20 +219,24 @@ function Card({ cert, onClick, i, showIds }: { cert: Cert; onClick: () => void; 
       ref={el}
       onClick={onClick}
       onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => { setHov(false); setPos({ x: 0.5, y: 0.5 }); }}
+      onMouseLeave={() => {
+        setHov(false);
+        if (el.current) el.current.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)";
+      }}
       onMouseMove={move}
       style={{
         position: "relative", cursor: "pointer",
-        transform: `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(${hov ? -9 : 0}px)`,
-        transition: "transform 0.36s cubic-bezier(.34,1.56,.64,1)",
+        transform: "perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)",
+        transition: "transform 0.36s cubic-bezier(.22,1,.36,1)",
         animation: `cardIn .58s ${i * .07}s both`,
-
+        ["--gx" as any]: "50%",
+        ["--gy" as any]: "50%",
       }}
     >
       <div style={{
         position: "absolute", inset: -2, borderRadius: 22, zIndex: 0, pointerEvents: "none",
         opacity: hov ? 1 : 0, transition: "opacity .3s",
-        background: `radial-gradient(ellipse at ${pos.x * 100}% ${pos.y * 100}%, hsla(${h}, 80%, 62%, 0.25) 0%, transparent 68%)`,
+        background: `radial-gradient(ellipse at var(--gx) var(--gy), hsla(${h}, 80%, 62%, 0.25) 0%, transparent 68%)`,
         filter: "blur(4px)",
       }} />
 
@@ -366,7 +385,7 @@ function Modal({ cert, onClose }: { cert: Cert; onClose: () => void }) {
     >
       <div style={{
         width: "100%", maxWidth: 540, position: "relative",
-        animation: "modalUp .46s cubic-bezier(.34,1.56,.64,1) both",
+        animation: "modalUp .46s cubic-bezier(.22,1,.36,1) both",
         opacity: 1 // Explicit opacity to prevent invisibility if animation glitches
       }}>
         {/* gradient border */}
@@ -519,11 +538,11 @@ function Modal({ cert, onClose }: { cert: Cert; onClose: () => void }) {
                   </div>
                   <div style={{ height: 3, borderRadius: 2, background: "rgba(255,255,255,.05)", overflow: "hidden" }}>
                     <div style={{
-                      height: "100%", borderRadius: 2,
+                      height: "100%", width: `${s.val}%`, borderRadius: 2, transformOrigin: "left",
                       background: `linear-gradient(90deg,hsla(${h},90%,55%,.9),hsla(${(h + 50) % 360},90%,65%,.85))`,
                       boxShadow: `0 0 10px hsla(${h},90%,55%,.38)`,
-                      width: ready ? `${s.val}%` : "0%",
-                      transition: `width .88s ${idx * .11}s cubic-bezier(.34,1.56,.64,1)`,
+                      transform: ready ? "scaleX(1)" : "scaleX(0)",
+                      transition: `transform .88s ${idx * .11}s cubic-bezier(.22,1,.36,1)`,
                     }} />
                   </div>
                 </div>
@@ -587,8 +606,7 @@ export default function Certifications() {
       }}
     >
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
-        :root { --display: 'DM Sans', sans-serif; --mono: 'JetBrains Mono', monospace; }
+        :root { --display: var(--font-malinton), sans-serif; --mono: var(--font-jetbrains-mono), monospace; }
         @keyframes cardIn {
           from { opacity:0; transform:perspective(1100px) rotateX(10deg) translateY(30px) scale(.94); }
           to   { opacity:1; transform:perspective(1100px) rotateX(0) translateY(0) scale(1); }
@@ -602,6 +620,30 @@ export default function Certifications() {
       <Background />
 
       <div style={{ position: "relative", zIndex: 10, width: "100%", maxWidth: 1100, padding: "0 2rem" }}>
+
+        {/* Section heading */}
+        <div style={{ marginBottom: "2rem", animation: "titleIn .6s ease both" }}>
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 14,
+            fontFamily: "var(--mono)", fontSize: 11, letterSpacing: "0.3em",
+            textTransform: "uppercase", color: "rgba(120,170,255,0.75)",
+          }}>
+            <span style={{ width: 34, height: 1, background: "linear-gradient(90deg, rgba(var(--tc2-rgb),0.6), transparent)" }} />
+            Proof of work
+          </div>
+          <h2 style={{
+            fontFamily: "var(--display)", fontWeight: 800, letterSpacing: "-0.03em",
+            fontSize: "clamp(36px, 6vw, 66px)", lineHeight: 0.98, color: "#fff", margin: 0,
+          }}>
+            Certifications<span style={{ color: "#38bdf8" }}>.</span>
+          </h2>
+          <p style={{
+            marginTop: 14, maxWidth: "48ch", fontSize: 14, lineHeight: 1.6,
+            color: "rgba(255,255,255,0.42)",
+          }}>
+            Verified credentials across cloud, AI/ML, and DevOps — the archive behind the architecture.
+          </p>
+        </div>
 
         {/* Header Terminal */}
         <div style={{

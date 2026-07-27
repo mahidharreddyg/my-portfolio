@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 1, "column": 0}, "map": {"version":3,"sources":["turbopack:///[project]/app/malinton_f918b2c4.module.css"],"sourcesContent":["@font-face {\n    \nfont-family: 'malinton';\n    src: url('@vercel/turbopack-next/internal/font/local/font?{%22path%22:%22./fonts/Malinton%20Font/MalintontrialversionExtbd-5y9Wj.otf%22,%22preload%22:true,%22has_size_adjust%22:true}') format('opentype');\n    font-display: swap;\n    \n}\n\n@font-face {\n    font-family: 'malinton Fallback';\n    src: local(\"Arial\");\n    ascent-override: 64.02%;\ndescent-override: 21.34%;\nline-gap-override: 8.54%;\nsize-adjust: 117.15%;\n\n}\n\n.className {\n    font-family: 'malinton', 'malinton Fallback';\n    \n}\n.variable {\n    --font-malinton: 'malinton', 'malinton Fallback';\n}\n\n"],"names":[],"mappings":"AAAA;;;;;;AAQA;;;;;;;;;AAUA;;;;AAIA"}}]
-}
