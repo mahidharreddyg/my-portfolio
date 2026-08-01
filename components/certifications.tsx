@@ -81,7 +81,7 @@ function Background() {
 
     const resize = () => {
       const parent = c.parentElement;
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       if (parent) {
         c.width = parent.offsetWidth * dpr;
         c.height = parent.offsetHeight * dpr;
@@ -622,7 +622,24 @@ export default function Certifications() {
       <div style={{ position: "relative", zIndex: 10, width: "100%", maxWidth: 1100, padding: "0 2rem" }}>
 
         {/* Section heading */}
-        <div style={{ marginBottom: "2rem", animation: "titleIn .6s ease both" }}>
+        <div style={{ position: "relative", marginBottom: "2rem", animation: "titleIn .6s ease both" }}>
+          {/* Oversized faint watermark behind the heading — same motif as
+              the Experience section's GhostYear: the word itself, huge and
+              low-opacity, as texture rather than a literal label. */}
+          <span
+            aria-hidden
+            style={{
+              position: "absolute", left: "-4px", top: "-1.1em",
+              fontFamily: "var(--display)", fontWeight: 800,
+              fontSize: "clamp(80px, 12vw, 150px)", letterSpacing: "-5px",
+              whiteSpace: "nowrap", pointerEvents: "none", userSelect: "none",
+              background: "linear-gradient(180deg, rgba(var(--tc2-rgb),0.14) 0%, rgba(var(--tc2-rgb),0) 100%)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+              WebkitTextStroke: "1px rgba(var(--tc2-rgb),0.08)",
+            }}
+          >
+            CERTS
+          </span>
           <div style={{
             display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 14,
             fontFamily: "var(--mono)", fontSize: 11, letterSpacing: "0.3em",

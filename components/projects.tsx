@@ -532,9 +532,30 @@ export default function Projects() {
             </div>
 
             {/* ── RIGHT: info panel ── */}
-            <div className="flex-1 flex flex-col gap-0 self-center">
+            <div className="relative flex-1 flex flex-col gap-0 self-center">
 
-              <div className="flex items-center gap-2 mb-5 text-[10px]" style={{ fontFamily: "var(--font-jetbrains-mono),monospace", color: "rgba(255,255,255,0.2)" }}>
+              {/* Oversized faint watermark behind the heading — same motif
+                  as the Experience section's GhostYear: the word itself,
+                  huge and low-opacity, as texture rather than a literal label. */}
+              <span
+                aria-hidden
+                className="absolute select-none pointer-events-none whitespace-nowrap"
+                style={{
+                  left: "-6px", top: "-0.5em",
+                  fontFamily: "var(--font-malinton),var(--font-jetbrains-mono),monospace",
+                  fontWeight: 800,
+                  fontSize: "clamp(64px, 10vw, 130px)",
+                  letterSpacing: "-4px",
+                  background: `linear-gradient(180deg, rgba(${project.accentRgb},0.16) 0%, rgba(${project.accentRgb},0) 100%)`,
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  WebkitTextStroke: `1px rgba(${project.accentRgb},0.08)`,
+                }}
+              >
+                PROJECTS
+              </span>
+
+              <div className="relative flex items-center gap-2 mb-5 text-[10px]" style={{ fontFamily: "var(--font-jetbrains-mono),monospace", color: "rgba(255,255,255,0.2)" }}>
                 <span>~/projects/</span>
                 <GlitchText
                   value={project.name.toLowerCase().replace(/\s/g, "-")}

@@ -486,7 +486,7 @@ function TimelineCanvas({
         lastTsRef.current = timestamp;
       }
       const t = timeRef.current;
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       if (canvas.width !== W * dpr || canvas.height !== H * dpr) {
         canvas.width = W * dpr;
         canvas.height = H * dpr;
